@@ -7,9 +7,9 @@ import {
 it('none match', () => {
 	const result = new AndMatcher([
 		new MethodMatcher(['POST']),
-		new MethodMatcher(['POST']),
-	])
-		.match(httpMocks.createRequest(), httpMocks.createResponse())
+		new ExactUrlPathnameMatcher(['/test']),
+	]).match(httpMocks.createRequest(), httpMocks.createResponse())
+
 	expect(result).toStrictEqual({
 		matched: false,
 	})
@@ -20,6 +20,7 @@ it('first match, second not', () => {
 		new MethodMatcher(['GET']),
 		new ExactUrlPathnameMatcher(['/test']),
 	]).match(httpMocks.createRequest(), httpMocks.createResponse())
+
 	expect(result).toStrictEqual({
 		matched: false,
 	})
@@ -35,6 +36,7 @@ it('first not match, but second', () => {
 		new MethodMatcher(['GET']),
 		new ExactUrlPathnameMatcher(['/test']),
 	]).match(request, httpMocks.createResponse())
+
 	expect(result).toStrictEqual({
 		matched: false,
 	})
@@ -49,6 +51,7 @@ it('both match', () => {
 		new MethodMatcher(['GET']),
 		new ExactUrlPathnameMatcher(['/test']),
 	]).match(request, httpMocks.createResponse())
+
 	expect(result).toStrictEqual({
 		matched: true,
 		and: [

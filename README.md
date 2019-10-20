@@ -20,6 +20,34 @@ This router is intended to be used with native node http interface. Features:
 - Can be used with [path-to-regexp](https://github.com/pillarjs/path-to-regexp).
 - Work with another servers? Tell it me!
 
+First example with micro
+------------------------
+```typescript
+// specify default handler
+const router = new Router((req, res) => sendError(req, res, { statusCode: 404 }))
+
+router.addRoute({
+	matcher: new ExactUrlPathnameMatcher(['/hello']),
+	handler: () => 'Hello kitty!',
+})
+
+
+const [address, port] = ['localhost', 8080]
+http.createServer(micro(router.serve)).listen(port, address)
+```
+
+
+Installation
+------------
+
+Choose for one of your favourite package manager:
+
+```bash
+pnpm install @bessonovs/node-http-router
+npm install @bessonovs/node-http-router
+yarn add @bessonovs/node-http-router
+```
+
 License
 -------
 

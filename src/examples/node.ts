@@ -16,7 +16,7 @@ yarn example-node-start
 */
 
 const router = new Router((req, res) => {
-	res.write('not found')
+	res.statusCode = 404
 	res.end()
 })
 
