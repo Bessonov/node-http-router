@@ -5,7 +5,7 @@ import {
 	MatchResult, Matched, Matcher, isMatched,
 } from './matchers'
 
-type Handler<MR extends MatchResult> = (
+export type Handler<MR extends MatchResult> = (
 	req: IncomingMessage,
 	res: ServerResponse,
 	matchResult: Matched<MR>) => any // eslint-disable-line @typescript-eslint/no-explicit-any

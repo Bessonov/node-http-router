@@ -19,7 +19,7 @@ implements Matcher<ExactUrlPathnameMatchResult<U>> {
 		/* istanbul ignore else */
 		if (req.url !== undefined) {
 			const { pathname } = Url.parse(req.url)
-			if (pathname !== undefined && this.urls.indexOf(pathname) >= 0) {
+			if (pathname !== null && this.urls.indexOf(pathname) >= 0) {
 				return {
 					matched: true,
 					pathname,
