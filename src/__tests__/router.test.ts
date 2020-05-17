@@ -4,14 +4,17 @@ import {
 import {
 	createRequest, createResponse,
 } from 'node-mocks-http'
-import pathToRegexp from 'path-to-regexp'
+import {
+	compile, pathToRegexp,
+} from 'path-to-regexp'
 import {
 	MatchedHandler, Router,
 } from '../router'
 import {
-	AndMatcher, ExactUrlPathnameMatcher, MethodMatcher,
+	AndMatcher, EndpointMatcher, ExactUrlPathnameMatcher,
+	MethodMatcher,
 } from '../matchers'
-import { EndpointMatcher } from '../matchers/EndpointMatcher'
+
 
 let router: Router
 
@@ -58,7 +61,7 @@ it('match POST /test route', () => {
 	const handler = (
 		req: IncomingMessage,
 		res: ServerResponse,
-		match: {and: [{method: string}, {pathname: string}]}
+		match: {and: [{method: string}, {pathname: string}]},
 	) => {
 		const [{ method }, { pathname }] = match.and
 		return `matched ${method} ${pathname}`
@@ -94,7 +97,7 @@ it('match POST /group/123 endpoint', () => {
 	// define an endpoint
 	const endpoint = ((pattern: string) => ({
 		pattern: pathToRegexp(pattern),
-		path: pathToRegexp.compile<{groupId: number}>(pattern),
+		path: compile<{groupId: number}>(pattern),
 	}))('/group/:groupId')
 
 	router.addRoute({

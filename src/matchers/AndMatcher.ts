@@ -2,9 +2,8 @@ import {
 	IncomingMessage, ServerResponse,
 } from 'http'
 import {
-	MatchResult, Matched, isMatched,
-} from './MatchResult'
-import { Matcher } from './Matcher'
+	MatchResult, Matched, Matcher, isMatched,
+} from '.'
 
 export type AndMatcherResult<MR1 extends MatchResult, MR2 extends MatchResult> = MatchResult<{
 	and: [Matched<MR1>, Matched<MR2>]
