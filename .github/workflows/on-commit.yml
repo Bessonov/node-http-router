@@ -1,0 +1,21 @@
+name: On commit hook
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2.0.0
+      - name: Read .nvmrc
+        id: nvm
+        run: echo ::set-output name=NVMRC::$(cat .nvmrc)
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '${{ steps.nvm.outputs.NVMRC }}'
+      - name: prepare dependencies
+        run: npm install
+      - name: test
+        run: npm run precommit

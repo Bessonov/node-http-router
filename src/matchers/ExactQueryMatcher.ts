@@ -44,7 +44,6 @@ implements Matcher<ExactQueryMatchResult<U>> {
 				params = query.split(/&/).reduce((acc, parts) => {
 					const part = parts.split(/=/)
 					const [key, value] = part
-					// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 					// @ts-ignore
 					acc[key] = value
 					return acc

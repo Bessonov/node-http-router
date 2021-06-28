@@ -15,7 +15,6 @@ import {
 	MethodMatcher,
 } from '../matchers'
 
-
 let router: Router
 
 beforeEach(() => {
