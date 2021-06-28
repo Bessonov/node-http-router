@@ -3,7 +3,6 @@ import {
 	AndMatcher, ExactUrlPathnameMatcher, MethodMatcher,
 } from '..'
 
-
 it('none match', () => {
 	const result = new AndMatcher([
 		new MethodMatcher(['POST']),

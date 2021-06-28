@@ -1,5 +1,3 @@
-import { U } from 'ts-toolbelt'
-
 type MatchedResult = {
 	matched: true
 }
@@ -8,12 +6,12 @@ type UnmatchedResult = {
 	matched: false
 }
 
-export type MatchResult<T = {}> = UnmatchedResult | MatchedResult & T
+export type MatchResult<T = Record<string, unknown>> = UnmatchedResult | MatchedResult & T
 
 /**
  * reperesent matcher result which is matched
  */
-export type Matched<MR extends MatchResult> = U.Select<MR, MatchedResult>
+export type Matched<MR extends MatchResult> = Extract<MR, MatchedResult>
 
 /**
  * check for matched result

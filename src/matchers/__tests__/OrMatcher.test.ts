@@ -3,7 +3,6 @@ import {
 	ExactUrlPathnameMatcher, MethodMatcher, OrMatcher,
 } from '..'
 
-
 it('none match', () => {
 	const result = new OrMatcher([
 		new MethodMatcher(['DELETE']),

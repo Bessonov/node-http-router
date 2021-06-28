@@ -1,5 +1,6 @@
 module.exports = {
 	root: true,
+	reportUnusedDisableDirectives: true,
 	env: {
 		node: true,
 		jest: true,
@@ -14,6 +15,14 @@ module.exports = {
 		'@bessonovs/eslint-config/typescript',
 	],
 	parser: '@typescript-eslint/parser',
+	parserOptions: {
+		project: [
+			'./tsconfig.json',
+		],
+	},
+	ignorePatterns: [
+		'.eslintrc.js',
+	],
 	rules: {
 		'arrow-body-style': 'off',
 		'lines-between-class-members': 'off',
