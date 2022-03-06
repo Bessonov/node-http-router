@@ -43,7 +43,7 @@ it('match second', () => {
 })
 
 it('match group', () => {
-	const result = new RegExpUrlMatcher<{groups: {groupId: string}}>([/^\/group\/(?<groupId>[^/]+)$/])
+	const result = new RegExpUrlMatcher<{ groupId: string }>([/^\/group\/(?<groupId>[^/]+)$/])
 		.match(httpMocks.createRequest({
 			url: '/group/123',
 		}))

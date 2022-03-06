@@ -1,7 +1,8 @@
 import http from 'http'
 import { Router } from '../router'
 import {
-	EndpointMatcher, ExactUrlPathnameMatcher,
+	EndpointMatcher,
+	ExactUrlPathnameMatcher,
 } from '../matchers'
 
 /*
@@ -31,7 +32,7 @@ server.once('listening', () => {
 
 router.addRoute({
 	// it's not necessary to type the matcher, but it give you a confidence
-	matcher: new EndpointMatcher<{groups: {name: string}}>('GET', /^\/hello\/(?<name>[^/]+)$/),
+	matcher: new EndpointMatcher<{ name: string }>('GET', /^\/hello\/(?<name>[^/]+)$/),
 	handler: (req, res, match) => {
 		res.write(`Hello ${match.match.groups.name}!`)
 		res.end()

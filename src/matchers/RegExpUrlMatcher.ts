@@ -2,11 +2,19 @@ import { IncomingMessage } from 'http'
 import { Matcher } from './Matcher'
 import { MatchResult } from './MatchResult'
 
-export type RegExpUrlMatchResult<R extends Partial<RegExpExecArray>> = MatchResult<{
-	match: RegExpExecArray & R
+export interface RegExpExecGroupArray<
+	T extends object
+> extends Array<string> {
+	index: number
+	input: string
+	groups: T
+}
+
+export type RegExpUrlMatchResult<R extends object> = MatchResult<{
+	match: RegExpExecGroupArray<R>
 }>
 
-export class RegExpUrlMatcher<R extends Partial<RegExpExecArray>>
+export class RegExpUrlMatcher<R extends object>
 implements Matcher<RegExpUrlMatchResult<R>> {
 	constructor(private readonly urls: [RegExp, ...RegExp[]]) {
 	}
@@ -14,7 +22,7 @@ implements Matcher<RegExpUrlMatchResult<R>> {
 	match(req: IncomingMessage): RegExpUrlMatchResult<R> {
 		if (req.url) {
 			for (const url of this.urls) {
-				const result = url.exec(req.url) as never as RegExpExecArray & R
+				const result = url.exec(req.url) as never as RegExpExecGroupArray<R>
 				if (result !== null) {
 					return {
 						matched: true,
