@@ -1,2 +1,3 @@
 export * from './matchers'
-export type { Route, Router, MatchedHandler } from './router'
+export type { Route, MatchedHandler } from './router'
+export { Router } from './router'
