@@ -1,6 +1,6 @@
 {
 	"name": "@bessonovs/node-http-router",
-	"version": "0.0.7",
+	"version": "0.0.8",
 	"description": "Extensible http router for node and micro",
 	"keywords": [
 		"router",
