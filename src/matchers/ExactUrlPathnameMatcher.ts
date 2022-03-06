@@ -1,5 +1,5 @@
 import { IncomingMessage } from 'http'
-import Url from 'fast-url-parser'
+import Url from 'urlite'
 import { Matcher } from './Matcher'
 import { MatchResult } from './MatchResult'
 
@@ -18,8 +18,9 @@ implements Matcher<ExactUrlPathnameMatchResult<U>> {
 	match(req: IncomingMessage): ExactUrlPathnameMatchResult<U> {
 		/* istanbul ignore else */
 		if (req.url !== undefined) {
-			const { pathname } = Url.parse(req.url)
-			if (pathname !== null && this.urls.indexOf(pathname) >= 0) {
+			// original URL returns '/' if pathname is empty
+			const pathname = Url.parse(req.url).pathname ?? '/'
+			if (this.urls.indexOf(pathname) >= 0) {
 				return {
 					matched: true,
 					pathname,

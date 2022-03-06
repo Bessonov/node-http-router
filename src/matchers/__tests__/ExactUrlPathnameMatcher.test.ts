@@ -1,16 +1,29 @@
 import * as httpMocks from 'node-mocks-http'
 import { ExactUrlPathnameMatcher } from '..'
 
-it('not match', () => {
+it('not match empty', () => {
 	const result = new ExactUrlPathnameMatcher(['/test'])
 		.match(httpMocks.createRequest())
 	expect(result).toStrictEqual({
 		matched: false,
 	})
 })
-it('not match', () => {
+
+it('not match with postfix', () => {
 	const result = new ExactUrlPathnameMatcher(['/test'])
-		.match(httpMocks.createRequest())
+		.match(httpMocks.createRequest({
+			url: '/test2',
+		}))
+	expect(result).toStrictEqual({
+		matched: false,
+	})
+})
+
+it('not match prefix', () => {
+	const result = new ExactUrlPathnameMatcher(['/test'])
+		.match(httpMocks.createRequest({
+			url: '/tes',
+		}))
 	expect(result).toStrictEqual({
 		matched: false,
 	})

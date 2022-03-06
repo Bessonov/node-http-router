@@ -1,5 +1,5 @@
 import { IncomingMessage } from 'http'
-import Url from 'fast-url-parser'
+import Url from 'urlite'
 import { Matcher } from './Matcher'
 import { MatchResult } from './MatchResult'
 
@@ -29,19 +29,20 @@ export type ExactQueryMatchResult<U extends QueryMatch> = MatchResult<{
 export class ExactQueryMatcher<U extends QueryMatch>
 implements Matcher<ExactQueryMatchResult<U>> {
 	private readonly listConfig: [string, string | true | false | undefined][]
-	constructor(private readonly config: U) {
+	constructor(config: U) {
 		this.listConfig = Object.entries(config)
 	}
 
 	match(req: IncomingMessage): ExactQueryMatchResult<U> {
 		/* istanbul ignore else */
 		if (req.url !== undefined) {
-			const { query } = Url.parse(req.url)
+			// original URL returns '' if search is empty
+			const search = Url.parse(req.url).search ?? ''
 
 			// parse query string into dict
 			let params = {} as QueryResult<U>
-			if (query !== null) {
-				params = query.split(/&/).reduce((acc, parts) => {
+			if (search !== '') {
+				params = search.substring(1).split(/&/).reduce((acc, parts) => {
 					const part = parts.split(/=/)
 					const [key, value] = part
 					// @ts-ignore
