@@ -1,8 +1,9 @@
 import http from 'http'
-import micro, { sendError } from 'micro'
+import micro, { send } from 'micro'
 import { Router } from '../router'
 import {
-	EndpointMatcher, ExactUrlPathnameMatcher,
+	EndpointMatcher,
+	ExactUrlPathnameMatcher,
 } from '../matchers'
 
 /*
@@ -17,7 +18,7 @@ yarn example-micro-start
 
 */
 
-const router = new Router((req, res) => sendError(req, res, { statusCode: 404 }))
+const router = new Router((req, res) => send(res, 404))
 
 const [address, port] = ['localhost', 8080]
 

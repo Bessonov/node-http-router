@@ -8,52 +8,141 @@ Router for Node.js, micro and others
 This router is intended to be used with native node http interface. Features:
 - Written in TypeScript with focus on type safety.
 - Extensible via [`Matcher`](src/matchers/Matcher.ts) and [`MatchResult`](src/matchers/MatchResult.ts) interfaces.
-- Works with [native node http server](https://nodejs.org/api/http.html#http_class_http_server) ([example](src/examples/node.ts)).
-- Works with [micro](https://github.com/zeit/micro) ([example](src/examples/micro.ts)).
+- Works with [native node http server](#usage-with-native-node-http-server).
+- Works with [micro](#usage-with-micro).
 - Offers a set of matchers:
+  - [`MethodMatcher`](#methodmatcher)
+  - [`ExactUrlPathnameMatcher`](#exacturlpathnamematcher)
+  - [`ExactQueryMatcher`](#exactquerymatcher)
+  - Powerful [`RegExpUrlMatcher`](#regexpurlmatcher)
+  - Convenient [`EndpointMatcher`](#endpointmatcher)
   - `AndMatcher` and `OrMatcher`
-  - `ExactQueryMatcher`
-  - Convenient `EndpointMatcher`
-  - `ExactUrlPathnameMatcher`
-  - `MethodMatcher`
-  - Powerful `RegExpUrlMatcher`
 - Can be used with [path-to-regexp](https://github.com/pillarjs/path-to-regexp).
 - Work with another servers? Tell it me!
 
-First example with micro
-------------------------
+## Installation
+
+Choose for one of your favourite package manager:
+
+```bash
+npm install @bessonovs/node-http-router
+yarn add @bessonovs/node-http-router
+pnpm add @bessonovs/node-http-router
+```
+
+## Documentation and examples
+
+### Usage with native node http server
+
 ```typescript
-// specify default handler
-const router = new Router((req, res) => sendError(req, res, { statusCode: 404 }))
+const router = new Router((req, res) => {
+	res.statusCode = 404
+	res.end()
+})
+
+const server = http.createServer(router.serve).listen(8080, 'localhost')
 
 router.addRoute({
 	matcher: new ExactUrlPathnameMatcher(['/hello']),
 	handler: () => 'Hello kitty!',
 })
-
-
-const [address, port] = ['localhost', 8080]
-http.createServer(micro(router.serve)).listen(port, address)
 ```
 
+See [full example](src/examples/node.ts) and [native node http server](https://nodejs.org/api/http.html#http_class_http_server) documentation.
 
-Installation
-------------
+### Usage with micro
 
-Choose for one of your favourite package manager:
+[micro](https://github.com/vercel/micro) is a very lightweight layer around the native node http server with some convenience methods.
 
-```bash
-pnpm install @bessonovs/node-http-router
-npm install @bessonovs/node-http-router
-yarn add @bessonovs/node-http-router
+```typescript
+// specify default handler
+const router = new Router((req, res) => send(res, 404))
+
+http.createServer(micro(router.serve)).listen(8080, 'localhost')
+
+router.addRoute({
+	matcher: new ExactUrlPathnameMatcher(['/hello']),
+	handler: () => 'Hello kitty!',
+})
 ```
 
-License
--------
+See [full example](src/examples/micro.ts).
+
+### MethodMatcher
+
+Method matcher is the simplest matcher and matches any of the passed http methods:
+
+```typescript
+router.addRoute({
+	matcher: new MethodMatcher(['OPTIONS', 'POST']),
+	// method is either OPTIONS or POST
+	handler: (req, res, { method }) => `Method: ${method}`,
+})
+```
+
+### ExactUrlPathnameMatcher
+
+Matches given pathnames (but ignores query parameters):
+
+```typescript
+router.addRoute({
+	matcher: new ExactUrlPathnameMatcher(['/v1/graphql', '/v2/graphql']),
+	// pathname is /v1/graphql or /v2/graphql
+	handler: (req, res, { pathname }) => `Path is ${pathname}`,
+})
+```
+
+### ExactQueryMatcher
+
+Defines expectations on query parameters:
+
+```typescript
+router.addRoute({
+	matcher: new ExactQueryMatcher({
+		// example of 4 query parameters:
+		// true defines mandatory parameters
+		mustPresent: true,
+		// false defines parameters expected to absent
+		mustAbsent: false,
+		// undefined defines optional parameters. They
+		// aren't used for matching, but available as type
+		isOptional: undefined,
+		// a string defines expected parameter name and value
+		mustExact: 'exactValue',
+	}),
+	// query parameter isOptional has type string | undefined
+	handler: (req, res, { query }) => query.isOptional,
+})
+```
+
+### RegExpUrlMatcher
+
+Allows powerful expressions:
+
+```typescript
+router.addRoute({
+	matcher: new RegExpUrlMatcher<{ userId: string }>([/^\/group\/(?<userId>[^/]+)$/]),
+	handler: (req, res, { match }) => `User id is: ${match.groups.userId}`,
+})
+```
+Ordinal parameters can be used too. Be aware that regular expression must match the whole base url (also with query parameters) and not only `pathname`.
+
+### EndpointMatcher
+
+EndpointMatcher is a combination of Method and RegExpUrl matcher for convenient usage:
+
+```typescript
+router.addRoute({
+	matcher: new EndpointMatcher<{ userId: string }>('GET', /^\/group\/(?<userId>[^/]+)$/),
+	handler: (req, res, { match }) => `Group id is: ${match.groups.userId}`,
+})
+```
+
+## License
 
 The MIT License (MIT)
 
-Copyright (c) 2019, Anton Bessonov
+Copyright (c) 2019 - today, Anton Bessonov
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
