@@ -1,10 +1,14 @@
 import {
-	IncomingMessage, ServerResponse,
+	IncomingMessage,
+	ServerResponse,
 } from 'http'
 import {
-	MatchResult, isMatched,
+	MatchResult,
+	isMatched,
 } from './MatchResult'
-import { Matcher } from './Matcher'
+import {
+	Matcher,
+} from './Matcher'
 
 export type OrMatcherResult<MR1 extends MatchResult, MR2 extends MatchResult> = MatchResult<{
 	or: [MR1, MR2]

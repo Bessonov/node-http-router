@@ -2,14 +2,20 @@ import {
 	IncomingMessage,
 	ServerResponse,
 } from 'http'
-import { Matcher } from './Matcher'
-import { MatchResult } from './MatchResult'
+import {
+	Matcher,
+} from './Matcher'
+import {
+	MatchResult,
+} from './MatchResult'
 import {
 	Method,
 	MethodMatchResult,
 	MethodMatcher,
 } from './MethodMatcher'
-import { AndMatcher } from './AndMatcher'
+import {
+	AndMatcher,
+} from './AndMatcher'
 import {
 	RegExpExecGroupArray,
 	RegExpUrlMatchResult,

@@ -32,7 +32,11 @@ pnpm add @bessonovs/node-http-router
 
 ## Documentation and examples
 
-### Usage with native node http server
+### Binding
+
+The router works with native http interfaces like `IncomingMessage` and `ServerResponse`. Therefore it should be possible to use it with most of existing servers.
+
+#### Usage with native node http server
 
 ```typescript
 const router = new Router((req, res) => {
@@ -50,7 +54,7 @@ router.addRoute({
 
 See [full example](src/examples/node.ts) and [native node http server](https://nodejs.org/api/http.html#http_class_http_server) documentation.
 
-### Usage with micro
+#### Usage with micro
 
 [micro](https://github.com/vercel/micro) is a very lightweight layer around the native node http server with some convenience methods.
 
@@ -68,7 +72,11 @@ router.addRoute({
 
 See [full example](src/examples/micro.ts).
 
-### MethodMatcher
+### Matchers
+
+In the core, matchers are responsible to decide if particular handler should be called or not. There is no magic: matchers are interated on every request and first positive "match" calls defined handler.
+
+#### MethodMatcher ([source](./src/matchers/MethodMatcher.ts))
 
 Method matcher is the simplest matcher and matches any of the passed http methods:
 
@@ -80,7 +88,7 @@ router.addRoute({
 })
 ```
 
-### ExactUrlPathnameMatcher
+#### ExactUrlPathnameMatcher ([source](./src/matchers/ExactUrlPathnameMatcher.ts))
 
 Matches given pathnames (but ignores query parameters):
 
@@ -92,7 +100,7 @@ router.addRoute({
 })
 ```
 
-### ExactQueryMatcher
+#### ExactQueryMatcher ([source](./src/matchers/ExactQueryMatcher.ts))
 
 Defines expectations on query parameters:
 
@@ -115,7 +123,7 @@ router.addRoute({
 })
 ```
 
-### RegExpUrlMatcher
+#### RegExpUrlMatcher ([source](./src/matchers/RegExpUrlMatcher.ts))
 
 Allows powerful expressions:
 
@@ -127,7 +135,7 @@ router.addRoute({
 ```
 Ordinal parameters can be used too. Be aware that regular expression must match the whole base url (also with query parameters) and not only `pathname`.
 
-### EndpointMatcher
+#### EndpointMatcher ([source](./src/matchers/EndpointMatcher.ts))
 
 EndpointMatcher is a combination of Method and RegExpUrl matcher for convenient usage:
 
@@ -138,9 +146,92 @@ router.addRoute({
 })
 ```
 
+### Middleware
+
+Currently, there is no built-in API for middlewares. It seems like there is no aproach to provide centralized and typesafe way for middlewares. And it need some conceptual work, before it will be added. Open an issue, if you have a great idea!
+
+But well, handler can be wrapped like:
+
+```typescript
+// example of a generic middleware, not a cors middleware!
+function corsMiddleware(origin: string) {
+	return function corsWrapper<T extends MatchResult>(
+		wrappedHandler: Handler<T>,
+	): Handler<T> {
+		return async function corsHandler(req, res, ...args) {
+			// -> executed before handler
+			// it's even possible to skip the handler at all
+			const result = await wrappedHandler(req, res, ...args)
+			// -> executed after handler, like:
+			res.setHeader('Access-Control-Allow-Origin', origin)
+			return result
+		}
+	}
+}
+
+// create a configured instance of middleware
+const cors = corsMiddleware('http://0.0.0.0:8080')
+
+router.addRoute({
+	matcher: new MethodMatcher(['OPTIONS', 'POST']),
+	// use it
+	handler: cors((req, res, { method }) => `Method: ${method}`),
+})
+```
+
+Of course you can create a `middlewares` wrapper and put all middlewares inside it:
+```typescript
+type Middleware<T extends (handler: Handler<MatchResult>) => Handler<MatchResult>> = Parameters<Parameters<T>[0]>[2]
+
+function middlewares<T extends MatchResult>(
+	handler: Handler<T, Matched<T>
+		& Middleware<typeof session>
+		& Middleware<typeof cors>>,
+): Handler<T> {
+	return function middlewaresHandler(...args) {
+		// @ts-expect-error
+		return cors(session(handler(...args)))
+	}
+}
+
+router.addRoute({
+	matcher,
+	// use it
+	handler: middlewares((req, res, { csrftoken }) => `Token: ${csrftoken}`),
+})
+```
+
+Apropos typesafety. You can modify types in middleware:
+
+```typescript
+function valueMiddleware(myValue: string) {
+	return function valueWrapper<T extends MatchResult>(
+		handler: Handler<T, Matched<T> & {
+			// add additional type
+			myValue: string
+		}>,
+	): Handler<T> {
+		return function valueHandler(req, res, match) {
+			return handler(req, res, {
+				...match,
+				// add additional property
+				myValue,
+			})
+		}
+	}
+}
+
+const value = valueMiddleware('world')
+
+router.addRoute({
+	matcher: new MethodMatcher(['GET']),
+	handler: value((req, res, { myValue }) => `Hello ${myValue}`),
+})
+```
+
 ## License
 
-The MIT License (MIT)
+MIT License
 
 Copyright (c) 2019 - today, Anton Bessonov
 

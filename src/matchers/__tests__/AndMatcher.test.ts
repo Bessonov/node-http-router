@@ -1,6 +1,8 @@
 import * as httpMocks from 'node-mocks-http'
 import {
-	AndMatcher, ExactUrlPathnameMatcher, MethodMatcher,
+	AndMatcher,
+	ExactUrlPathnameMatcher,
+	MethodMatcher,
 } from '..'
 
 it('none match', () => {

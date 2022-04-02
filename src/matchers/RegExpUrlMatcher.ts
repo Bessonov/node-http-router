@@ -1,6 +1,12 @@
-import { IncomingMessage } from 'http'
-import { Matcher } from './Matcher'
-import { MatchResult } from './MatchResult'
+import {
+	IncomingMessage,
+} from 'http'
+import {
+	Matcher,
+} from './Matcher'
+import {
+	MatchResult,
+} from './MatchResult'
 
 export interface RegExpExecGroupArray<
 	T extends object

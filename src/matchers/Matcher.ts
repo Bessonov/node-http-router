@@ -1,7 +1,10 @@
 import {
-	IncomingMessage, ServerResponse,
+	IncomingMessage,
+	ServerResponse,
 } from 'http'
-import { MatchResult } from './MatchResult'
+import {
+	MatchResult,
+} from './MatchResult'
 
 export type ExtractMatchResult<M> = M extends Matcher<infer MR> ? MR : never
 

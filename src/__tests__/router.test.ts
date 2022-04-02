@@ -1,17 +1,23 @@
 import {
-	IncomingMessage, ServerResponse,
+	IncomingMessage,
+	ServerResponse,
 } from 'http'
 import {
-	createRequest, createResponse,
+	createRequest,
+	createResponse,
 } from 'node-mocks-http'
 import {
-	compile, pathToRegexp,
+	compile,
+	pathToRegexp,
 } from 'path-to-regexp'
 import {
-	MatchedHandler, Router,
+	MatchedHandler,
+	Router,
 } from '../router'
 import {
-	AndMatcher, EndpointMatcher, ExactUrlPathnameMatcher,
+	AndMatcher,
+	EndpointMatcher,
+	ExactUrlPathnameMatcher,
 	MethodMatcher,
 } from '../matchers'
 
