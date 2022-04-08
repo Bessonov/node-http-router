@@ -1,7 +1,13 @@
-import { IncomingMessage } from 'http'
+import {
+	IncomingMessage,
+} from 'http'
 import Url from 'urlite'
-import { Matcher } from './Matcher'
-import { MatchResult } from './MatchResult'
+import {
+	Matcher,
+} from './Matcher'
+import {
+	MatchResult,
+} from './MatchResult'
 
 export type ExactUrlPathnameMatchResult<U extends [string, ...string[]]> = MatchResult<{
 	pathname: U[number]

@@ -1,14 +1,19 @@
 import {
-	IncomingMessage, ServerResponse,
+	IncomingMessage,
+	ServerResponse,
 } from 'http'
 import {
-	MatchResult, Matched, Matcher, isMatched,
+	MatchResult,
+	Matched,
+	Matcher,
+	isMatched,
 } from './matchers'
 
-export type Handler<MR extends MatchResult> = (
+export type Handler<MR extends MatchResult, D = Matched<MR>> = (
 	req: IncomingMessage,
 	res: ServerResponse,
-	matchResult: Matched<MR>) => any // eslint-disable-line @typescript-eslint/no-explicit-any
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	data: D) => any
 
 export type MatchedHandler<M extends Matcher> = Handler<ReturnType<M['match']>>
 

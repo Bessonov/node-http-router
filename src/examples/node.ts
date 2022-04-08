@@ -1,5 +1,7 @@
 import http from 'http'
-import { Router } from '../router'
+import {
+	Router,
+} from '../router'
 import {
 	EndpointMatcher,
 	ExactUrlPathnameMatcher,

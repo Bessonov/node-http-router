@@ -1,5 +1,7 @@
 import * as httpMocks from 'node-mocks-http'
-import { ExactQueryMatcher } from '..'
+import {
+	ExactQueryMatcher,
+} from '..'
 
 const matcher = new ExactQueryMatcher({
 	mustPresent: true,

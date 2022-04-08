@@ -1,5 +1,7 @@
 import * as httpMocks from 'node-mocks-http'
-import { ExactUrlPathnameMatcher } from '..'
+import {
+	ExactUrlPathnameMatcher,
+} from '..'
 
 it('not match empty', () => {
 	const result = new ExactUrlPathnameMatcher(['/test'])

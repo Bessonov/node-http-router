@@ -1,5 +1,7 @@
 import * as httpMocks from 'node-mocks-http'
-import { RegExpUrlMatcher } from '..'
+import {
+	RegExpUrlMatcher,
+} from '..'
 
 it('not match', () => {
 	const result = new RegExpUrlMatcher([/^\/test$/])

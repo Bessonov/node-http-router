@@ -1,6 +1,12 @@
-import { IncomingMessage } from 'http'
-import { Matcher } from './Matcher'
-import { MatchResult } from './MatchResult'
+import {
+	IncomingMessage,
+} from 'http'
+import {
+	Matcher,
+} from './Matcher'
+import {
+	MatchResult,
+} from './MatchResult'
 
 const validMethods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'] as const
 

@@ -1,5 +1,7 @@
 import * as httpMocks from 'node-mocks-http'
-import { MethodMatcher } from '..'
+import {
+	MethodMatcher,
+} from '..'
 
 it('not match', () => {
 	const result = new MethodMatcher(['POST'])

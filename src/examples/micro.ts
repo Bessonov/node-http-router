@@ -1,6 +1,10 @@
 import http from 'http'
-import micro, { send } from 'micro'
-import { Router } from '../router'
+import micro, {
+	send,
+} from 'micro'
+import {
+	Router,
+} from '../router'
 import {
 	EndpointMatcher,
 	ExactUrlPathnameMatcher,
@@ -30,7 +34,7 @@ server.once('listening', () => {
 
 router.addRoute({
 	// it's not necessary to type the matcher, but it give you a confidence
-	matcher: new EndpointMatcher<{name: string}>('GET', /^\/hello\/(?<name>[^/]+)$/),
+	matcher: new EndpointMatcher<{ name: string }>('GET', /^\/hello\/(?<name>[^/]+)$/),
 	handler: (req, res, match) => {
 		return `Hello ${match.match.groups.name}!`
 	},

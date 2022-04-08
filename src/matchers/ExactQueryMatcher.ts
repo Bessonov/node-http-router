@@ -1,7 +1,13 @@
-import { IncomingMessage } from 'http'
+import {
+	IncomingMessage,
+} from 'http'
 import Url from 'urlite'
-import { Matcher } from './Matcher'
-import { MatchResult } from './MatchResult'
+import {
+	Matcher,
+} from './Matcher'
+import {
+	MatchResult,
+} from './MatchResult'
 
 type QueryMatch = {[key: string]: string | true | false | undefined}
 

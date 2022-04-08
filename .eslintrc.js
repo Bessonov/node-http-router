@@ -32,7 +32,7 @@ module.exports = {
 			'error',
 			{
 				ImportDeclaration: {
-					minProperties: 2,
+					minProperties: 1,
 					multiline: true,
 				},
 			},
