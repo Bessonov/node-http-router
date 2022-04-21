@@ -74,7 +74,7 @@ See [full example](src/examples/micro.ts).
 
 ### Matchers
 
-In the core, matchers are responsible to decide if particular handler should be called or not. There is no magic: matchers are interated on every request and first positive "match" calls defined handler.
+In the core, matchers are responsible to decide if particular handler should be called or not. There is no magic: matchers are iterated on every request and first positive "match" calls defined handler.
 
 #### MethodMatcher ([source](./src/matchers/MethodMatcher.ts))
 
@@ -146,18 +146,49 @@ router.addRoute({
 })
 ```
 
-### Middleware
+### Middlewares
+
+**This section is highly experimental!**
 
 Currently, there is no built-in API for middlewares. It seems like there is no aproach to provide centralized and typesafe way for middlewares. And it need some conceptual work, before it will be added. Open an issue, if you have a great idea!
 
-But well, handler can be wrapped like:
+#### CorsMiddleware ([source](./src/middlewares/CorsMiddleware.ts))
+
+Example of CorsMiddleware usage:
+
+```typescript
+const corsMiddleware = CorsMiddleware({
+	origins: corsOrigins,
+})
+```
+
+Available options:
+
+```typescript
+interface CorsMiddlewareOptions {
+	// exact origins like 'http://0.0.0.0:8080' or '*'
+	origins: string[],
+	// methods like 'POST', 'GET' etc.
+	allowMethods?: HttpMethod[]
+	// headers like 'Authorization' or 'X-Requested-With'
+	allowHeaders?: string[]
+	// allows cookies in CORS scenario
+	allowCredentials?: boolean
+	// max age in seconds
+	maxAge?: number
+}
+```
+
+See source file for defaults.
+
+#### Create own middleware
 
 ```typescript
 // example of a generic middleware, not a cors middleware!
-function corsMiddleware(origin: string) {
-	return function corsWrapper<T extends MatchResult>(
-		wrappedHandler: Handler<T>,
-	): Handler<T> {
+function CorsMiddleware(origin: string) {
+	return function corsWrapper<T extends MatchResult, D extends Matched<T>>(
+		wrappedHandler: Handler<T, D>,
+	): Handler<T, D> {
 		return async function corsHandler(req, res, ...args) {
 			// -> executed before handler
 			// it's even possible to skip the handler at all
@@ -170,7 +201,7 @@ function corsMiddleware(origin: string) {
 }
 
 // create a configured instance of middleware
-const cors = corsMiddleware('http://0.0.0.0:8080')
+const cors = CorsMiddleware('http://0.0.0.0:8080')
 
 router.addRoute({
 	matcher: new MethodMatcher(['OPTIONS', 'POST']),
@@ -179,32 +210,10 @@ router.addRoute({
 })
 ```
 
-Of course you can create a `middlewares` wrapper and put all middlewares inside it:
-```typescript
-type Middleware<T extends (handler: Handler<MatchResult>) => Handler<MatchResult>> = Parameters<Parameters<T>[0]>[2]
-
-function middlewares<T extends MatchResult>(
-	handler: Handler<T, Matched<T>
-		& Middleware<typeof session>
-		& Middleware<typeof cors>>,
-): Handler<T> {
-	return function middlewaresHandler(...args) {
-		// @ts-expect-error
-		return cors(session(handler(...args)))
-	}
-}
-
-router.addRoute({
-	matcher,
-	// use it
-	handler: middlewares((req, res, { csrftoken }) => `Token: ${csrftoken}`),
-})
-```
-
 Apropos typesafety. You can modify types in middleware:
 
 ```typescript
-function valueMiddleware(myValue: string) {
+function ValueMiddleware(myValue: string) {
 	return function valueWrapper<T extends MatchResult>(
 		handler: Handler<T, Matched<T> & {
 			// add additional type
@@ -221,11 +230,34 @@ function valueMiddleware(myValue: string) {
 	}
 }
 
-const value = valueMiddleware('world')
+const value = ValueMiddleware('world')
 
 router.addRoute({
 	matcher: new MethodMatcher(['GET']),
 	handler: value((req, res, { myValue }) => `Hello ${myValue}`),
+})
+```
+
+#### DRY approach
+
+Of course you can create a `middlewares` wrapper and put all middlewares inside it:
+```typescript
+type Middleware<T extends (handler: Handler<MatchResult>) => Handler<MatchResult>> = Parameters<Parameters<T>[0]>[2]
+
+function middlewares<T extends MatchResult>(
+	handler: Handler<T, Matched<T>
+		& Middleware<typeof session>
+		& Middleware<typeof cors>>,
+): Handler<T> {
+	return function middlewaresHandler(...args) {
+		return cors(session(handler))(...args)
+	}
+}
+
+router.addRoute({
+	matcher,
+	// use it
+	handler: middlewares((req, res, { csrftoken }) => `Token: ${csrftoken}`),
 })
 ```
 

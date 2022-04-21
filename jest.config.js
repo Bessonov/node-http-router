@@ -5,7 +5,7 @@ module.exports = {
 	transform: {
 		'^.+\\.tsx?$': 'ts-jest',
 	},
-	testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$',
+	testRegex: '(/__tests__/.*|(\\.|/)test)\\.tsx?$',
 	testPathIgnorePatterns: ['/node_modules/'],
 	moduleFileExtensions: [...defaults.moduleFileExtensions, 'ts', 'tsx'],
 	coverageThreshold: {
