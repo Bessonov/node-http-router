@@ -1,4 +1,5 @@
 export * from './matchers'
+export * from './middlewares'
 export type {
 	Handler,
 	Route,
