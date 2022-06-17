@@ -1,11 +1,11 @@
 import * as httpMocks from 'node-mocks-http'
 import {
 	MethodMatcher,
-} from '..'
+} from '../MethodMatcher'
 
 it('not match', () => {
 	const result = new MethodMatcher(['POST'])
-		.match(httpMocks.createRequest())
+		.match({ req: httpMocks.createRequest() })
 	expect(result).toStrictEqual({
 		matched: false,
 	})
@@ -13,33 +13,45 @@ it('not match', () => {
 
 it('match GET', () => {
 	const result = new MethodMatcher(['GET'])
-		.match(httpMocks.createRequest({
-			url: '/test',
-		}))
+		.match({
+			req: httpMocks.createRequest({
+				url: '/test',
+			}),
+		})
 	expect(result).toStrictEqual({
 		matched: true,
-		method: 'GET',
+		result: {
+			method: 'GET',
+		},
 	})
 })
 
 it('match first', () => {
 	const result = new MethodMatcher(['POST', 'GET'])
-		.match(httpMocks.createRequest({
-			method: 'POST',
-		}))
+		.match({
+			req: httpMocks.createRequest({
+				method: 'POST',
+			}),
+		})
 	expect(result).toStrictEqual({
 		matched: true,
-		method: 'POST',
+		result: {
+			method: 'POST',
+		},
 	})
 })
 
 it('match second', () => {
 	const result = new MethodMatcher(['POST', 'GET'])
-		.match(httpMocks.createRequest({
-			method: 'GET',
-		}))
+		.match({
+			req: httpMocks.createRequest({
+				method: 'GET',
+			}),
+		})
 	expect(result).toStrictEqual({
 		matched: true,
-		method: 'GET',
+		result: {
+			method: 'GET',
+		},
 	})
 })

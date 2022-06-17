@@ -9,7 +9,7 @@ it('none match', () => {
 	const result = new AndMatcher([
 		new MethodMatcher(['POST']),
 		new ExactUrlPathnameMatcher(['/test']),
-	]).match(httpMocks.createRequest(), httpMocks.createResponse())
+	]).match({ req: httpMocks.createRequest() })
 
 	expect(result).toStrictEqual({
 		matched: false,
@@ -20,7 +20,7 @@ it('first match, second not', () => {
 	const result = new AndMatcher([
 		new MethodMatcher(['GET']),
 		new ExactUrlPathnameMatcher(['/test']),
-	]).match(httpMocks.createRequest(), httpMocks.createResponse())
+	]).match({ req: httpMocks.createRequest() })
 
 	expect(result).toStrictEqual({
 		matched: false,
@@ -28,7 +28,7 @@ it('first match, second not', () => {
 })
 
 it('first not match, but second', () => {
-	const request = httpMocks.createRequest({
+	const req = httpMocks.createRequest({
 		method: 'POST',
 		url: '/test',
 	})
@@ -36,7 +36,7 @@ it('first not match, but second', () => {
 	const result = new AndMatcher([
 		new MethodMatcher(['GET']),
 		new ExactUrlPathnameMatcher(['/test']),
-	]).match(request, httpMocks.createResponse())
+	]).match({ req })
 
 	expect(result).toStrictEqual({
 		matched: false,
@@ -44,26 +44,32 @@ it('first not match, but second', () => {
 })
 
 it('both match', () => {
-	const request = httpMocks.createRequest({
+	const req = httpMocks.createRequest({
 		url: '/test',
 	})
 
 	const result = new AndMatcher([
 		new MethodMatcher(['GET']),
 		new ExactUrlPathnameMatcher(['/test']),
-	]).match(request, httpMocks.createResponse())
+	]).match({ req })
 
 	expect(result).toStrictEqual({
 		matched: true,
-		and: [
-			{
-				matched: true,
-				method: 'GET',
-			},
-			{
-				matched: true,
-				pathname: '/test',
-			},
-		],
+		result: {
+			and: [
+				{
+					matched: true,
+					result: {
+						method: 'GET',
+					},
+				},
+				{
+					matched: true,
+					result: {
+						pathname: '/test',
+					},
+				},
+			],
+		},
 	})
 })

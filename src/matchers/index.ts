@@ -1,36 +1,46 @@
 export {
 	AndMatcher,
-	AndMatcherResult,
+	type AndMatcherResult,
 } from './AndMatcher'
 export {
 	EndpointMatcher,
+	type EndpointMatcherInput,
 } from './EndpointMatcher'
 export {
 	ExactQueryMatcher,
 } from './ExactQueryMatcher'
 export {
 	ExactUrlPathnameMatcher,
-	ExactUrlPathnameMatchResult,
+	type ExactUrlPathnameMatcherInput,
+	type ExactUrlPathnameMatchResult,
 } from './ExactUrlPathnameMatcher'
-export type {
-	ExtractMatchResult,
-	Matcher,
+export {
+	type ExtractMatchResult,
+	type Matcher,
 } from './Matcher'
 export {
 	isMatched,
-	Matched,
-	MatchResult,
+	type Matched,
+	type MatchResult,
+	type MatchResultAny,
+	type MatchedResult,
+	type UnmatchedResult,
 } from './MatchResult'
 export {
-	Method,
+	type Method,
 	MethodMatcher,
-	MethodMatchResult,
+	type MethodMatcherInput,
+	type MethodMatchResult,
 } from './MethodMatcher'
 export {
 	OrMatcher,
-	OrMatcherResult,
+	type OrMatcherResult,
 } from './OrMatcher'
 export {
 	RegExpUrlMatcher,
-	RegExpUrlMatchResult,
+	type RegExpUrlMatcherInput,
+	type RegExpUrlMatchResult,
 } from './RegExpUrlMatcher'
+export {
+	BooleanMatcher,
+} from './BooleanMatcher'

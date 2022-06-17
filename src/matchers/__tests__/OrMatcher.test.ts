@@ -10,7 +10,7 @@ it('none match', () => {
 		new MethodMatcher(['DELETE']),
 		new MethodMatcher(['POST']),
 	])
-		.match(httpMocks.createRequest(), httpMocks.createResponse())
+		.match({ req: httpMocks.createRequest() })
 	expect(result).toStrictEqual({
 		matched: false,
 	})
@@ -20,64 +20,78 @@ it('first match, second not', () => {
 	const result = new OrMatcher([
 		new MethodMatcher(['DELETE']),
 		new MethodMatcher(['POST']),
-	]).match(httpMocks.createRequest({ method: 'DELETE' }), httpMocks.createResponse())
+	]).match({ req: httpMocks.createRequest({ method: 'DELETE' }) })
 	expect(result).toStrictEqual({
 		matched: true,
-		or: [
-			{
-				matched: true,
-				method: 'DELETE',
-			},
-			{
-				matched: false,
-			},
-		],
+		result: {
+			or: [
+				{
+					matched: true,
+					result: {
+						method: 'DELETE',
+					},
+				},
+				{
+					matched: false,
+				},
+			],
+		},
 	})
 })
 
 it('first not match, but second', () => {
-	const request = httpMocks.createRequest({
+	const req = httpMocks.createRequest({
 		method: 'POST',
 	})
 
 	const result = new OrMatcher([
 		new MethodMatcher(['DELETE']),
 		new MethodMatcher(['POST']),
-	]).match(request, httpMocks.createResponse())
+	]).match({ req })
 	expect(result).toStrictEqual({
 		matched: true,
-		or: [
-			{
-				matched: false,
-			},
-			{
-				matched: true,
-				method: 'POST',
-			},
-		],
+		result: {
+			or: [
+				{
+					matched: false,
+				},
+				{
+					matched: true,
+					result: {
+						method: 'POST',
+					},
+				},
+			],
+		},
 	})
 })
 
 it('both match', () => {
-	const request = httpMocks.createRequest({
+	const req = httpMocks.createRequest({
 		url: '/test',
 	})
 
 	const result = new OrMatcher([
 		new MethodMatcher(['GET']),
 		new ExactUrlPathnameMatcher(['/test']),
-	]).match(request, httpMocks.createResponse())
+	]).match({ req })
 	expect(result).toStrictEqual({
 		matched: true,
-		or: [
-			{
-				matched: true,
-				method: 'GET',
-			},
-			{
-				matched: true,
-				pathname: '/test',
-			},
-		],
+		result: {
+			or: [
+				{
+					matched: true,
+					result: {
+						method: 'GET',
+					},
+				},
+				{
+					matched: true,
+					result: {
+						pathname: '/test',
+					},
+				},
+			],
+		},
 	})
 })

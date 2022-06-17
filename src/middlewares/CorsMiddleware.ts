@@ -1,10 +1,16 @@
 import {
-	MatchResult,
-	Matched,
+	MatchResultAny,
 } from '../matchers/MatchResult'
 import {
 	Handler,
-} from '../router'
+} from '../Router'
+
+export interface CorsMiddlewareInput {
+	headers: {
+		origin?: string
+	}
+	method: string
+}
 
 type HttpMethod =
 	| 'POST'
@@ -33,7 +39,7 @@ const DEFAULT_ALLOWED_HEADERS = [
 
 const DEFAULT_MAX_AGE_SECONDS = 60 * 60 * 24 // 24 hours
 
-interface CorsMiddlewareOptions {
+export interface CorsMiddlewareCallbackResult {
 	// exact origins like 'http://0.0.0.0:8080' or '*'
 	origins: string[]
 	// methods like 'POST', 'GET' etc.
@@ -46,25 +52,41 @@ interface CorsMiddlewareOptions {
 	maxAge?: number
 }
 
-export function CorsMiddleware({
-	origins: originConfig,
-	allowMethods = DEFAULT_ALLOWED_METHODS,
-	allowHeaders = DEFAULT_ALLOWED_HEADERS,
-	allowCredentials = true,
-	maxAge = DEFAULT_MAX_AGE_SECONDS,
-}: CorsMiddlewareOptions) {
-	return function corsWrapper<T extends MatchResult, D extends Matched<T>>(
-		handler: Handler<T, D>,
-	): Handler<T, D> {
-		return async function corsHandler(req, res, ...args) {
+export function CorsMiddleware<
+	D2,
+	R extends CorsMiddlewareInput = CorsMiddlewareInput
+>(callback: (
+	req: R,
+	origin: string,
+	params: { data: D2 }
+) => Promise<CorsMiddlewareCallbackResult>) {
+	return function corsWrapper<T extends MatchResultAny, D extends D2 & {
+		req: R
+		res: {
+			writableEnded: boolean
+			setHeader:(name: string, value: string) => void
+			statusCode: number
+			end: () => void
+		}
+	}>(
+		handler: Handler<T, D>): Handler<T, D> {
+		return async function corsHandler(params) {
+			const { req, res } = params.data
 			// avoid "Cannot set headers after they are sent to the client"
 			if (res.writableEnded) {
 				// TODO: not sure if handler should be called
-				return handler(req, res, ...args)
+				return handler(params)
 			}
 
 			const origin = req.headers.origin ?? ''
-			if (originConfig.includes(origin) || originConfig.includes('*')) {
+
+			const config = await callback(req, origin, params)
+			const allowCredentials = config.allowCredentials ?? true
+			const allowMethods = config.allowMethods ?? DEFAULT_ALLOWED_METHODS
+			const allowHeaders = config.allowHeaders ?? DEFAULT_ALLOWED_HEADERS
+			const maxAge = config.maxAge ?? DEFAULT_MAX_AGE_SECONDS
+
+			if (config.origins.includes(origin)) {
 				res.setHeader('Access-Control-Allow-Origin', origin)
 				res.setHeader('Vary', 'Origin')
 				if (allowCredentials) {
@@ -89,7 +111,7 @@ export function CorsMiddleware({
 				return
 			}
 
-			const result = await handler(req, res, ...args)
+			const result = await handler(params)
 			return result
 		}
 	}

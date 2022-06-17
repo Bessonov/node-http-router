@@ -1,13 +1,10 @@
 import {
-	IncomingMessage,
-	ServerResponse,
-} from 'http'
-import {
-	MatchResult,
+	MatchResultAny,
 } from './MatchResult'
 
-export type ExtractMatchResult<M> = M extends Matcher<infer MR> ? MR : never
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ExtractMatchResult<M> = M extends Matcher<infer MR, any> ? MR : never
 
-export interface Matcher<T extends MatchResult = MatchResult> {
-	match(req: IncomingMessage, res: ServerResponse): T
+export interface Matcher<T extends MatchResultAny, P> {
+	match(params: P): T
 }
