@@ -1,10 +1,10 @@
 coverage/
 .eslintignore
 .eslintrc.js
+.git
+.github
 .npmignore
 .nvmrc
-.travis/
-.travis.yml
 jest.config.js
 tsconfig.json
 src/

@@ -1,11 +1,14 @@
 import http from 'http'
 import {
-	Router,
-} from '../router'
-import {
 	EndpointMatcher,
 	ExactUrlPathnameMatcher,
 } from '../matchers'
+import {
+	BooleanMatcher,
+} from '../matchers/BooleanMatcher'
+import {
+	NodeHttpRouter,
+} from '../node/NodeHttpRouter'
 
 /*
 
@@ -19,10 +22,7 @@ yarn example-node-start
 
 */
 
-const router = new Router((req, res) => {
-	res.statusCode = 404
-	res.end()
-})
+const router = new NodeHttpRouter()
 
 const [address, port] = ['localhost', 8080]
 
@@ -35,17 +35,26 @@ server.once('listening', () => {
 router.addRoute({
 	// it's not necessary to type the matcher, but it give you a confidence
 	matcher: new EndpointMatcher<{ name: string }>('GET', /^\/hello\/(?<name>[^/]+)$/),
-	handler: (req, res, match) => {
-		res.write(`Hello ${match.match.groups.name}!`)
+	handler: ({ data: { res }, match }) => {
+		res.write(`Hello ${match.result.match.groups.name}!`)
 		res.end()
 	},
 })
 
 router.addRoute({
 	matcher: new ExactUrlPathnameMatcher(['/shutdown']),
-	handler: (req, res) => {
+	handler: ({ data: { res } }) => {
 		res.write('Shutdown the server')
 		res.end()
 		server.close()
+	},
+})
+
+// 404 handler
+router.addRoute({
+	matcher: new BooleanMatcher(true),
+	handler: ({ data: { res } }) => {
+		res.statusCode = 404
+		res.end()
 	},
 })

@@ -12,9 +12,9 @@ describe('simple configuration', () => {
 	})
 
 	const innerHandler = jest.fn()
-	const handler = CorsMiddleware({
+	const handler = CorsMiddleware(async () => ({
 		origins: ['http://0.0.0.0:8000'],
-	})(innerHandler)
+	}))(innerHandler)
 
 	it('no action', async () => {
 		const req = createRequest({
@@ -24,7 +24,16 @@ describe('simple configuration', () => {
 			},
 		})
 		const res = createResponse()
-		await handler(req, res, { matched: true })
+		await handler({
+			data: {
+				req,
+				res,
+			},
+			match: {
+				matched: true,
+				result: undefined,
+			},
+		})
 		expect(innerHandler).toBeCalledTimes(1)
 		expect(res.getHeader('Access-Control-Allow-Methods')).toBeUndefined()
 		expect(res.getHeader('Access-Control-Allow-Origin')).toBe('http://0.0.0.0:8000')
@@ -38,7 +47,16 @@ describe('simple configuration', () => {
 			},
 		})
 		const res = createResponse()
-		await handler(req, res, { matched: true })
+		await handler({
+			data: {
+				req,
+				res,
+			},
+			match: {
+				matched: true,
+				result: undefined,
+			},
+		})
 		expect(innerHandler).toBeCalledTimes(0)
 		expect(res.getHeader('Access-Control-Allow-Methods')).toBe('POST,GET,PUT,PATCH,DELETE,OPTIONS')
 		expect(res.getHeader('Access-Control-Allow-Origin')).toBe('http://0.0.0.0:8000')
@@ -50,7 +68,16 @@ describe('simple configuration', () => {
 			method: 'OPTIONS',
 		})
 		const res = createResponse()
-		await handler(req, res, { matched: true })
+		await handler({
+			data: {
+				req,
+				res,
+			},
+			match: {
+				matched: true,
+				result: undefined,
+			},
+		})
 		expect(innerHandler).toBeCalledTimes(0)
 		expect(res.getHeader('Access-Control-Allow-Methods')).toBe('POST,GET,PUT,PATCH,DELETE,OPTIONS')
 		expect(res.getHeader('Access-Control-Allow-Origin')).toBeUndefined()
@@ -62,7 +89,16 @@ describe('simple configuration', () => {
 		})
 		const res = createResponse()
 		res.end()
-		await handler(req, res, { matched: true })
+		await handler({
+			data: {
+				req,
+				res,
+			},
+			match: {
+				matched: true,
+				result: undefined,
+			},
+		})
 		expect(innerHandler).toBeCalledTimes(1)
 		expect(res.getHeader('Access-Control-Allow-Methods')).toBeUndefined()
 		expect(res.getHeader('Access-Control-Allow-Origin')).toBeUndefined()
@@ -75,13 +111,14 @@ describe('changed defaults', () => {
 	})
 
 	const innerHandler = jest.fn()
-	const handler = CorsMiddleware({
-		origins: ['*'],
+	const handler = CorsMiddleware(async (req, origin) => ({
+		// simulates '*'
+		origins: [origin],
 		allowMethods: ['POST', 'DELETE'],
 		allowHeaders: ['Authorization'],
 		allowCredentials: false,
 		maxAge: 360,
-	})(innerHandler)
+	}))(innerHandler)
 
 	it('no action', async () => {
 		const req = createRequest({
@@ -91,7 +128,16 @@ describe('changed defaults', () => {
 			},
 		})
 		const res = createResponse()
-		await handler(req, res, { matched: true })
+		await handler({
+			data: {
+				req,
+				res,
+			},
+			match: {
+				matched: true,
+				result: undefined,
+			},
+		})
 		expect(innerHandler).toBeCalledTimes(0)
 		expect(res.getHeader('Access-Control-Allow-Methods')).toBe('POST,DELETE')
 		expect(res.getHeader('Access-Control-Allow-Origin')).toBe('http:/idontcare:80')

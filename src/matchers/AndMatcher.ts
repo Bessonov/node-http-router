@@ -1,37 +1,39 @@
 import {
-	IncomingMessage,
-	ServerResponse,
-} from 'http'
+	Matcher,
+} from './Matcher'
 import {
 	MatchResult,
+	MatchResultAny,
 	Matched,
-	Matcher,
 	isMatched,
-} from '.'
+} from './MatchResult'
 
-export type AndMatcherResult<MR1 extends MatchResult, MR2 extends MatchResult> = MatchResult<{
+export type AndMatcherResult<MR1 extends MatchResultAny, MR2 extends MatchResultAny> = MatchResult<{
 	and: [Matched<MR1>, Matched<MR2>]
 }>
 
 /**
  * Match if every matcher matches
  */
-export class AndMatcher<MR1 extends MatchResult, MR2 extends MatchResult>
-implements Matcher<AndMatcherResult<MR1, MR2>> {
-	constructor(private readonly matchers: [Matcher<MR1>, Matcher<MR2>]) {
+export class AndMatcher<MR1 extends MatchResultAny, MR2 extends MatchResultAny, P1, P2>
+implements Matcher<AndMatcherResult<MR1, MR2>, P1 & P2> {
+	constructor(private readonly matchers: [Matcher<MR1, P1>, Matcher<MR2, P2>]) {
+		this.match = this.match.bind(this)
 	}
 
-	match(req: IncomingMessage, res: ServerResponse): AndMatcherResult<MR1, MR2> {
+	match(params: P1 & P2): AndMatcherResult<MR1, MR2> {
 		const [matcher1, matcher2] = this.matchers
 
-		const result1 = matcher1.match(req, res)
+		const result1 = matcher1.match(params)
 
 		if (isMatched(result1)) {
-			const result2 = matcher2.match(req, res)
+			const result2 = matcher2.match(params)
 			if (isMatched(result2)) {
 				return {
 					matched: true,
-					and: [result1, result2],
+					result: {
+						and: [result1, result2],
+					},
 				}
 			}
 		}
