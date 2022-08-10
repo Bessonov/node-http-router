@@ -7,6 +7,5 @@ coverage/
 .nvmrc
 jest.config.js
 tsconfig.json
-src/
 **/__tests__/**
 **/examples/**
