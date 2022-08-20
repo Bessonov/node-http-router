@@ -150,6 +150,16 @@ it('match POST /group/123 endpoint', () => {
 	expect(router.exec({ req: createRequest() })).toBe('not found')
 })
 
+it('no match, but default handler', () => {
+	router = new Router(() => 'default route')
+	const req = createRequest({
+		method: 'POST',
+		url: '/dontcare',
+	})
+
+	expect(router.exec({ req })).toBe('default route')
+})
+
 class TestMatcherWithParams<
 	T extends MatchResult<void>,
 	D extends { test: string }

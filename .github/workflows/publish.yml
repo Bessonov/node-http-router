@@ -17,9 +17,11 @@ jobs:
           # https://github.com/actions/setup-node/issues/32#issuecomment-1003854758
           node-version-file: '.nvmrc'
       - name: prepare dependencies
-        run: npm install
+        run: |
+          npm install
+          npm install -g pnpm@7.1.5
       - name: test
-        run: npm run precommit
+        run: pnpm run precommit
       - name: publish
         run: |
           echo '//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}' >> .npmrc
