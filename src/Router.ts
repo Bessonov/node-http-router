@@ -4,6 +4,7 @@ import {
 	isMatched,
 } from './matchers'
 import {
+	MatchResult,
 	MatchResultAny,
 } from './matchers/MatchResult'
 
@@ -29,7 +30,7 @@ export interface Route<MR extends MatchResultAny, D> {
 export class Router<D> {
 	private routes: Route<MatchResultAny, D>[] = []
 
-	constructor() {
+	constructor(private defaultHandler?: Handler<MatchResult<unknown>, D>) {
 		this.addRoute = this.addRoute.bind(this)
 		this.exec = this.exec.bind(this)
 	}
@@ -44,11 +45,14 @@ export class Router<D> {
 			const match = route.matcher.match(params)
 			if (isMatched(match)) {
 				return route.handler({
-					data: params,
 					match,
+					data: params,
 				})
 			}
 		}
-		return undefined
+		return this.defaultHandler?.({
+			match: { matched: true, result: undefined },
+			data: params,
+		})
 	}
 }
