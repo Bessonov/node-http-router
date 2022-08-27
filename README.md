@@ -349,7 +349,53 @@ There are some use cases for nested routers:
 - Implement modularity
 - Apply middlewares globally
 
-See [example](./src/__tests__/Router.test.ts#216).
+An example of multi-tenancy:
+
+```typescript
+// create main rooter
+const rootRouter = new NodeHttpRouter()
+// attach some global urls
+// rootRouter.addRoute(...)
+
+// create a router used for all handlers
+// with tenant information
+const tenantRouter = new Router<{
+	req: ServerRequest
+	res: ServerResponse
+	tenant: string
+}>()
+
+// connect routers
+rootRouter.addRoute({
+	matcher: new RegExpUrlMatcher<{
+		tenant: string
+		url: string
+	}>([/^\/auth\/realms\/(?<tenant>[^/]+)(?<url>.+)/]),
+	handler: ({ data, match }) => {
+		const { req, res } = data
+		// figure tenant out
+		const { tenant, url } = match.result.match.groups
+		// pass the new url down
+		req.url = url
+		return tenantRouter.exec({
+			req,
+			res,
+			tenant,
+		})
+	},
+})
+
+// attach some urls behind tenant
+tenantRouter.addRoute({
+	matcher: new ExactUrlPathnameMatcher(['/myurl']),
+	handler: ({ data: { tenant }, match: { result: { pathname } } }) => {
+		// if requested url is `/auth/realms/mytenant/myurl`, then:
+		// tenant: mytenant
+		// pathname: /myurl
+		return `tenant: ${tenant}, url: ${pathname}`
+	}
+})
+```
 
 ## License
 
