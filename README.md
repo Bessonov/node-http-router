@@ -396,6 +396,9 @@ tenantRouter.addRoute({
 	}
 })
 ```
+## Change log
+
+See [releases](https://github.com/Bessonov/node-http-router/releases).
 
 ## License
 
