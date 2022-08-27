@@ -3,9 +3,11 @@ import {
 	ServerResponse,
 } from 'http'
 import {
+	MatchResult,
 	MatchedResult,
 } from '../matchers'
 import {
+	Handler,
 	Router,
 } from '../Router'
 import {
@@ -13,20 +15,19 @@ import {
 	toServerRequest,
 } from './ServerRequest'
 
+interface ServerRequestResponse {
+	req: ServerRequest
+	res: ServerResponse
+}
+
 export interface NodeHttpRouterParams<MR> {
-	data: {
-		req: ServerRequest
-		res: ServerResponse
-	}
+	data: ServerRequestResponse
 	match: MatchedResult<MR>
 }
 
-export class NodeHttpRouter extends Router<{
-	req: ServerRequest
-	res: ServerResponse
-}> {
-	constructor() {
-		super()
+export class NodeHttpRouter extends Router<ServerRequestResponse> {
+	constructor(defaultHandler?: Handler<MatchResult<unknown>, ServerRequestResponse>) {
+		super(defaultHandler)
 		this.serve = this.serve.bind(this)
 	}
 
