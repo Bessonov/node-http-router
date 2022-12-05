@@ -1,6 +1,7 @@
 import http from 'http'
-import micro, {
+import {
 	send,
+	serve,
 } from 'micro'
 import {
 	EndpointMatcher,
@@ -29,7 +30,7 @@ const router = new NodeHttpRouter()
 
 const [address, port] = ['localhost', 8080]
 
-const server = http.createServer(micro(router.serve)).listen(port, address)
+const server = http.createServer(serve(router.serve)).listen(port, address)
 server.once('listening', () => {
 	// eslint-disable-next-line no-console
 	console.log(`started at http://${address}:${port}`)

@@ -26,10 +26,9 @@ From 2.0.0 the router isn't tied to node or even http anymore! Although the prim
 
 Contact me if you want to become a sponsor or need paid support.
 
-Sponsored by Superlative GmbH
+Sponsored by [Superlative GmbH](https://superlative.gmbh)
 
 ![Superlative GmbH](./sponsors/superlative.gmbh.png)
-
 
 ## Installation
 
@@ -77,9 +76,14 @@ See [full example](src/examples/node.ts) and [native node http server](https://n
 [micro](https://github.com/vercel/micro) is a very lightweight layer around the native node http server with some convenience methods.
 
 ```typescript
+import {
+	send,
+	serve,
+} from 'micro'
+
 const router = new NodeHttpRouter()
 
-http.createServer(micro(router.serve)).listen(8080, 'localhost')
+http.createServer(serve(router.serve)).listen(8080, 'localhost')
 
 router.addRoute({
 	matcher: new ExactUrlPathnameMatcher(['/hello']),
