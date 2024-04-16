@@ -1,7 +1,7 @@
-import {
+import type {
 	MatchResultAny,
 } from '../matchers/MatchResult'
-import {
+import type {
 	Handler,
 } from '../Router'
 
