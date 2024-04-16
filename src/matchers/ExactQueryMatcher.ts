@@ -1,8 +1,8 @@
 import Url from 'urlite'
-import {
+import type {
 	Matcher,
 } from './Matcher'
-import {
+import type {
 	MatchResult,
 } from './MatchResult'
 

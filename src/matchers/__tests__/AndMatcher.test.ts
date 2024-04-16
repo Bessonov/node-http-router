@@ -1,15 +1,16 @@
-import * as httpMocks from 'node-mocks-http'
+import { createRequest } from 'node-mocks-http'
 import {
 	AndMatcher,
 	ExactUrlPathnameMatcher,
 	MethodMatcher,
 } from '..'
+import type { ServerRequest } from '../../node/ServerRequest'
 
 it('none match', () => {
 	const result = new AndMatcher([
 		new MethodMatcher(['POST']),
 		new ExactUrlPathnameMatcher(['/test']),
-	]).match({ req: httpMocks.createRequest() })
+	]).match({ req: createRequest<ServerRequest>() })
 
 	expect(result).toStrictEqual({
 		matched: false,
@@ -20,7 +21,7 @@ it('first match, second not', () => {
 	const result = new AndMatcher([
 		new MethodMatcher(['GET']),
 		new ExactUrlPathnameMatcher(['/test']),
-	]).match({ req: httpMocks.createRequest() })
+	]).match({ req: createRequest<ServerRequest>() })
 
 	expect(result).toStrictEqual({
 		matched: false,
@@ -28,7 +29,7 @@ it('first match, second not', () => {
 })
 
 it('first not match, but second', () => {
-	const req = httpMocks.createRequest({
+	const req = createRequest<ServerRequest>({
 		method: 'POST',
 		url: '/test',
 	})
@@ -44,7 +45,7 @@ it('first not match, but second', () => {
 })
 
 it('both match', () => {
-	const req = httpMocks.createRequest({
+	const req = createRequest<ServerRequest>({
 		url: '/test',
 	})
 

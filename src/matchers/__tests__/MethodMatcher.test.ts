@@ -1,11 +1,12 @@
-import * as httpMocks from 'node-mocks-http'
+import { createRequest } from 'node-mocks-http'
 import {
 	MethodMatcher,
 } from '../MethodMatcher'
+import type { ServerRequest } from '../../node/ServerRequest'
 
 it('not match', () => {
 	const result = new MethodMatcher(['POST'])
-		.match({ req: httpMocks.createRequest() })
+		.match({ req: createRequest<ServerRequest>() })
 	expect(result).toStrictEqual({
 		matched: false,
 	})
@@ -14,7 +15,7 @@ it('not match', () => {
 it('match GET', () => {
 	const result = new MethodMatcher(['GET'])
 		.match({
-			req: httpMocks.createRequest({
+			req: createRequest<ServerRequest>({
 				url: '/test',
 			}),
 		})
@@ -29,7 +30,7 @@ it('match GET', () => {
 it('match first', () => {
 	const result = new MethodMatcher(['POST', 'GET'])
 		.match({
-			req: httpMocks.createRequest({
+			req: createRequest<ServerRequest>({
 				method: 'POST',
 			}),
 		})
@@ -44,7 +45,7 @@ it('match first', () => {
 it('match second', () => {
 	const result = new MethodMatcher(['POST', 'GET'])
 		.match({
-			req: httpMocks.createRequest({
+			req: createRequest<ServerRequest>({
 				method: 'GET',
 			}),
 		})

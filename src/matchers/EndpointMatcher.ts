@@ -1,20 +1,20 @@
-import {
+import type {
 	Matcher,
 } from './Matcher'
-import {
+import type {
 	MatchResult,
 } from './MatchResult'
 import {
-	Method,
-	MethodMatchResult,
+	type Method,
+	type MethodMatchResult,
 	MethodMatcher,
 } from './MethodMatcher'
 import {
 	AndMatcher,
 } from './AndMatcher'
 import {
-	RegExpExecGroupArray,
-	RegExpUrlMatchResult,
+	type RegExpExecGroupArray,
+	type RegExpUrlMatchResult,
 	RegExpUrlMatcher,
 } from './RegExpUrlMatcher'
 

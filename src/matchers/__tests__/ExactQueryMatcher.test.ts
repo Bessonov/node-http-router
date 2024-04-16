@@ -1,7 +1,8 @@
-import * as httpMocks from 'node-mocks-http'
+import { createRequest } from 'node-mocks-http'
 import {
 	ExactQueryMatcher,
 } from '..'
+import type { ServerRequest } from '../../node/ServerRequest'
 
 const matcher = new ExactQueryMatcher({
 	mustPresent: true,
@@ -11,7 +12,7 @@ const matcher = new ExactQueryMatcher({
 })
 
 it('not match (mustPresent and mustExact are missing)', () => {
-	const result = matcher.match({ req: httpMocks.createRequest() })
+	const result = matcher.match({ req: createRequest<ServerRequest>() })
 	expect(result).toStrictEqual({
 		matched: false,
 	})
@@ -19,7 +20,7 @@ it('not match (mustPresent and mustExact are missing)', () => {
 
 it('not match (mustPresent is missing)', () => {
 	const result = matcher.match({
-		req: httpMocks.createRequest({
+		req: createRequest<ServerRequest>({
 			url: '/test?mustExact=exactValue1',
 		}),
 	})
@@ -30,7 +31,7 @@ it('not match (mustPresent is missing)', () => {
 
 it('not match (mustExact is missing)', () => {
 	const result = matcher.match({
-		req: httpMocks.createRequest({
+		req: createRequest<ServerRequest>({
 			url: '/test?mustPresent=foo',
 		}),
 	})
@@ -41,7 +42,7 @@ it('not match (mustExact is missing)', () => {
 
 it('match', () => {
 	const result = matcher.match({
-		req: httpMocks.createRequest({
+		req: createRequest<ServerRequest>({
 			url: '/test?mustExact=exactValue1&mustPresent=foo',
 		}),
 	})
@@ -58,7 +59,7 @@ it('match', () => {
 
 it('match with optional param', () => {
 	const result = matcher.match({
-		req: httpMocks.createRequest({
+		req: createRequest<ServerRequest>({
 			url: '/test?mustExact=exactValue1&mustPresent=foo&isOptional=bar',
 		}),
 	})
@@ -76,7 +77,7 @@ it('match with optional param', () => {
 
 it('not match because of forbidden param', () => {
 	const result = matcher.match({
-		req: httpMocks.createRequest({
+		req: createRequest<ServerRequest>({
 			url: '/test?mustExact=exactValue1&mustPresent=foo&mustAbsent=foo',
 		}),
 	})
@@ -87,7 +88,7 @@ it('not match because of forbidden param', () => {
 
 it('match with additional param', () => {
 	const result = matcher.match({
-		req: httpMocks.createRequest({
+		req: createRequest<ServerRequest>({
 			url: '/test?mustExact=exactValue1&mustPresent=foo&additional=bar',
 		}),
 	})

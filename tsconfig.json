@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
-		"target": "es5",
-		"module": "commonjs",
+		"target": "es2017",
+		"module": "es2022",
 		"moduleResolution": "node",
 		"esModuleInterop": true,
 		"pretty": true,
@@ -11,6 +11,9 @@
 		"declaration": true,
 		"resolveJsonModule": true,
 		"sourceMap": true,
+		"noUncheckedIndexedAccess": true,
+		"noImplicitOverride": true,						
+		"verbatimModuleSyntax": true,
 		"rootDir": "./src",
 		"outDir": "./dist"
 	}

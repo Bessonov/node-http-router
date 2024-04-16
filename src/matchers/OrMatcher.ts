@@ -1,9 +1,9 @@
 import {
-	MatchResult,
-	MatchResultAny,
+	type MatchResult,
+	type MatchResultAny,
 	isMatched,
 } from './MatchResult'
-import {
+import type {
 	Matcher,
 } from './Matcher'
 

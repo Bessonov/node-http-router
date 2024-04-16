@@ -1,10 +1,10 @@
-import {
+import type {
 	Matcher,
 } from './Matcher'
 import {
-	MatchResult,
-	MatchResultAny,
-	Matched,
+	type MatchResult,
+	type MatchResultAny,
+	type Matched,
 	isMatched,
 } from './MatchResult'
 

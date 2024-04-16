@@ -1,11 +1,12 @@
-import * as httpMocks from 'node-mocks-http'
+import { createRequest } from 'node-mocks-http'
 import {
 	EndpointMatcher,
 } from '..'
+import type { ServerRequest } from '../../node/ServerRequest'
 
 it('not match empty', () => {
 	const result = new EndpointMatcher('GET', /\/test/)
-		.match({ req: httpMocks.createRequest() })
+		.match({ req: createRequest<ServerRequest>() })
 	expect(result).toStrictEqual({
 		matched: false,
 	})
@@ -16,7 +17,7 @@ it('usual usage', () => {
 	// https://github.com/facebook/jest/issues/8475#issuecomment-656629010
 	expect(() => {
 		expect(matcher.match({
-			req: httpMocks.createRequest({
+			req: createRequest<ServerRequest>({
 				url: '/test',
 			}),
 		})).toStrictEqual({
@@ -32,7 +33,7 @@ it('usual usage', () => {
 
 	expect(() => {
 		expect(matcher.match({
-			req: httpMocks.createRequest({
+			req: createRequest<ServerRequest>({
 				method: 'POST',
 				url: '/test',
 			}),
@@ -48,7 +49,7 @@ it('usual usage', () => {
 	}).toThrow('serializes to the same string')
 
 	expect(matcher.match({
-		req: httpMocks.createRequest({
+		req: createRequest<ServerRequest>({
 			method: 'OPTIONS',
 			url: '/test',
 		}),

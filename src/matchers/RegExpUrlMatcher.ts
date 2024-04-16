@@ -1,7 +1,7 @@
-import {
+import type {
 	Matcher,
 } from './Matcher'
-import {
+import type {
 	MatchResult,
 } from './MatchResult'
 
@@ -27,20 +27,22 @@ export class RegExpUrlMatcher<
 	R extends object,
 	P extends RegExpUrlMatcherInput = RegExpUrlMatcherInput
 >
-implements Matcher<RegExpUrlMatchResult<R>, P> {
+	implements Matcher<RegExpUrlMatchResult<R>, P> {
 	constructor(private readonly urls: RegExp[]) {
 		this.match = this.match.bind(this)
 	}
 
 	match({ req }: RegExpUrlMatcherInput): RegExpUrlMatchResult<R> {
-		for (const url of this.urls) {
-			const result = url.exec(req.url) as never as RegExpExecGroupArray<R>
-			if (result !== null) {
-				return {
-					matched: true,
-					result: {
-						match: result,
-					},
+		if (req.url) {
+			for (const url of this.urls) {
+				const result = url.exec(req.url) as never as RegExpExecGroupArray<R>
+				if (result !== null) {
+					return {
+						matched: true,
+						result: {
+							match: result,
+						},
+					}
 				}
 			}
 		}

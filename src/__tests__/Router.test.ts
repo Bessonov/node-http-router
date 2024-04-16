@@ -13,28 +13,28 @@ import {
 	ServerResponse,
 } from 'http'
 import {
-	MatchedHandler,
+	type MatchedHandler,
 	Router,
 } from '../Router'
 import {
 	AndMatcher,
-	AndMatcherResult,
+	type AndMatcherResult,
 	EndpointMatcher,
-	ExactUrlPathnameMatchResult,
+	type ExactUrlPathnameMatchResult,
 	ExactUrlPathnameMatcher,
-	Matched,
-	Method,
-	MethodMatchResult,
+	type Matched,
+	type Method,
+	type MethodMatchResult,
 	MethodMatcher,
 	RegExpUrlMatcher,
 } from '../matchers'
-import {
+import type {
 	ServerRequest,
 } from '../node/ServerRequest'
-import {
+import type {
 	MatchResult,
 } from '../matchers/MatchResult'
-import {
+import type {
 	Matcher,
 } from '../matchers/Matcher'
 import {

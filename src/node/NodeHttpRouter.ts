@@ -2,16 +2,16 @@ import {
 	IncomingMessage,
 	ServerResponse,
 } from 'http'
-import {
+import type {
 	MatchResult,
 	MatchedResult,
 } from '../matchers'
 import {
-	Handler,
+	type Handler,
 	Router,
 } from '../Router'
 import {
-	ServerRequest,
+	type ServerRequest,
 	toServerRequest,
 } from './ServerRequest'
 

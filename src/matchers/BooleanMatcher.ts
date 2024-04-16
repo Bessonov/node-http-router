@@ -1,7 +1,7 @@
-import {
+import type {
 	MatchResult,
 } from './MatchResult'
-import {
+import type {
 	Matcher,
 } from './Matcher'
 
