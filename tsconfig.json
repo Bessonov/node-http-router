@@ -12,9 +12,11 @@
 		"resolveJsonModule": true,
 		"sourceMap": true,
 		"noUncheckedIndexedAccess": true,
-		"noImplicitOverride": true,						
+		"noImplicitOverride": true,
 		"verbatimModuleSyntax": true,
 		"rootDir": "./src",
-		"outDir": "./dist"
+		"outDir": "./dist",
+		"incremental": true,
+		"tsBuildInfoFile": "./build/.tsbuildinfo"
 	}
 }

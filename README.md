@@ -2,7 +2,6 @@ Router for Node.js, micro and other use cases
 =============================================
 
 [![Project is](https://img.shields.io/badge/Project%20is-fantastic-ff69b4.svg)](https://github.com/Bessonov/node-http-router)
-[![Build Status](https://api.travis-ci.org/Bessonov/node-http-router.svg?branch=master)](https://travis-ci.org/Bessonov/node-http-router)
 [![License](http://img.shields.io/:license-MIT-blue.svg)](https://raw.githubusercontent.com/Bessonov/node-http-router/master/LICENSE)
 
 This router is intended to be used with native node http interface. Features:

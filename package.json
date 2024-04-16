@@ -25,20 +25,29 @@
 	"type": "module",
 	"sideEffects": false,
 	"scripts": {
-		"test": "jest --coverage",
-		"test:watch": "jest --coverage --watch",
-		"lint": "eslint . --ext .ts,.js",
-		"build": "tsc",
-		"example-node-start": "tsc && node dist/examples/node.js",
-		"example-micro-start": "tsc && node dist/examples/micro.js",
-		"precommit": "pnpm test && pnpm run lint && pnpm run build",
+		"start": "pnpm run compile && ultra start:all",
+		"start:all": "pnpm run compile:watch || pnpm run test:watch",
+		"test": "pnpm run compile && NODE_OPTIONS='--experimental-vm-modules --no-warnings=ExperimentalWarning' jest --coverage",
+		"test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --coverage --watchAll",
+		"lint": "eslint . --ext .ts,.js,.cjs",
+		"compile": "tsc --build",
+		"compile:watch": "tsc --build --watch",
+		"example-node-start": "pnpm run compile && node dist/examples/node.js",
+		"example-micro-start": "pnpm run compile && node dist/examples/micro.js",
+		"precommit": "pnpm run compile && pnpm test && pnpm run lint",
 		"update": "pnpm update --interactive --recursive --latest"
+	},
+	"ultra": {
+		"concurrent": [
+			"start:all"
+		]
 	},
 	"dependencies": {
 		"urlite": "3.1.0"
 	},
 	"devDependencies": {
 		"@bessonovs/eslint-config": "0.0.7",
+		"@jest/globals": "29.7.0",
 		"@types/express": "4.17.21",
 		"@types/jest": "29.5.12",
 		"@types/node": "20.12.7",
@@ -50,19 +59,22 @@
 		"eslint-plugin-jsx-a11y": "6.8.0",
 		"eslint-plugin-react": "7.34.1",
 		"jest": "29.7.0",
-		"jest-config": "29.7.0",
 		"micro": "10.0.1",
 		"node-mocks-http": "1.14.1",
 		"path-to-regexp": "6.2.2",
-		"ts-jest": "29.1.2",
-		"ts-toolbelt": "9.6.0",
-		"typescript": "5.4.5"
+		"typescript": "5.4.5",
+		"ultra-runner": "3.10.5"
 	},
 	"publishConfig": {
 		"access": "public"
 	},
 	"packageManager": "pnpm@8.15.7+sha256.50783dd0fa303852de2dd1557cd4b9f07cb5b018154a6e76d0f40635d6cee019",
 	"pnpm": {
+		"updateConfig": {
+			"ignoreDependencies": [
+				"eslint"
+			]
+		},
 		"peerDependencyRules": {
 			"ignoreMissing": [
 				"eslint-plugin-react-hooks"

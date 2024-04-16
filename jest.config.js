@@ -1,15 +1,11 @@
-import { defaults } from 'jest-config'
-
+// eslint-disable-next-line import/no-default-export
 export default {
-	roots: ['<rootDir>/src'],
-	preset: 'ts-jest',
+	roots: ['<rootDir>/dist'],
 	testEnvironment: 'node',
-	testRegex: '(/__tests__/.*|(\\.|/)test)\\.tsx?$',
-	testPathIgnorePatterns: ['/node_modules/'],
-	moduleFileExtensions: [...defaults.moduleFileExtensions, 'ts', 'tsx'],
-	transform: {
-		'\\.[jt]sx?$': ['ts-jest'],
-	},
+	testRegex: '(/__tests__/.*|(\\.|/)test)\\.jsx?$',
+	collectCoverageFrom: ['<rootDir>/dist/**/*.js'],
+	// eslint-disable-next-line no-useless-escape
+	coveragePathIgnorePatterns: ['/dist\/examples/'],
 	coverageThreshold: {
 		global: {
 			statements: 100,

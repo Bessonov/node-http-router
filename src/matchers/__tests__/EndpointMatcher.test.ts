@@ -1,8 +1,12 @@
-import { createRequest } from 'node-mocks-http'
+import {
+	createRequest,
+} from 'node-mocks-http'
 import {
 	EndpointMatcher,
 } from '..'
-import type { ServerRequest } from '../../node/ServerRequest'
+import type {
+	ServerRequest,
+} from '../../node/ServerRequest'
 
 it('not match empty', () => {
 	const result = new EndpointMatcher('GET', /\/test/)

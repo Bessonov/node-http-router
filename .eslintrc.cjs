@@ -21,7 +21,7 @@ module.exports = {
 		],
 	},
 	ignorePatterns: [
-		'.eslintrc.js',
+		'.eslintrc.cjs',
 	],
 	rules: {
 		'arrow-body-style': 'off',
@@ -80,6 +80,13 @@ module.exports = {
 			rules: {
 				indent: 'off', // ts has own rule: @typescript-eslint/indent
 				'no-useless-constructor': 'off',
+				'@typescript-eslint/no-unused-vars': [
+					'error',
+					{
+						argsIgnorePattern: '^_',
+						varsIgnorePattern: '^_',
+					},
+				],
 			},
 		},
 	],

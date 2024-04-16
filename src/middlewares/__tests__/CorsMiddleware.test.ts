@@ -3,6 +3,9 @@ import {
 	createResponse,
 } from 'node-mocks-http'
 import {
+	jest,
+} from '@jest/globals'
+import {
 	CorsMiddleware,
 } from '../CorsMiddleware'
 

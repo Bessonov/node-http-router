@@ -1,10 +1,14 @@
-import { createRequest } from 'node-mocks-http'
+import {
+	createRequest,
+} from 'node-mocks-http'
 import {
 	ExactUrlPathnameMatcher,
 	MethodMatcher,
 	OrMatcher,
 } from '..'
-import type { ServerRequest } from '../../node/ServerRequest'
+import type {
+	ServerRequest,
+} from '../../node/ServerRequest'
 
 it('none match', () => {
 	const result = new OrMatcher([

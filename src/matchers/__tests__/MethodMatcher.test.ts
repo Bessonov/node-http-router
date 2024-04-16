@@ -1,8 +1,12 @@
-import { createRequest } from 'node-mocks-http'
+import {
+	createRequest,
+} from 'node-mocks-http'
 import {
 	MethodMatcher,
 } from '../MethodMatcher'
-import type { ServerRequest } from '../../node/ServerRequest'
+import type {
+	ServerRequest,
+} from '../../node/ServerRequest'
 
 it('not match', () => {
 	const result = new MethodMatcher(['POST'])

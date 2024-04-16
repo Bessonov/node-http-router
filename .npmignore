@@ -1,6 +1,6 @@
 coverage/
 .eslintignore
-.eslintrc.js
+.eslintrc.cjs
 .git
 .github
 .npmignore
@@ -9,3 +9,4 @@ jest.config.js
 tsconfig.json
 **/__tests__/**
 **/examples/**
+build/

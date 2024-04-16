@@ -6,10 +6,7 @@ import {
 	compile,
 	pathToRegexp,
 } from 'path-to-regexp'
-import {
-	Test,
-} from 'ts-toolbelt'
-import {
+import type {
 	ServerResponse,
 } from 'http'
 import {
@@ -167,23 +164,21 @@ class TestMatcherWithParams<
 	T extends MatchResult<void>,
 	D extends { test: string }
 > implements Matcher<T, D> {
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars, class-methods-use-this
-	match(neededForTypeScript: D): T {
+	// eslint-disable-next-line class-methods-use-this
+	match(_neededForTypeScript: D): T {
 		throw new Error('Method not implemented.')
 	}
 }
 
 it('simple route match', () => {
 	const routerWithoutParams = new Router()
+	interface TypeCheckPass {
+		data: unknown
+		match: { matched: true; result: boolean }
+	}
 	routerWithoutParams.addRoute<MatchResult<boolean>>({
 		matcher: new BooleanMatcher(true),
-		handler: params => {
-			Test.checks([
-				Test.check<typeof params, {
-					data: unknown
-					match: { matched: true; result: boolean }
-				}, Test.Pass>(),
-			])
+		handler: (_params: TypeCheckPass) => {
 			return 'test'
 		},
 	})
@@ -191,15 +186,15 @@ it('simple route match', () => {
 
 it('simple route match with custom type', () => {
 	const typedRouter = new Router<{ test: string }>()
+
+	interface TypeCheckPass {
+		data: { test: string }
+		match: { matched: true; result: void }
+	}
+
 	typedRouter.addRoute({
 		matcher: new TestMatcherWithParams(),
-		handler: params => {
-			Test.checks([
-				Test.check<typeof params, {
-					data: { test: string }
-					match: { matched: true; result: void }
-				}, Test.Pass>(),
-			])
+		handler: (_params: TypeCheckPass) => {
 			return 'myreturn'
 		},
 	})
@@ -207,20 +202,24 @@ it('simple route match with custom type', () => {
 
 it('simple non-matching router type', () => {
 	const typedRouter = new Router<{ test2: string }>()
+
+	interface TypeCheckPass {
+		data: { test2: string }
+		match: { matched: true; result: void }
+	}
+
+	interface TypeCheckFail {
+		data: { test: string }
+		match: { matched: true; result: void }
+	}
+
 	typedRouter.addRoute({
 		// @ts-expect-error
 		matcher: new TestMatcherWithParams(),
-		handler: params => {
-			Test.checks([
-				Test.check<typeof params, {
-					data: { test2: string }
-					match: { matched: true; result: void }
-				}, Test.Pass>(),
-				Test.check<typeof params, {
-					data: { test: string }
-					match: { matched: true; result: void }
-				}, Test.Fail>(),
-			])
+		handler: (_params: TypeCheckPass) => {
+			// @ts-expect-error
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			const fail: TypeCheckFail = _params
 			return 'myreturn'
 		},
 	})

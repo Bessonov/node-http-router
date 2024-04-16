@@ -27,7 +27,7 @@ export class RegExpUrlMatcher<
 	R extends object,
 	P extends RegExpUrlMatcherInput = RegExpUrlMatcherInput
 >
-	implements Matcher<RegExpUrlMatchResult<R>, P> {
+implements Matcher<RegExpUrlMatchResult<R>, P> {
 	constructor(private readonly urls: RegExp[]) {
 		this.match = this.match.bind(this)
 	}
