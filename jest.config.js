@@ -1,6 +1,6 @@
-const { defaults } = require('jest-config')
+import { defaults } from 'jest-config'
 
-module.exports = {
+export default {
 	roots: ['<rootDir>/src'],
 	preset: 'ts-jest',
 	testEnvironment: 'node',
