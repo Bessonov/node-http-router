@@ -45,3 +45,10 @@ implements Matcher<ExactUrlPathnameMatchResult<U>, P> {
 		}
 	}
 }
+
+export function exactUrlPathname<
+	U extends [string, ...string[]],
+	P extends ExactUrlPathnameMatcherInput
+>(urls: U): ExactUrlPathnameMatcher<U, P> {
+	return new ExactUrlPathnameMatcher(urls)
+}

@@ -87,3 +87,22 @@ MR5
 		}
 	}
 }
+
+export function and<MR1 extends MatchResultAny | never = never,
+	P1 = unknown,
+	MR2 extends MatchResultAny | never = never,
+	P2 = unknown,
+	MR3 extends MatchResultAny | never = never,
+	P3 = unknown,
+	MR4 extends MatchResultAny | never = never,
+	P4 = unknown,
+	MR5 extends MatchResultAny | never = never,
+	P5 = unknown>(matchers: [
+		Matcher<MR1, P1>?,
+		Matcher<MR2, P2>?,
+		Matcher<MR3, P3>?,
+		Matcher<MR4, P4>?,
+		Matcher<MR5, P5>?
+]): AndMatcher<MR1, P1, MR2, P2, MR3, P3, MR4, P4, MR5, P5> {
+	return new AndMatcher(matchers)
+}

@@ -31,12 +31,12 @@ export class MethodMatcher<
 	}
 
 	match({ req }: MethodMatcherInput): MethodMatchResult<M> {
-		const { method } = req
-		if (method && this.methods.indexOf(method as Method) >= 0) {
+		const { method: httpMethod } = req
+		if (httpMethod && this.methods.indexOf(httpMethod as Method) >= 0) {
 			return {
 				matched: true,
 				result: {
-					method: method as M[number],
+					method: httpMethod as M[number],
 				},
 			}
 		}
@@ -45,4 +45,11 @@ export class MethodMatcher<
 			matched: false,
 		}
 	}
+}
+
+export function method<
+	M extends Method[],
+	P extends MethodMatcherInput
+>(methods: M): MethodMatcher<M, P> {
+	return new MethodMatcher(methods)
 }

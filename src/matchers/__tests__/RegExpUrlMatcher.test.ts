@@ -2,14 +2,14 @@ import {
 	createRequest,
 } from 'node-mocks-http'
 import {
-	RegExpUrlMatcher,
+	regExpUrl,
 } from '..'
 import type {
 	ServerRequest,
 } from '../../node/ServerRequest'
 
 it('not match', () => {
-	const result = new RegExpUrlMatcher([/^\/test$/])
+	const result = regExpUrl([/^\/test$/])
 		.match({ req: createRequest<ServerRequest>() })
 	expect(result).toStrictEqual({
 		matched: false,
@@ -17,7 +17,7 @@ it('not match', () => {
 })
 
 it('match', () => {
-	const result = new RegExpUrlMatcher([/^\/test$/])
+	const result = regExpUrl([/^\/test$/])
 		.match({
 			req: createRequest<ServerRequest>({
 				url: '/test',
@@ -30,7 +30,7 @@ it('match', () => {
 })
 
 it('match first', () => {
-	const result = new RegExpUrlMatcher([/^\/test$/, /^\/test2$/])
+	const result = regExpUrl([/^\/test$/, /^\/test2$/])
 		.match({
 			req: createRequest<ServerRequest>({
 				url: '/test',
@@ -43,7 +43,7 @@ it('match first', () => {
 })
 
 it('match second', () => {
-	const result = new RegExpUrlMatcher([/^\/test$/, /^\/test2$/])
+	const result = regExpUrl([/^\/test$/, /^\/test2$/])
 		.match({
 			req: createRequest<ServerRequest>({
 				url: '/test2',
@@ -56,7 +56,7 @@ it('match second', () => {
 })
 
 it('match group', () => {
-	const result = new RegExpUrlMatcher<{ groupId: string }>([/^\/group\/(?<groupId>[^/]+)$/])
+	const result = regExpUrl<{ groupId: string }>([/^\/group\/(?<groupId>[^/]+)$/])
 		.match({
 			req: createRequest<ServerRequest>({
 				url: '/group/123',
@@ -70,7 +70,7 @@ it('match group', () => {
 })
 
 it(`url is empty`, () => {
-	const result = new RegExpUrlMatcher([/^\/$/])
+	const result = regExpUrl([/^\/$/])
 		.match({
 			req: createRequest<ServerRequest>({
 				url: '',
@@ -83,7 +83,7 @@ it(`url is empty`, () => {
 })
 
 it(`query string isn't matched`, () => {
-	const result = new RegExpUrlMatcher([/^\/test$/])
+	const result = regExpUrl([/^\/test$/])
 		.match({
 			req: createRequest<ServerRequest>({
 				url: '/test?query=not-matched',

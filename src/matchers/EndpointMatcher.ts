@@ -10,7 +10,8 @@ import {
 	MethodMatcher,
 } from './MethodMatcher'
 import {
-	AndMatcher,
+	type AndMatcher,
+	and,
 } from './AndMatcher'
 import {
 	type RegExpExecGroupArray,
@@ -53,7 +54,7 @@ implements Matcher<EndpointMatchResult<R>, P> {
 	>
 	constructor(methods: Method | Method[], url: RegExp) {
 		this.match = this.match.bind(this)
-		this.matcher = new AndMatcher([
+		this.matcher = and([
 			new MethodMatcher(Array.isArray(methods) ? methods : [methods]),
 			new RegExpUrlMatcher<R, P>([url]),
 		])
@@ -78,4 +79,11 @@ implements Matcher<EndpointMatchResult<R>, P> {
 			matched: false,
 		}
 	}
+}
+
+export function endpoint<
+	R extends object,
+	P extends EndpointMatcherInput = EndpointMatcherInput
+>(methods: Method | Method[], url: RegExp): EndpointMatcher<R, P> {
+	return new EndpointMatcher(methods, url)
 }

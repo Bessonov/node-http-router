@@ -4,14 +4,14 @@ import {
 import {
 	ExactUrlPathnameMatcher,
 	MethodMatcher,
-	OrMatcher,
+	or,
 } from '..'
 import type {
 	ServerRequest,
 } from '../../node/ServerRequest'
 
 it('none match', () => {
-	const result = new OrMatcher([
+	const result = or([
 		new MethodMatcher(['DELETE']),
 		new MethodMatcher(['POST']),
 	])
@@ -22,7 +22,7 @@ it('none match', () => {
 })
 
 it('first match, second not', () => {
-	const result = new OrMatcher([
+	const result = or([
 		new MethodMatcher(['DELETE']),
 		new MethodMatcher(['POST']),
 	]).match({ req: createRequest<ServerRequest>({ method: 'DELETE' }) })
@@ -49,9 +49,10 @@ it('first not match, but second', () => {
 		method: 'POST',
 	})
 
-	const result = new OrMatcher([
+	const result = or([
 		new MethodMatcher(['DELETE']),
 		new MethodMatcher(['POST']),
+		undefined,
 	]).match({ req })
 	expect(result).toStrictEqual({
 		matched: true,
@@ -66,6 +67,7 @@ it('first not match, but second', () => {
 						method: 'POST',
 					},
 				},
+				undefined,
 			],
 		},
 	})
@@ -76,7 +78,7 @@ it('both match', () => {
 		url: '/test',
 	})
 
-	const result = new OrMatcher([
+	const result = or([
 		new MethodMatcher(['GET']),
 		new ExactUrlPathnameMatcher(['/test']),
 	]).match({ req })

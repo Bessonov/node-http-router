@@ -14,7 +14,6 @@ import {
 	Router,
 } from '../Router'
 import {
-	AndMatcher,
 	type AndMatcherResult,
 	EndpointMatcher,
 	type ExactUrlPathnameMatchResult,
@@ -24,6 +23,7 @@ import {
 	type MethodMatchResult,
 	MethodMatcher,
 	RegExpUrlMatcher,
+	and,
 } from '../matchers'
 import type {
 	ServerRequest,
@@ -108,7 +108,7 @@ it('match POST /test route', () => {
 	}
 
 	router.addRoute({
-		matcher: new AndMatcher([
+		matcher: and([
 			new MethodMatcher(['POST']),
 			new ExactUrlPathnameMatcher(['/test']),
 		]),

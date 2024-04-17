@@ -103,3 +103,10 @@ implements Matcher<ExactQueryMatchResult<U>, P> {
 		}
 	}
 }
+
+export function exactQuery<
+	U extends QueryMatch,
+	P extends ExactQueryMatcherInput
+>(config: U): ExactQueryMatcher<U, P> {
+	return new ExactQueryMatcher(config)
+}

@@ -2,13 +2,13 @@ import {
 	createRequest,
 } from 'node-mocks-http'
 import {
-	ExactQueryMatcher,
+	exactQuery,
 } from '..'
 import type {
 	ServerRequest,
 } from '../../node/ServerRequest'
 
-const matcher = new ExactQueryMatcher({
+const matcher = exactQuery({
 	mustPresent: true,
 	mustAbsent: false,
 	isOptional: undefined,

@@ -22,3 +22,7 @@ export class BooleanMatcher<T extends boolean> implements Matcher<MatchResult<T>
 		}
 	}
 }
+
+export function bool<T extends boolean>(value: T): BooleanMatcher<T> {
+	return new BooleanMatcher(value)
+}

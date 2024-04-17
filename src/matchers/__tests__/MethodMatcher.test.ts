@@ -2,14 +2,14 @@ import {
 	createRequest,
 } from 'node-mocks-http'
 import {
-	MethodMatcher,
+	method,
 } from '../MethodMatcher'
 import type {
 	ServerRequest,
 } from '../../node/ServerRequest'
 
 it('not match', () => {
-	const result = new MethodMatcher(['POST'])
+	const result = method(['POST'])
 		.match({ req: createRequest<ServerRequest>() })
 	expect(result).toStrictEqual({
 		matched: false,
@@ -17,7 +17,7 @@ it('not match', () => {
 })
 
 it('match GET', () => {
-	const result = new MethodMatcher(['GET'])
+	const result = method(['GET'])
 		.match({
 			req: createRequest<ServerRequest>({
 				url: '/test',
@@ -32,7 +32,7 @@ it('match GET', () => {
 })
 
 it('match first', () => {
-	const result = new MethodMatcher(['POST', 'GET'])
+	const result = method(['POST', 'GET'])
 		.match({
 			req: createRequest<ServerRequest>({
 				method: 'POST',
@@ -47,7 +47,7 @@ it('match first', () => {
 })
 
 it('match second', () => {
-	const result = new MethodMatcher(['POST', 'GET'])
+	const result = method(['POST', 'GET'])
 		.match({
 			req: createRequest<ServerRequest>({
 				method: 'GET',

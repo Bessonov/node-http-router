@@ -2,17 +2,17 @@ import {
 	createRequest,
 } from 'node-mocks-http'
 import {
-	AndMatcher,
 	BooleanMatcher,
 	ExactUrlPathnameMatcher,
 	MethodMatcher,
+	and,
 } from '..'
 import type {
 	ServerRequest,
 } from '../../node/ServerRequest'
 
 it('none match', () => {
-	const result = new AndMatcher([
+	const result = and([
 		new MethodMatcher(['POST']),
 		new ExactUrlPathnameMatcher(['/test']),
 	]).match({ req: createRequest<ServerRequest>() })
@@ -23,7 +23,7 @@ it('none match', () => {
 })
 
 it('first match, second not', () => {
-	const result = new AndMatcher([
+	const result = and([
 		new MethodMatcher(['GET']),
 		new ExactUrlPathnameMatcher(['/test']),
 	]).match({ req: createRequest<ServerRequest>() })
@@ -39,7 +39,7 @@ it('first not match, but second', () => {
 		url: '/test',
 	})
 
-	const result = new AndMatcher([
+	const result = and([
 		new MethodMatcher(['GET']),
 		new ExactUrlPathnameMatcher(['/test']),
 	]).match({ req })
@@ -54,7 +54,7 @@ it('both match', () => {
 		url: '/test',
 	})
 
-	const result = new AndMatcher([
+	const result = and([
 		new MethodMatcher(['GET']),
 		new ExactUrlPathnameMatcher(['/test']),
 	]).match({ req })
@@ -85,7 +85,7 @@ it('three not a match', () => {
 		url: '/test',
 	})
 
-	const result = new AndMatcher([
+	const result = and([
 		new MethodMatcher(['GET']),
 		new ExactUrlPathnameMatcher(['/test']),
 		new BooleanMatcher(false),
@@ -101,7 +101,7 @@ it('three match', () => {
 		url: '/test',
 	})
 
-	const result = new AndMatcher([
+	const result = and([
 		new MethodMatcher(['GET']),
 		new ExactUrlPathnameMatcher(['/test']),
 		new BooleanMatcher(true),

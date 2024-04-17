@@ -2,14 +2,14 @@ import {
 	createRequest,
 } from 'node-mocks-http'
 import {
-	EndpointMatcher,
+	endpoint,
 } from '..'
 import type {
 	ServerRequest,
 } from '../../node/ServerRequest'
 
 it('not match empty', () => {
-	const result = new EndpointMatcher('GET', /\/test/)
+	const result = endpoint('GET', /\/test/)
 		.match({ req: createRequest<ServerRequest>() })
 	expect(result).toStrictEqual({
 		matched: false,
@@ -17,7 +17,7 @@ it('not match empty', () => {
 })
 
 it('usual usage', () => {
-	const matcher = new EndpointMatcher(['GET', 'POST'], /\/test/)
+	const matcher = endpoint(['GET', 'POST'], /\/test/)
 	// https://github.com/facebook/jest/issues/8475#issuecomment-656629010
 	expect(() => {
 		expect(matcher.match({
@@ -60,4 +60,26 @@ it('usual usage', () => {
 	})).toStrictEqual({
 		matched: false,
 	})
+})
+
+it('match path', () => {
+	const matcher = endpoint<{ userId: string }>('GET', /^\/api\/user\/(?<userId>[^/]+)$/)
+	// https://github.com/facebook/jest/issues/8475#issuecomment-656629010
+	expect(() => {
+		const match = matcher.match({
+			req: createRequest<ServerRequest>({
+				url: '/api/user/5',
+			}),
+		})
+		expect(match).toStrictEqual({
+			matched: true,
+			result: {
+				method: 'GET',
+				match: [
+					'/api/user/5',
+					'5',
+				],
+			},
+		})
+	}).toThrow('serializes to the same string')
 })

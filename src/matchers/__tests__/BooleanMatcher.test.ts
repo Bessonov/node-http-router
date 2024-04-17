@@ -1,9 +1,9 @@
 import {
-	BooleanMatcher,
+	bool,
 } from '..'
 
 it('match', () => {
-	const result = new BooleanMatcher(true)
+	const result = bool(true)
 		.match()
 	expect(result).toStrictEqual({
 		matched: true,
@@ -12,7 +12,7 @@ it('match', () => {
 })
 
 it('not match', () => {
-	const result = new BooleanMatcher(false)
+	const result = bool(false)
 		.match()
 	expect(result).toStrictEqual({
 		matched: false,

@@ -53,3 +53,10 @@ implements Matcher<RegExpUrlMatchResult<R>, P> {
 		}
 	}
 }
+
+export function regExpUrl<
+	R extends object,
+	P extends RegExpUrlMatcherInput = RegExpUrlMatcherInput
+>(urls: RegExp[]): RegExpUrlMatcher<R, P> {
+	return new RegExpUrlMatcher(urls)
+}

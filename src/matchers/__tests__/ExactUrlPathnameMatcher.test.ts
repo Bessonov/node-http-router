@@ -2,14 +2,14 @@ import {
 	createRequest,
 } from 'node-mocks-http'
 import {
-	ExactUrlPathnameMatcher,
+	exactUrlPathname,
 } from '..'
 import type {
 	ServerRequest,
 } from '../../node/ServerRequest'
 
 it('not match empty', () => {
-	const result = new ExactUrlPathnameMatcher(['/test'])
+	const result = exactUrlPathname(['/test'])
 		.match({ req: createRequest<ServerRequest>() })
 	expect(result).toStrictEqual({
 		matched: false,
@@ -17,7 +17,7 @@ it('not match empty', () => {
 })
 
 it('not match with postfix', () => {
-	const result = new ExactUrlPathnameMatcher(['/test'])
+	const result = exactUrlPathname(['/test'])
 		.match({
 			req: createRequest<ServerRequest>({
 				url: '/test2',
@@ -29,7 +29,7 @@ it('not match with postfix', () => {
 })
 
 it('not match prefix', () => {
-	const result = new ExactUrlPathnameMatcher(['/test'])
+	const result = exactUrlPathname(['/test'])
 		.match({
 			req: createRequest<ServerRequest>({
 				url: '/tes',
@@ -41,7 +41,7 @@ it('not match prefix', () => {
 })
 
 it('match', () => {
-	const result = new ExactUrlPathnameMatcher(['/test'])
+	const result = exactUrlPathname(['/test'])
 		.match({
 			req: createRequest<ServerRequest>({
 				url: '/test?foo=bar',
@@ -56,7 +56,7 @@ it('match', () => {
 })
 
 it('match first', () => {
-	const result = new ExactUrlPathnameMatcher(['/test', '/foo'])
+	const result = exactUrlPathname(['/test', '/foo'])
 		.match({
 			req: createRequest<ServerRequest>({
 				url: '/test',
@@ -71,7 +71,7 @@ it('match first', () => {
 })
 
 it('match second', () => {
-	const result = new ExactUrlPathnameMatcher(['/test', '/foo'])
+	const result = exactUrlPathname(['/test', '/foo'])
 		.match({
 			req: createRequest<ServerRequest>({
 				url: '/foo',
