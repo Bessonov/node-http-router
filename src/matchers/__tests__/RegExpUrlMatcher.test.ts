@@ -68,3 +68,29 @@ it('match group', () => {
 		expect(result.result.match.groups.groupId).toBe('123')
 	}
 })
+
+it(`url is empty`, () => {
+	const result = new RegExpUrlMatcher([/^\/$/])
+		.match({
+			req: createRequest<ServerRequest>({
+				url: '',
+			}),
+		})
+	expect(result.matched).toBe(true)
+	if (result.matched) {
+		expect(result.result.match.input).toBe('/')
+	}
+})
+
+it(`query string isn't matched`, () => {
+	const result = new RegExpUrlMatcher([/^\/test$/])
+		.match({
+			req: createRequest<ServerRequest>({
+				url: '/test?query=not-matched',
+			}),
+		})
+	expect(result.matched).toBe(true)
+	if (result.matched) {
+		expect(result.result.match.input).toBe('/test')
+	}
+})

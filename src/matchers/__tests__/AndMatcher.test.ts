@@ -80,6 +80,22 @@ it('both match', () => {
 	})
 })
 
+it('three not a match', () => {
+	const req = createRequest<ServerRequest>({
+		url: '/test',
+	})
+
+	const result = new AndMatcher([
+		new MethodMatcher(['GET']),
+		new ExactUrlPathnameMatcher(['/test']),
+		new BooleanMatcher(false),
+	]).match({ req })
+
+	expect(result).toStrictEqual({
+		matched: false,
+	})
+})
+
 it('three match', () => {
 	const req = createRequest<ServerRequest>({
 		url: '/test',

@@ -39,7 +39,7 @@ it('usual usage', () => {
 		expect(matcher.match({
 			req: createRequest<ServerRequest>({
 				method: 'POST',
-				url: '/test',
+				url: '/test?query=ignored',
 			}),
 		})).toStrictEqual({
 			matched: true,

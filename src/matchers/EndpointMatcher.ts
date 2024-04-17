@@ -45,7 +45,12 @@ export class EndpointMatcher<
 	P extends EndpointMatcherInput = EndpointMatcherInput
 >
 implements Matcher<EndpointMatchResult<R>, P> {
-	private readonly matcher: AndMatcher<MethodMatchResult<[Method]>, RegExpUrlMatchResult<R>, P, P>
+	private readonly matcher: AndMatcher<
+	MethodMatchResult<[Method]>,
+	P,
+	RegExpUrlMatchResult<R>,
+	P
+	>
 	constructor(methods: Method | Method[], url: RegExp) {
 		this.match = this.match.bind(this)
 		this.matcher = new AndMatcher([

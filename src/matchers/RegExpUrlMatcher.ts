@@ -1,3 +1,4 @@
+import Url from 'urlite'
 import type {
 	Matcher,
 } from './Matcher'
@@ -33,16 +34,16 @@ implements Matcher<RegExpUrlMatchResult<R>, P> {
 	}
 
 	match({ req }: RegExpUrlMatcherInput): RegExpUrlMatchResult<R> {
-		if (req.url) {
-			for (const url of this.urls) {
-				const result = url.exec(req.url) as never as RegExpExecGroupArray<R>
-				if (result !== null) {
-					return {
-						matched: true,
-						result: {
-							match: result,
-						},
-					}
+		// original URL returns '/' if pathname is empty
+		const pathname = Url.parse(req.url).pathname ?? '/'
+		for (const url of this.urls) {
+			const result = url.exec(pathname) as unknown as RegExpExecGroupArray<R>
+			if (result !== null) {
+				return {
+					matched: true,
+					result: {
+						match: result,
+					},
 				}
 			}
 		}
