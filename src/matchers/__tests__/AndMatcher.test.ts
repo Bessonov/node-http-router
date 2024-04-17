@@ -3,6 +3,7 @@ import {
 } from 'node-mocks-http'
 import {
 	AndMatcher,
+	BooleanMatcher,
 	ExactUrlPathnameMatcher,
 	MethodMatcher,
 } from '..'
@@ -73,6 +74,42 @@ it('both match', () => {
 					result: {
 						pathname: '/test',
 					},
+				},
+			],
+		},
+	})
+})
+
+it('three match', () => {
+	const req = createRequest<ServerRequest>({
+		url: '/test',
+	})
+
+	const result = new AndMatcher([
+		new MethodMatcher(['GET']),
+		new ExactUrlPathnameMatcher(['/test']),
+		new BooleanMatcher(true),
+	]).match({ req })
+
+	expect(result).toStrictEqual({
+		matched: true,
+		result: {
+			and: [
+				{
+					matched: true,
+					result: {
+						method: 'GET',
+					},
+				},
+				{
+					matched: true,
+					result: {
+						pathname: '/test',
+					},
+				},
+				{
+					matched: true,
+					result: true,
 				},
 			],
 		},
