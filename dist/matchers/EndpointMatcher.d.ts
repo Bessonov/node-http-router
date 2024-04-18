@@ -1,7 +1,7 @@
-import type { Matcher } from './Matcher';
-import type { MatchResult } from './MatchResult';
-import { type Method } from './MethodMatcher';
-import { type RegExpExecGroupArray } from './RegExpUrlMatcher';
+import type { Matcher } from './Matcher.js';
+import type { MatchResult } from './MatchResult.js';
+import { type Method } from './MethodMatcher.js';
+import { type RegExpExecGroupArray } from './RegExpUrlMatcher.js';
 export interface EndpointMatcherInput {
     req: {
         url: string;

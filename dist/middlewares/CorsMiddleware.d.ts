@@ -1,5 +1,5 @@
-import type { MatchResultAny } from '../matchers/MatchResult';
-import type { Handler } from '../Router';
+import type { MatchResultAny } from '../matchers/MatchResult.js';
+import type { Handler } from '../Router.js';
 export interface CorsMiddlewareInput {
     headers: {
         origin?: string;

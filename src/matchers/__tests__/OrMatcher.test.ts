@@ -5,10 +5,10 @@ import {
 	ExactUrlPathnameMatcher,
 	MethodMatcher,
 	or,
-} from '..'
+} from '../index.js'
 import type {
 	ServerRequest,
-} from '../../node/ServerRequest'
+} from '../../node/ServerRequest.js'
 
 it('none match', () => {
 	const result = or([

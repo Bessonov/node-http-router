@@ -1,9 +1,9 @@
 import type {
 	MatchResultAny,
-} from '../matchers/MatchResult'
+} from '../matchers/MatchResult.js'
 import type {
 	Handler,
-} from '../Router'
+} from '../Router.js'
 
 export interface CorsMiddlewareInput {
 	headers: {

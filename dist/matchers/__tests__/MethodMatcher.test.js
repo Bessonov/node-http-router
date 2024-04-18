@@ -1,5 +1,5 @@
 import { createRequest, } from 'node-mocks-http';
-import { method, } from '../MethodMatcher';
+import { method, } from '../MethodMatcher.js';
 it('not match', () => {
     const result = method(['POST'])
         .match({ req: createRequest() });

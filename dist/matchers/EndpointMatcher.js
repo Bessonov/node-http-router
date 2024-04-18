@@ -1,6 +1,6 @@
-import { MethodMatcher, } from './MethodMatcher';
-import { and, } from './AndMatcher';
-import { RegExpUrlMatcher, } from './RegExpUrlMatcher';
+import { MethodMatcher, } from './MethodMatcher.js';
+import { and, } from './AndMatcher.js';
+import { RegExpUrlMatcher, } from './RegExpUrlMatcher.js';
 /**
  * higher order matcher which is combine matching of method
  * with regular expression

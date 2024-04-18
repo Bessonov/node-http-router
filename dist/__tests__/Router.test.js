@@ -1,9 +1,9 @@
 import { createRequest, createResponse, } from 'node-mocks-http';
 import { compile, pathToRegexp, } from 'path-to-regexp';
-import { Router, } from '../Router';
-import { EndpointMatcher, ExactUrlPathnameMatcher, MethodMatcher, RegExpUrlMatcher, and, } from '../matchers';
-import { BooleanMatcher, } from '../matchers/BooleanMatcher';
-import { NodeHttpRouter, } from '../node/NodeHttpRouter';
+import { Router, } from '../Router.js';
+import { EndpointMatcher, ExactUrlPathnameMatcher, MethodMatcher, RegExpUrlMatcher, and, } from '../matchers/index.js';
+import { BooleanMatcher, } from '../matchers/BooleanMatcher.js';
+import { NodeHttpRouter, } from '../node/NodeHttpRouter.js';
 let router;
 beforeEach(() => {
     router = new Router();

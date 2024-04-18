@@ -1,6 +1,6 @@
 import { IncomingMessage, ServerResponse, } from 'http';
-import { Router, } from '../Router';
-import { toServerRequest, } from './ServerRequest';
+import { Router, } from '../Router.js';
+import { toServerRequest, } from './ServerRequest.js';
 export class NodeHttpRouter extends Router {
     constructor(defaultHandler) {
         super(defaultHandler);

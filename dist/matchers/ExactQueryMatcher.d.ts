@@ -1,5 +1,5 @@
-import type { Matcher } from './Matcher';
-import type { MatchResult } from './MatchResult';
+import type { Matcher } from './Matcher.js';
+import type { MatchResult } from './MatchResult.js';
 export interface ExactQueryMatcherInput {
     req: {
         url: string;

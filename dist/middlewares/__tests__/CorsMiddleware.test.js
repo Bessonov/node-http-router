@@ -1,6 +1,6 @@
 import { createRequest, createResponse, } from 'node-mocks-http';
 import { jest, } from '@jest/globals';
-import { CorsMiddleware, } from '../CorsMiddleware';
+import { CorsMiddleware, } from '../CorsMiddleware.js';
 describe('simple configuration', () => {
     beforeEach(() => {
         jest.resetAllMocks();

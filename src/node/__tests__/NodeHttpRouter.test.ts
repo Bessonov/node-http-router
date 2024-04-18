@@ -4,10 +4,10 @@ import {
 } from 'http'
 import {
 	ExactUrlPathnameMatcher,
-} from '../../matchers'
+} from '../../matchers/index.js'
 import {
 	NodeHttpRouter,
-} from '../NodeHttpRouter'
+} from '../NodeHttpRouter.js'
 
 it('missing method in request', () => {
 	const nodeRouter = new NodeHttpRouter()

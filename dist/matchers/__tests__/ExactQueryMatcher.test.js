@@ -1,5 +1,5 @@
 import { createRequest, } from 'node-mocks-http';
-import { exactQuery, } from '..';
+import { exactQuery, } from '../index.js';
 const matcher = exactQuery({
     mustPresent: true,
     mustAbsent: false,

@@ -1,5 +1,5 @@
 import { createRequest, } from 'node-mocks-http';
-import { ExactUrlPathnameMatcher, MethodMatcher, or, } from '..';
+import { ExactUrlPathnameMatcher, MethodMatcher, or, } from '../index.js';
 it('none match', () => {
     const result = or([
         new MethodMatcher(['DELETE']),

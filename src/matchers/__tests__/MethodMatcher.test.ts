@@ -3,10 +3,10 @@ import {
 } from 'node-mocks-http'
 import {
 	method,
-} from '../MethodMatcher'
+} from '../MethodMatcher.js'
 import type {
 	ServerRequest,
-} from '../../node/ServerRequest'
+} from '../../node/ServerRequest.js'
 
 it('not match', () => {
 	const result = method(['POST'])

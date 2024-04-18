@@ -1,23 +1,23 @@
 import type {
 	Matcher,
-} from './Matcher'
+} from './Matcher.js'
 import type {
 	MatchResult,
-} from './MatchResult'
+} from './MatchResult.js'
 import {
 	type Method,
 	type MethodMatchResult,
 	MethodMatcher,
-} from './MethodMatcher'
+} from './MethodMatcher.js'
 import {
 	type AndMatcher,
 	and,
-} from './AndMatcher'
+} from './AndMatcher.js'
 import {
 	type RegExpExecGroupArray,
 	type RegExpUrlMatchResult,
 	RegExpUrlMatcher,
-} from './RegExpUrlMatcher'
+} from './RegExpUrlMatcher.js'
 
 // waiting for
 // https://github.com/microsoft/TypeScript/issues/10571

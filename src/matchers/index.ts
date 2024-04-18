@@ -2,26 +2,26 @@ export {
 	and,
 	AndMatcher,
 	type AndMatcherResult,
-} from './AndMatcher'
+} from './AndMatcher.js'
 export {
 	endpoint,
 	EndpointMatcher,
 	type EndpointMatcherInput,
-} from './EndpointMatcher'
+} from './EndpointMatcher.js'
 export {
 	exactQuery,
 	ExactQueryMatcher,
-} from './ExactQueryMatcher'
+} from './ExactQueryMatcher.js'
 export {
 	exactUrlPathname,
 	ExactUrlPathnameMatcher,
 	type ExactUrlPathnameMatcherInput,
 	type ExactUrlPathnameMatchResult,
-} from './ExactUrlPathnameMatcher'
+} from './ExactUrlPathnameMatcher.js'
 export {
 	type ExtractMatchResult,
 	type Matcher,
-} from './Matcher'
+} from './Matcher.js'
 export {
 	isMatched,
 	type Matched,
@@ -29,26 +29,26 @@ export {
 	type MatchResultAny,
 	type MatchedResult,
 	type UnmatchedResult,
-} from './MatchResult'
+} from './MatchResult.js'
 export {
 	method,
 	type Method,
 	MethodMatcher,
 	type MethodMatcherInput,
 	type MethodMatchResult,
-} from './MethodMatcher'
+} from './MethodMatcher.js'
 export {
 	or,
 	OrMatcher,
 	type OrMatcherResult,
-} from './OrMatcher'
+} from './OrMatcher.js'
 export {
 	regExpUrl,
 	RegExpUrlMatcher,
 	type RegExpUrlMatcherInput,
 	type RegExpUrlMatchResult,
-} from './RegExpUrlMatcher'
+} from './RegExpUrlMatcher.js'
 export {
 	bool,
 	BooleanMatcher,
-} from './BooleanMatcher'
+} from './BooleanMatcher.js'

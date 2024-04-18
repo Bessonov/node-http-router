@@ -3,10 +3,10 @@ import {
 } from 'node-mocks-http'
 import {
 	exactUrlPathname,
-} from '..'
+} from '../index.js'
 import type {
 	ServerRequest,
-} from '../../node/ServerRequest'
+} from '../../node/ServerRequest.js'
 
 it('not match empty', () => {
 	const result = exactUrlPathname(['/test'])

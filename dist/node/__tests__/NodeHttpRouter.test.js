@@ -1,6 +1,6 @@
 import { IncomingMessage, ServerResponse, } from 'http';
-import { ExactUrlPathnameMatcher, } from '../../matchers';
-import { NodeHttpRouter, } from '../NodeHttpRouter';
+import { ExactUrlPathnameMatcher, } from '../../matchers/index.js';
+import { NodeHttpRouter, } from '../NodeHttpRouter.js';
 it('missing method in request', () => {
     const nodeRouter = new NodeHttpRouter();
     expect(() => nodeRouter.serve({}, {})).toThrowError(`request missing 'method'`);

@@ -3,10 +3,10 @@ import {
 } from 'node-mocks-http'
 import {
 	exactQuery,
-} from '..'
+} from '../index.js'
 import type {
 	ServerRequest,
-} from '../../node/ServerRequest'
+} from '../../node/ServerRequest.js'
 
 const matcher = exactQuery({
 	mustPresent: true,

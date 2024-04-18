@@ -1,5 +1,5 @@
 import { createRequest, } from 'node-mocks-http';
-import { BooleanMatcher, ExactUrlPathnameMatcher, MethodMatcher, and, } from '..';
+import { BooleanMatcher, ExactUrlPathnameMatcher, MethodMatcher, and, } from '../index.js';
 it('none match', () => {
     const result = and([
         new MethodMatcher(['POST']),

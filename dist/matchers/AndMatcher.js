@@ -1,4 +1,4 @@
-import { isMatched, } from './MatchResult';
+import { isMatched, } from './MatchResult.js';
 /**
  * Match if every matcher matches
  */

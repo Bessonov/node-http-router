@@ -2,7 +2,7 @@ export {
 	CorsMiddleware,
 	type CorsMiddlewareCallbackResult,
 	type CorsMiddlewareInput,
-} from './CorsMiddleware'
+} from './CorsMiddleware.js'
 export {
 	type MiddlewareData,
-} from './MiddlewareData'
+} from './MiddlewareData.js'

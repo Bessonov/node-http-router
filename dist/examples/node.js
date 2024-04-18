@@ -1,7 +1,7 @@
 import http from 'http';
-import { EndpointMatcher, ExactUrlPathnameMatcher, } from '../matchers';
-import { BooleanMatcher, } from '../matchers/BooleanMatcher';
-import { NodeHttpRouter, } from '../node/NodeHttpRouter';
+import { EndpointMatcher, ExactUrlPathnameMatcher, } from '../matchers/index.js';
+import { BooleanMatcher, } from '../matchers/BooleanMatcher.js';
+import { NodeHttpRouter, } from '../node/NodeHttpRouter.js';
 /*
 
 Demo how to use router with native node native http server

@@ -5,15 +5,15 @@ import {
 import type {
 	MatchResult,
 	MatchedResult,
-} from '../matchers'
+} from '../matchers/index.js'
 import {
 	type Handler,
 	Router,
-} from '../Router'
+} from '../Router.js'
 import {
 	type ServerRequest,
 	toServerRequest,
-} from './ServerRequest'
+} from './ServerRequest.js'
 
 interface ServerRequestResponse {
 	req: ServerRequest

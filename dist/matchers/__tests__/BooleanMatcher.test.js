@@ -1,4 +1,4 @@
-import { bool, } from '..';
+import { bool, } from '../index.js';
 it('match', () => {
     const result = bool(true)
         .match();

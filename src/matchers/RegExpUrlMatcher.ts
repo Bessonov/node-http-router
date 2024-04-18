@@ -1,10 +1,10 @@
 import Url from 'urlite'
 import type {
 	Matcher,
-} from './Matcher'
+} from './Matcher.js'
 import type {
 	MatchResult,
-} from './MatchResult'
+} from './MatchResult.js'
 
 export interface RegExpUrlMatcherInput {
 	req: {

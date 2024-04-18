@@ -2,11 +2,11 @@ import {
 	type Matched,
 	type Matcher,
 	isMatched,
-} from './matchers'
+} from './matchers/index.js'
 import {
 	type MatchResult,
 	type MatchResultAny,
-} from './matchers/MatchResult'
+} from './matchers/MatchResult.js'
 
 interface HandlerParams<MR extends MatchResultAny, D> {
 	match: Matched<MR>

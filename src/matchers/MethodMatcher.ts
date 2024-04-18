@@ -1,9 +1,9 @@
 import type {
 	Matcher,
-} from './Matcher'
+} from './Matcher.js'
 import type {
 	MatchResult,
-} from './MatchResult'
+} from './MatchResult.js'
 
 const validMethods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'] as const
 

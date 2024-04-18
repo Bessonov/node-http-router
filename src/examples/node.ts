@@ -2,13 +2,13 @@ import http from 'http'
 import {
 	EndpointMatcher,
 	ExactUrlPathnameMatcher,
-} from '../matchers'
+} from '../matchers/index.js'
 import {
 	BooleanMatcher,
-} from '../matchers/BooleanMatcher'
+} from '../matchers/BooleanMatcher.js'
 import {
 	NodeHttpRouter,
-} from '../node/NodeHttpRouter'
+} from '../node/NodeHttpRouter.js'
 
 /*
 

@@ -1,5 +1,5 @@
-import { isMatched, } from './matchers';
-import {} from './matchers/MatchResult';
+import { isMatched, } from './matchers/index.js';
+import {} from './matchers/MatchResult.js';
 export class Router {
     constructor(defaultHandler) {
         this.defaultHandler = defaultHandler;

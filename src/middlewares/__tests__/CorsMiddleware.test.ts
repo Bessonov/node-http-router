@@ -7,7 +7,7 @@ import {
 } from '@jest/globals'
 import {
 	CorsMiddleware,
-} from '../CorsMiddleware'
+} from '../CorsMiddleware.js'
 
 describe('simple configuration', () => {
 	beforeEach(() => {

@@ -1,6 +1,6 @@
 import {
 	bool,
-} from '..'
+} from '../index.js'
 
 it('match', () => {
 	const result = bool(true)

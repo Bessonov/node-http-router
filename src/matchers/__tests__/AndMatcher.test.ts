@@ -6,10 +6,10 @@ import {
 	ExactUrlPathnameMatcher,
 	MethodMatcher,
 	and,
-} from '..'
+} from '../index.js'
 import type {
 	ServerRequest,
-} from '../../node/ServerRequest'
+} from '../../node/ServerRequest.js'
 
 it('none match', () => {
 	const result = and([

@@ -1,5 +1,5 @@
 import { createRequest, } from 'node-mocks-http';
-import { endpoint, } from '..';
+import { endpoint, } from '../index.js';
 it('not match empty', () => {
     const result = endpoint('GET', /\/test/)
         .match({ req: createRequest() });

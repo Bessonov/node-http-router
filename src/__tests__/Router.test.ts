@@ -12,7 +12,7 @@ import type {
 import {
 	type MatchedHandler,
 	Router,
-} from '../Router'
+} from '../Router.js'
 import {
 	type AndMatcherResult,
 	EndpointMatcher,
@@ -24,22 +24,22 @@ import {
 	MethodMatcher,
 	RegExpUrlMatcher,
 	and,
-} from '../matchers'
+} from '../matchers/index.js'
 import type {
 	ServerRequest,
-} from '../node/ServerRequest'
+} from '../node/ServerRequest.js'
 import type {
 	MatchResult,
-} from '../matchers/MatchResult'
+} from '../matchers/MatchResult.js'
 import type {
 	Matcher,
-} from '../matchers/Matcher'
+} from '../matchers/Matcher.js'
 import {
 	BooleanMatcher,
-} from '../matchers/BooleanMatcher'
+} from '../matchers/BooleanMatcher.js'
 import {
 	NodeHttpRouter,
-} from '../node/NodeHttpRouter'
+} from '../node/NodeHttpRouter.js'
 
 let router: Router<{ req: ServerRequest }>
 

@@ -1,9 +1,9 @@
 import type {
 	MatchResultAny,
-} from '../matchers/MatchResult'
+} from '../matchers/MatchResult.js'
 import type {
 	Handler,
-} from '../Router'
+} from '../Router.js'
 
 export type MiddlewareData<
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any

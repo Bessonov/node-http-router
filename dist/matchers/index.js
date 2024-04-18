@@ -1,11 +1,11 @@
-export { and, AndMatcher, } from './AndMatcher';
-export { endpoint, EndpointMatcher, } from './EndpointMatcher';
-export { exactQuery, ExactQueryMatcher, } from './ExactQueryMatcher';
-export { exactUrlPathname, ExactUrlPathnameMatcher, } from './ExactUrlPathnameMatcher';
-export {} from './Matcher';
-export { isMatched, } from './MatchResult';
-export { method, MethodMatcher, } from './MethodMatcher';
-export { or, OrMatcher, } from './OrMatcher';
-export { regExpUrl, RegExpUrlMatcher, } from './RegExpUrlMatcher';
-export { bool, BooleanMatcher, } from './BooleanMatcher';
+export { and, AndMatcher, } from './AndMatcher.js';
+export { endpoint, EndpointMatcher, } from './EndpointMatcher.js';
+export { exactQuery, ExactQueryMatcher, } from './ExactQueryMatcher.js';
+export { exactUrlPathname, ExactUrlPathnameMatcher, } from './ExactUrlPathnameMatcher.js';
+export {} from './Matcher.js';
+export { isMatched, } from './MatchResult.js';
+export { method, MethodMatcher, } from './MethodMatcher.js';
+export { or, OrMatcher, } from './OrMatcher.js';
+export { regExpUrl, RegExpUrlMatcher, } from './RegExpUrlMatcher.js';
+export { bool, BooleanMatcher, } from './BooleanMatcher.js';
 //# sourceMappingURL=index.js.map

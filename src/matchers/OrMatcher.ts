@@ -1,12 +1,12 @@
 import type {
 	Matcher,
-} from './Matcher'
+} from './Matcher.js'
 import {
 	type MatchResult,
 	type MatchResultAny,
 	type Matched,
 	isMatched,
-} from './MatchResult'
+} from './MatchResult.js'
 
 export type OrMatcherResult<
 	MR1 extends MatchResultAny | never = never,
