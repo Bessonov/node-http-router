@@ -37,6 +37,7 @@
 		"example-node-start": "pnpm run compile && node dist/examples/node.js",
 		"example-micro-start": "pnpm run compile && node dist/examples/micro.js",
 		"precommit": "pnpm run format && pnpm run compile && pnpm test && pnpm run lint",
+		"precommit:fix": "pnpm run format:fix && pnpm run compile && pnpm test && pnpm run lint --fix",
 		"update": "pnpm update --interactive --recursive --latest"
 	},
 	"ultra": {

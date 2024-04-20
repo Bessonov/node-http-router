@@ -1,6 +1,4 @@
-import { type Method } from './index.js';
-import type { Matcher } from './Matcher.js';
-import type { MatchResult } from './MatchResult.js';
+import { type Matcher, type MatchResult, type Method } from './index.js';
 import type { RegExpExecGroupArray } from './RegExpUrlMatcher.js';
 export interface EndpointMatcherInput {
     req: {
@@ -18,7 +16,7 @@ export type EndpointMatchResult<R extends object> = MatchResult<{
  */
 export declare class EndpointMatcher<R extends object, P extends EndpointMatcherInput = EndpointMatcherInput> implements Matcher<EndpointMatchResult<R>, P> {
     private readonly matcher;
-    constructor(methods: Method | Method[], url: RegExp);
+    constructor(methods: Method | Method[], urls: RegExp | string | (RegExp | string)[]);
     match(params: EndpointMatcherInput): EndpointMatchResult<R>;
 }
-export declare function endpoint<R extends object, P extends EndpointMatcherInput = EndpointMatcherInput>(methods: Method | Method[], url: RegExp): EndpointMatcher<R, P>;
+export declare function endpoint<R extends object, P extends EndpointMatcherInput = EndpointMatcherInput>(...args: ConstructorParameters<typeof EndpointMatcher<R, P>>): EndpointMatcher<R, P>;

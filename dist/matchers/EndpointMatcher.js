@@ -1,14 +1,14 @@
-import { and, method, RegExpUrlMatcher, } from './index.js';
+import { and, method, regExpUrl, } from './index.js';
 /**
  * higher order matcher which is combine matching of method
  * with regular expression
  */
 export class EndpointMatcher {
-    constructor(methods, url) {
+    constructor(methods, urls) {
         this.match = this.match.bind(this);
         this.matcher = and([
             method(Array.isArray(methods) ? methods : [methods]),
-            new RegExpUrlMatcher([url]),
+            regExpUrl(Array.isArray(urls) ? urls : [urls]),
         ]);
     }
     match(params) {
@@ -29,7 +29,7 @@ export class EndpointMatcher {
         };
     }
 }
-export function endpoint(methods, url) {
-    return new EndpointMatcher(methods, url);
+export function endpoint(...args) {
+    return new EndpointMatcher(...args);
 }
 //# sourceMappingURL=EndpointMatcher.js.map

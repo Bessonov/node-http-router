@@ -80,4 +80,16 @@ it(`query string isn't matched`, () => {
         expect(result.result.match.input).toBe('/test');
     }
 });
+it('match string', () => {
+    const result = regExpUrl(['/test'])
+        .match({
+        req: createRequest({
+            url: '/test?param=value',
+        }),
+    });
+    expect(result.matched).toBe(true);
+    if (result.matched) {
+        expect(result.result.match.input).toBe('/test');
+    }
+});
 //# sourceMappingURL=RegExpUrlMatcher.test.js.map

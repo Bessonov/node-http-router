@@ -1,18 +1,14 @@
 import {
 	and,
 	type AndMatcher,
+	type Matcher,
+	type MatchResult,
 	type Method,
 	method,
 	type MethodMatchResult,
-	RegExpUrlMatcher,
+	regExpUrl,
 	type RegExpUrlMatchResult,
 } from './index.js'
-import type {
-	Matcher,
-} from './Matcher.js'
-import type {
-	MatchResult,
-} from './MatchResult.js'
 import type {
 	RegExpExecGroupArray,
 } from './RegExpUrlMatcher.js'
@@ -48,11 +44,11 @@ export class EndpointMatcher<
 		RegExpUrlMatchResult<R>,
 		P
 	>
-	constructor(methods: Method | Method[], url: RegExp) {
+	constructor(methods: Method | Method[], urls: RegExp | string | (RegExp | string)[]) {
 		this.match = this.match.bind(this)
 		this.matcher = and([
 			method(Array.isArray(methods) ? methods : [methods]),
-			new RegExpUrlMatcher<R, P>([url]),
+			regExpUrl<R, P>(Array.isArray(urls) ? urls : [urls]),
 		])
 	}
 
@@ -80,6 +76,8 @@ export class EndpointMatcher<
 export function endpoint<
 	R extends object,
 	P extends EndpointMatcherInput = EndpointMatcherInput,
->(methods: Method | Method[], url: RegExp): EndpointMatcher<R, P> {
-	return new EndpointMatcher(methods, url)
+>(
+	...args: ConstructorParameters<typeof EndpointMatcher<R, P>>
+): EndpointMatcher<R, P> {
+	return new EndpointMatcher(...args)
 }

@@ -235,6 +235,8 @@ router.addRoute({
 })
 ```
 
+Both, `RegExpUrlMatcher` and `EndpointMatcher` can be used with a string for an exact match instead of a RegExp.
+
 ### Middlewares
 
 **This whole section is highly experimental!**

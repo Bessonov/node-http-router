@@ -1,14 +1,14 @@
 import { createRequest, } from 'node-mocks-http';
 import { endpoint, } from '../index.js';
 it('not match empty', () => {
-    const result = endpoint('GET', /\/test/)
+    const result = endpoint('GET', /^\/test$/)
         .match({ req: createRequest() });
     expect(result).toStrictEqual({
         matched: false,
     });
 });
 it('usual usage', () => {
-    const matcher = endpoint(['GET', 'POST'], /\/test/);
+    const matcher = endpoint(['GET', 'POST'], [/^\/test$/, '/api']);
     // https://github.com/facebook/jest/issues/8475#issuecomment-656629010
     expect(() => {
         expect(matcher.match({
@@ -37,6 +37,21 @@ it('usual usage', () => {
                 method: 'POST',
                 match: [
                     '/test',
+                ],
+            },
+        });
+    }).toThrow('serializes to the same string');
+    expect(() => {
+        expect(matcher.match({
+            req: createRequest({
+                url: '/api',
+            }),
+        })).toStrictEqual({
+            matched: true,
+            result: {
+                method: 'GET',
+                match: [
+                    '/api',
                 ],
             },
         });

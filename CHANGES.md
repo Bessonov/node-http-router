@@ -8,6 +8,7 @@ Features
 - `AndMatcher` and `OrMatcher` supports now up to five matchers instead of two.
 - Every matcher can be instantiated with a shortcut function now. For example, `and`, `or`, `method`, `endpoint`, etc.
 - `ExactQueryMatcher` is now deprecated and will be replaced with the new `queryString` matcher. It comes with a set of validators, which can also convert values and supports PHP style arrays such as `users[]=1&users[]=2`.
+- `regExpUrl` and `endpoint` supports now `RegExp`, `string`, and array of them for the url matching.
 
 What's next?
 ------------

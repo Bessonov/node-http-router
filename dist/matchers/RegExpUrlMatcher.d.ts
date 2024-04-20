@@ -15,7 +15,8 @@ export type RegExpUrlMatchResult<R extends object> = MatchResult<{
 }>;
 export declare class RegExpUrlMatcher<R extends object, P extends RegExpUrlMatcherInput = RegExpUrlMatcherInput> implements Matcher<RegExpUrlMatchResult<R>, P> {
     private readonly urls;
-    constructor(urls: RegExp[]);
+    readonly regExps: RegExp[];
+    constructor(urls: (RegExp | string)[]);
     match({ req }: RegExpUrlMatcherInput): RegExpUrlMatchResult<R>;
 }
-export declare function regExpUrl<R extends object, P extends RegExpUrlMatcherInput = RegExpUrlMatcherInput>(urls: RegExp[]): RegExpUrlMatcher<R, P>;
+export declare function regExpUrl<R extends object, P extends RegExpUrlMatcherInput = RegExpUrlMatcherInput>(urls: (RegExp | string)[]): RegExpUrlMatcher<R, P>;
