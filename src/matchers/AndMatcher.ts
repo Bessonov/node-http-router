@@ -2,10 +2,10 @@ import type {
 	Matcher,
 } from './Matcher.js'
 import {
+	isMatched,
+	type Matched,
 	type MatchResult,
 	type MatchResultAny,
-	type Matched,
-	isMatched,
 } from './MatchResult.js'
 
 export type AndMatcherResult<
@@ -38,30 +38,35 @@ export class AndMatcher<
 	P4 = unknown,
 	MR5 extends MatchResultAny | never = never,
 	P5 = unknown,
->
-implements Matcher<AndMatcherResult<
-MR1,
-MR2,
-MR3,
-MR4,
-MR5
->, P1 & P2 & P3 & P4 & P5> {
-	constructor(private readonly matchers: [
-		Matcher<MR1, P1>?,
-		Matcher<MR2, P2>?,
-		Matcher<MR3, P3>?,
-		Matcher<MR4, P4>?,
-		Matcher<MR5, P5>?
-	]) {
+> implements
+	Matcher<
+		AndMatcherResult<
+			MR1,
+			MR2,
+			MR3,
+			MR4,
+			MR5
+		>,
+		P1 & P2 & P3 & P4 & P5
+	> {
+	constructor(
+		private readonly matchers: [
+			Matcher<MR1, P1>?,
+			Matcher<MR2, P2>?,
+			Matcher<MR3, P3>?,
+			Matcher<MR4, P4>?,
+			Matcher<MR5, P5>?,
+		],
+	) {
 		this.match = this.match.bind(this)
 	}
 
 	match(params: P1 & P2 & P3 & P4 & P5): AndMatcherResult<
-	MR1 | never,
-	MR2 | never,
-	MR3 | never,
-	MR4 | never,
-	MR5 | never
+		MR1 | never,
+		MR2 | never,
+		MR3 | never,
+		MR4 | never,
+		MR5 | never
 	> {
 		type Result = MR1 | MR2 | MR3 | MR4 | MR5 | undefined
 		const results: Result[] = []
@@ -88,7 +93,8 @@ MR5
 	}
 }
 
-export function and<MR1 extends MatchResultAny | never = never,
+export function and<
+	MR1 extends MatchResultAny | never = never,
 	P1 = unknown,
 	MR2 extends MatchResultAny | never = never,
 	P2 = unknown,
@@ -97,12 +103,13 @@ export function and<MR1 extends MatchResultAny | never = never,
 	MR4 extends MatchResultAny | never = never,
 	P4 = unknown,
 	MR5 extends MatchResultAny | never = never,
-	P5 = unknown>(matchers: [
-		Matcher<MR1, P1>?,
-		Matcher<MR2, P2>?,
-		Matcher<MR3, P3>?,
-		Matcher<MR4, P4>?,
-		Matcher<MR5, P5>?
+	P5 = unknown,
+>(matchers: [
+	Matcher<MR1, P1>?,
+	Matcher<MR2, P2>?,
+	Matcher<MR3, P3>?,
+	Matcher<MR4, P4>?,
+	Matcher<MR5, P5>?,
 ]): AndMatcher<MR1, P1, MR2, P2, MR3, P3, MR4, P4, MR5, P5> {
 	return new AndMatcher(matchers)
 }

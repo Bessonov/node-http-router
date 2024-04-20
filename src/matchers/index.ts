@@ -4,6 +4,10 @@ export {
 	type AndMatcherResult,
 } from './AndMatcher.js'
 export {
+	bool,
+	BooleanMatcher,
+} from './BooleanMatcher.js'
+export {
 	endpoint,
 	EndpointMatcher,
 	type EndpointMatcherInput,
@@ -25,14 +29,14 @@ export {
 export {
 	isMatched,
 	type Matched,
+	type MatchedResult,
 	type MatchResult,
 	type MatchResultAny,
-	type MatchedResult,
 	type UnmatchedResult,
 } from './MatchResult.js'
 export {
-	method,
 	type Method,
+	method,
 	MethodMatcher,
 	type MethodMatcherInput,
 	type MethodMatchResult,
@@ -43,12 +47,13 @@ export {
 	type OrMatcherResult,
 } from './OrMatcher.js'
 export {
+	queryString,
+	type QueryStringMatcherInput,
+	type QueryStringMatchResult,
+} from './QueryStringMatcher.js'
+export {
 	regExpUrl,
 	RegExpUrlMatcher,
 	type RegExpUrlMatcherInput,
 	type RegExpUrlMatchResult,
 } from './RegExpUrlMatcher.js'
-export {
-	bool,
-	BooleanMatcher,
-} from './BooleanMatcher.js'

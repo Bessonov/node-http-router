@@ -1,5 +1,4 @@
-import { type Matched, type Matcher } from './matchers/index.js';
-import { type MatchResult, type MatchResultAny } from './matchers/MatchResult.js';
+import { type Matched, type Matcher, type MatchResult, type MatchResultAny } from './matchers/index.js';
 interface HandlerParams<MR extends MatchResultAny, D> {
     match: Matched<MR>;
     data: D;

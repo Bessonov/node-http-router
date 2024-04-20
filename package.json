@@ -30,11 +30,13 @@
 		"test": "pnpm run compile && NODE_OPTIONS='--experimental-vm-modules --no-warnings=ExperimentalWarning' jest --coverage",
 		"test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --coverage --watchAll",
 		"lint": "eslint . --ext .ts,.js,.cjs",
+		"format": "dprint check",
+		"format:fix": "dprint fmt",
 		"compile": "tsc --build",
 		"compile:watch": "tsc --build --watch",
 		"example-node-start": "pnpm run compile && node dist/examples/node.js",
 		"example-micro-start": "pnpm run compile && node dist/examples/micro.js",
-		"precommit": "pnpm run compile && pnpm test && pnpm run lint",
+		"precommit": "pnpm run format && pnpm run compile && pnpm test && pnpm run lint",
 		"update": "pnpm update --interactive --recursive --latest"
 	},
 	"ultra": {
@@ -53,6 +55,7 @@
 		"@types/node": "20.12.7",
 		"@typescript-eslint/eslint-plugin": "7.7.0",
 		"@typescript-eslint/parser": "7.7.0",
+		"dprint": "0.45.1",
 		"eslint": "8.56.0",
 		"eslint-config-airbnb": "19.0.4",
 		"eslint-plugin-import": "2.29.1",

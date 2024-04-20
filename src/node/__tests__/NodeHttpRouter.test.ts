@@ -3,7 +3,7 @@ import {
 	ServerResponse,
 } from 'http'
 import {
-	ExactUrlPathnameMatcher,
+	exactUrlPathname,
 } from '../../matchers/index.js'
 import {
 	NodeHttpRouter,
@@ -16,7 +16,9 @@ it('missing method in request', () => {
 
 it('missing url in request', () => {
 	const nodeRouter = new NodeHttpRouter()
-	expect(() => nodeRouter.serve({ method: 'GET' } as IncomingMessage, {} as ServerResponse)).toThrowError(`request missing 'url'`)
+	expect(() => nodeRouter.serve({ method: 'GET' } as IncomingMessage, {} as ServerResponse)).toThrowError(
+		`request missing 'url'`,
+	)
 })
 
 it('default handler', () => {
@@ -24,10 +26,12 @@ it('default handler', () => {
 		return `not found url: ${req.url}`
 	})
 	nodeRouter.addRoute({
-		matcher: new ExactUrlPathnameMatcher(['/test']),
+		matcher: exactUrlPathname(['/test']),
 		handler: () => 'test url',
 	})
 
 	expect(nodeRouter.serve({ method: 'GET', url: '/test' } as IncomingMessage, {} as ServerResponse)).toBe('test url')
-	expect(nodeRouter.serve({ method: 'GET', url: '/404' } as IncomingMessage, {} as ServerResponse)).toBe('not found url: /404')
+	expect(nodeRouter.serve({ method: 'GET', url: '/404' } as IncomingMessage, {} as ServerResponse)).toBe(
+		'not found url: /404',
+	)
 })

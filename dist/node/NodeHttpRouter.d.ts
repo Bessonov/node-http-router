@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import { IncomingMessage, ServerResponse } from 'http';
-import type { MatchResult, MatchedResult } from '../matchers/index.js';
+import type { MatchedResult, MatchResult } from '../matchers/index.js';
 import { type Handler, Router } from '../Router.js';
 import { type ServerRequest } from './ServerRequest.js';
 interface ServerRequestResponse {

@@ -1,6 +1,6 @@
 import type {
 	MatchResultAny,
-} from '../matchers/MatchResult.js'
+} from '../matchers/index.js'
 import type {
 	Handler,
 } from '../Router.js'
@@ -54,22 +54,28 @@ export interface CorsMiddlewareCallbackResult {
 
 export function CorsMiddleware<
 	D2,
-	R extends CorsMiddlewareInput = CorsMiddlewareInput
->(callback: (
-	req: R,
-	origin: string,
-	params: { data: D2 }
-) => Promise<CorsMiddlewareCallbackResult>) {
-	return function corsWrapper<T extends MatchResultAny, D extends D2 & {
-		req: R
-		res: {
-			writableEnded: boolean
-			setHeader:(name: string, value: string) => void
-			statusCode: number
-			end: () => void
-		}
-	}>(
-		handler: Handler<T, D>): Handler<T, D> {
+	R extends CorsMiddlewareInput = CorsMiddlewareInput,
+>(
+	callback: (
+		req: R,
+		origin: string,
+		params: { data: D2 },
+	) => Promise<CorsMiddlewareCallbackResult>,
+) {
+	return function corsWrapper<
+		T extends MatchResultAny,
+		D extends D2 & {
+			req: R
+			res: {
+				writableEnded: boolean
+				setHeader: (name: string, value: string) => void
+				statusCode: number
+				end: () => void
+			}
+		},
+	>(
+		handler: Handler<T, D>,
+	): Handler<T, D> {
 		return async function corsHandler(params) {
 			const { req, res } = params.data
 			// avoid "Cannot set headers after they are sent to the client"

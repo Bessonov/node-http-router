@@ -21,9 +21,8 @@ export type ExactUrlPathnameMatchResult<U extends [string, ...string[]]> = Match
  */
 export class ExactUrlPathnameMatcher<
 	U extends [string, ...string[]],
-	P extends ExactUrlPathnameMatcherInput
->
-implements Matcher<ExactUrlPathnameMatchResult<U>, P> {
+	P extends ExactUrlPathnameMatcherInput,
+> implements Matcher<ExactUrlPathnameMatchResult<U>, P> {
 	constructor(private readonly urls: U) {
 		this.match = this.match.bind(this)
 	}
@@ -48,7 +47,7 @@ implements Matcher<ExactUrlPathnameMatchResult<U>, P> {
 
 export function exactUrlPathname<
 	U extends [string, ...string[]],
-	P extends ExactUrlPathnameMatcherInput
+	P extends ExactUrlPathnameMatcherInput,
 >(urls: U): ExactUrlPathnameMatcher<U, P> {
 	return new ExactUrlPathnameMatcher(urls)
 }

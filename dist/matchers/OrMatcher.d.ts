@@ -1,5 +1,5 @@
 import type { Matcher } from './Matcher.js';
-import { type MatchResult, type MatchResultAny, type Matched } from './MatchResult.js';
+import { type Matched, type MatchResult, type MatchResultAny } from './MatchResult.js';
 export type OrMatcherResult<MR1 extends MatchResultAny | never = never, MR2 extends MatchResultAny | never = never, MR3 extends MatchResultAny | never = never, MR4 extends MatchResultAny | never = never, MR5 extends MatchResultAny | never = never> = MatchResult<{
     or: [
         MR1 extends MatchResultAny ? Matched<MR1> : Partial<void>,

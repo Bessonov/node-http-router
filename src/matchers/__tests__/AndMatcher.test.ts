@@ -1,20 +1,20 @@
 import {
 	createRequest,
 } from 'node-mocks-http'
-import {
-	BooleanMatcher,
-	ExactUrlPathnameMatcher,
-	MethodMatcher,
-	and,
-} from '../index.js'
 import type {
 	ServerRequest,
 } from '../../node/ServerRequest.js'
+import {
+	and,
+	bool,
+	exactUrlPathname,
+	method,
+} from '../index.js'
 
 it('none match', () => {
 	const result = and([
-		new MethodMatcher(['POST']),
-		new ExactUrlPathnameMatcher(['/test']),
+		method(['POST']),
+		exactUrlPathname(['/test']),
 	]).match({ req: createRequest<ServerRequest>() })
 
 	expect(result).toStrictEqual({
@@ -24,8 +24,8 @@ it('none match', () => {
 
 it('first match, second not', () => {
 	const result = and([
-		new MethodMatcher(['GET']),
-		new ExactUrlPathnameMatcher(['/test']),
+		method(['GET']),
+		exactUrlPathname(['/test']),
 	]).match({ req: createRequest<ServerRequest>() })
 
 	expect(result).toStrictEqual({
@@ -40,8 +40,8 @@ it('first not match, but second', () => {
 	})
 
 	const result = and([
-		new MethodMatcher(['GET']),
-		new ExactUrlPathnameMatcher(['/test']),
+		method(['GET']),
+		exactUrlPathname(['/test']),
 	]).match({ req })
 
 	expect(result).toStrictEqual({
@@ -55,8 +55,8 @@ it('both match', () => {
 	})
 
 	const result = and([
-		new MethodMatcher(['GET']),
-		new ExactUrlPathnameMatcher(['/test']),
+		method(['GET']),
+		exactUrlPathname(['/test']),
 	]).match({ req })
 
 	expect(result).toStrictEqual({
@@ -86,9 +86,9 @@ it('three not a match', () => {
 	})
 
 	const result = and([
-		new MethodMatcher(['GET']),
-		new ExactUrlPathnameMatcher(['/test']),
-		new BooleanMatcher(false),
+		method(['GET']),
+		exactUrlPathname(['/test']),
+		bool(false),
 	]).match({ req })
 
 	expect(result).toStrictEqual({
@@ -102,9 +102,9 @@ it('three match', () => {
 	})
 
 	const result = and([
-		new MethodMatcher(['GET']),
-		new ExactUrlPathnameMatcher(['/test']),
-		new BooleanMatcher(true),
+		method(['GET']),
+		exactUrlPathname(['/test']),
+		bool(true),
 	]).match({ req })
 
 	expect(result).toStrictEqual({

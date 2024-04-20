@@ -1,6 +1,5 @@
 import http from 'http';
-import { EndpointMatcher, ExactUrlPathnameMatcher, } from '../matchers/index.js';
-import { BooleanMatcher, } from '../matchers/BooleanMatcher.js';
+import { bool, endpoint, exactUrlPathname, } from '../matchers/index.js';
 import { NodeHttpRouter, } from '../node/NodeHttpRouter.js';
 /*
 
@@ -22,14 +21,14 @@ server.once('listening', () => {
 });
 router.addRoute({
     // it's not necessary to type the matcher, but it give you a confidence
-    matcher: new EndpointMatcher('GET', /^\/hello\/(?<name>[^/]+)$/),
+    matcher: endpoint('GET', /^\/hello\/(?<name>[^/]+)$/),
     handler: ({ data: { res }, match }) => {
         res.write(`Hello ${match.result.match.groups.name}!`);
         res.end();
     },
 });
 router.addRoute({
-    matcher: new ExactUrlPathnameMatcher(['/shutdown']),
+    matcher: exactUrlPathname(['/shutdown']),
     handler: ({ data: { res } }) => {
         res.write('Shutdown the server');
         res.end();
@@ -38,7 +37,7 @@ router.addRoute({
 });
 // 404 handler
 router.addRoute({
-    matcher: new BooleanMatcher(true),
+    matcher: bool(true),
     handler: ({ data: { res } }) => {
         res.statusCode = 404;
         res.end();

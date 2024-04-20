@@ -1,12 +1,12 @@
 import {
 	createRequest,
 } from 'node-mocks-http'
-import {
-	exactUrlPathname,
-} from '../index.js'
 import type {
 	ServerRequest,
 } from '../../node/ServerRequest.js'
+import {
+	exactUrlPathname,
+} from '../index.js'
 
 it('not match empty', () => {
 	const result = exactUrlPathname(['/test'])

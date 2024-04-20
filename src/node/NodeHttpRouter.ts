@@ -3,8 +3,8 @@ import {
 	ServerResponse,
 } from 'http'
 import type {
-	MatchResult,
 	MatchedResult,
+	MatchResult,
 } from '../matchers/index.js'
 import {
 	type Handler,

@@ -1,5 +1,5 @@
-import { createRequest, createResponse, } from 'node-mocks-http';
 import { jest, } from '@jest/globals';
+import { createRequest, createResponse, } from 'node-mocks-http';
 import { CorsMiddleware, } from '../CorsMiddleware.js';
 describe('simple configuration', () => {
     beforeEach(() => {

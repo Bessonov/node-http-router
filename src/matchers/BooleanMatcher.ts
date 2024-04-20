@@ -1,9 +1,9 @@
 import type {
-	MatchResult,
-} from './MatchResult.js'
-import type {
 	Matcher,
 } from './Matcher.js'
+import type {
+	MatchResult,
+} from './MatchResult.js'
 
 export class BooleanMatcher<T extends boolean> implements Matcher<MatchResult<T>, void> {
 	constructor(private value: T) {

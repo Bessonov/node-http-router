@@ -7,6 +7,7 @@ import Url from 'urlite';
  * false: must be absent
  * undefined: optional
  * 'some string': must be exact value
+ * @deprecated
  */
 export class ExactQueryMatcher {
     constructor(config) {
@@ -70,6 +71,9 @@ export class ExactQueryMatcher {
         };
     }
 }
+/**
+ * @deprecated
+ */
 export function exactQuery(config) {
     return new ExactQueryMatcher(config);
 }

@@ -1,5 +1,5 @@
 import { IncomingMessage, ServerResponse, } from 'http';
-import { ExactUrlPathnameMatcher, } from '../../matchers/index.js';
+import { exactUrlPathname, } from '../../matchers/index.js';
 import { NodeHttpRouter, } from '../NodeHttpRouter.js';
 it('missing method in request', () => {
     const nodeRouter = new NodeHttpRouter();
@@ -14,7 +14,7 @@ it('default handler', () => {
         return `not found url: ${req.url}`;
     });
     nodeRouter.addRoute({
-        matcher: new ExactUrlPathnameMatcher(['/test']),
+        matcher: exactUrlPathname(['/test']),
         handler: () => 'test url',
     });
     expect(nodeRouter.serve({ method: 'GET', url: '/test' }, {})).toBe('test url');

@@ -1,22 +1,20 @@
+import {
+	and,
+	type AndMatcher,
+	type Method,
+	method,
+	type MethodMatchResult,
+	RegExpUrlMatcher,
+	type RegExpUrlMatchResult,
+} from './index.js'
 import type {
 	Matcher,
 } from './Matcher.js'
 import type {
 	MatchResult,
 } from './MatchResult.js'
-import {
-	type Method,
-	type MethodMatchResult,
-	MethodMatcher,
-} from './MethodMatcher.js'
-import {
-	type AndMatcher,
-	and,
-} from './AndMatcher.js'
-import {
-	type RegExpExecGroupArray,
-	type RegExpUrlMatchResult,
-	RegExpUrlMatcher,
+import type {
+	RegExpExecGroupArray,
 } from './RegExpUrlMatcher.js'
 
 // waiting for
@@ -31,11 +29,10 @@ export interface EndpointMatcherInput {
 	}
 }
 
-export type EndpointMatchResult<R extends object> =
-	MatchResult<{
-		method: Method
-		match: RegExpExecGroupArray<R>
-	}>
+export type EndpointMatchResult<R extends object> = MatchResult<{
+	method: Method
+	match: RegExpExecGroupArray<R>
+}>
 
 /**
  * higher order matcher which is combine matching of method
@@ -43,19 +40,18 @@ export type EndpointMatchResult<R extends object> =
  */
 export class EndpointMatcher<
 	R extends object,
-	P extends EndpointMatcherInput = EndpointMatcherInput
->
-implements Matcher<EndpointMatchResult<R>, P> {
+	P extends EndpointMatcherInput = EndpointMatcherInput,
+> implements Matcher<EndpointMatchResult<R>, P> {
 	private readonly matcher: AndMatcher<
-	MethodMatchResult<[Method]>,
-	P,
-	RegExpUrlMatchResult<R>,
-	P
+		MethodMatchResult<[Method]>,
+		P,
+		RegExpUrlMatchResult<R>,
+		P
 	>
 	constructor(methods: Method | Method[], url: RegExp) {
 		this.match = this.match.bind(this)
 		this.matcher = and([
-			new MethodMatcher(Array.isArray(methods) ? methods : [methods]),
+			method(Array.isArray(methods) ? methods : [methods]),
 			new RegExpUrlMatcher<R, P>([url]),
 		])
 	}
@@ -83,7 +79,7 @@ implements Matcher<EndpointMatchResult<R>, P> {
 
 export function endpoint<
 	R extends object,
-	P extends EndpointMatcherInput = EndpointMatcherInput
+	P extends EndpointMatcherInput = EndpointMatcherInput,
 >(methods: Method | Method[], url: RegExp): EndpointMatcher<R, P> {
 	return new EndpointMatcher(methods, url)
 }

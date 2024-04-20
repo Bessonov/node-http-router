@@ -6,6 +6,9 @@ import type {
 	MatchResult,
 } from './MatchResult.js'
 
+/**
+ * @deprecated
+ */
 export interface ExactQueryMatcherInput {
 	req: {
 		url: string
@@ -15,14 +18,16 @@ export interface ExactQueryMatcherInput {
 type QueryMatch = { [key: string]: readonly string[] | true | false | undefined }
 
 type QueryResult<T> = {
-	[P in keyof T]:
-	T[P] extends true ? string
+	[P in keyof T]: T[P] extends true ? string
 		: T[P] extends false ? never
-			: T[P] extends undefined ? string | undefined
-				: T[P] extends readonly string[] ? T[P][number]
-					: never
+		: T[P] extends undefined ? string | undefined
+		: T[P] extends readonly string[] ? T[P][number]
+		: never
 }
 
+/**
+ * @deprecated
+ */
 export type ExactQueryMatchResult<U extends QueryMatch> = MatchResult<{
 	query: QueryResult<U>
 }>
@@ -35,9 +40,10 @@ export type ExactQueryMatchResult<U extends QueryMatch> = MatchResult<{
  * false: must be absent
  * undefined: optional
  * 'some string': must be exact value
+ * @deprecated
  */
 export class ExactQueryMatcher<U extends QueryMatch, P extends ExactQueryMatcherInput>
-implements Matcher<ExactQueryMatchResult<U>, P> {
+	implements Matcher<ExactQueryMatchResult<U>, P> {
 	private readonly listConfig: [string, readonly string[] | true | false | undefined][]
 	constructor(config: U) {
 		this.match = this.match.bind(this)
@@ -104,9 +110,12 @@ implements Matcher<ExactQueryMatchResult<U>, P> {
 	}
 }
 
+/**
+ * @deprecated
+ */
 export function exactQuery<
 	U extends QueryMatch,
-	P extends ExactQueryMatcherInput
+	P extends ExactQueryMatcherInput,
 >(config: U): ExactQueryMatcher<U, P> {
 	return new ExactQueryMatcher(config)
 }

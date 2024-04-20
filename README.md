@@ -12,7 +12,7 @@ This router is intended to be used with native node http interface. Features:
 - Offers a set of matchers:
   - [`MethodMatcher`](#methodmatcher)
   - [`ExactUrlPathnameMatcher`](#exacturlpathnamematcher)
-  - [`ExactQueryMatcher`](#exactquerymatcher)
+  - [`QueryStringMatcher`](#querystringmatcher)
   - Powerful [`RegExpUrlMatcher`](#regexpurlmatcher)
   - Convenient [`EndpointMatcher`](#endpointmatcher)
   - `AndMatcher` and `OrMatcher`
@@ -57,13 +57,13 @@ const router = new NodeHttpRouter()
 const server = http.createServer(router.serve).listen(8080, 'localhost')
 
 router.addRoute({
-	matcher: new ExactUrlPathnameMatcher(['/hello']),
+	matcher: exactUrlPathname(['/hello']),
 	handler: () => 'Hello kitty!',
 })
 
 // 404 handler
 router.addRoute({
-	matcher: new BooleanMatcher(true),
+	matcher: bool(true),
 	handler: ({ data: { res } }) => send(res, 404)
 })
 ```
@@ -85,13 +85,13 @@ const router = new NodeHttpRouter()
 http.createServer(serve(router.serve)).listen(8080, 'localhost')
 
 router.addRoute({
-	matcher: new ExactUrlPathnameMatcher(['/hello']),
+	matcher: exactUrlPathname(['/hello']),
 	handler: () => 'Hello kitty!',
 })
 
 // 404 handler
 router.addRoute({
-	matcher: new BooleanMatcher(true),
+	matcher: bool(true),
 	handler: ({ data: { res } }) => send(res, 404)
 })
 ```
@@ -136,7 +136,7 @@ eventRouter.addRoute({
 
 // add default handler
 eventRouter.addRoute({
-	matcher: new BooleanMatcher(true),
+	matcher: bool(true),
 	handler({ data }) {
 		return `the event '${data.name}' is unknown`
 	}
@@ -152,72 +152,85 @@ const result = eventRouter.exec({
 
 In the core, matchers are responsible to decide if particular handler should be called or not. There is no magic: matchers are iterated on every request and first positive "match" calls defined handler.
 
-#### MethodMatcher ([source](./src/matchers/MethodMatcher.ts))
+#### MethodMatcher
+([source](./src/matchers/MethodMatcher.ts))
 
 Method matcher is the simplest matcher and matches any of the passed http methods:
 
 ```typescript
 router.addRoute({
-	matcher: new MethodMatcher(['OPTIONS', 'POST']),
+	matcher: method(['OPTIONS', 'POST']),
 	// method is either OPTIONS or POST
 	handler: ({ match: { result: { method } } }) => `Method: ${method}`,
 })
 ```
 
-#### ExactUrlPathnameMatcher ([source](./src/matchers/ExactUrlPathnameMatcher.ts))
+#### ExactUrlPathnameMatcher
+([source](./src/matchers/ExactUrlPathnameMatcher.ts))
 
 Matches given pathnames (but ignores query parameters):
 
 ```typescript
 router.addRoute({
-	matcher: new ExactUrlPathnameMatcher(['/v1/graphql', '/v2/graphql']),
+	matcher: exactUrlPathname(['/v1/graphql', '/v2/graphql']),
 	// pathname is /v1/graphql or /v2/graphql
 	handler: ({ match: { result: { pathname } } }) => `Path is ${pathname}`,
 })
 ```
 
-#### ExactQueryMatcher ([source](./src/matchers/ExactQueryMatcher.ts))
+#### QueryStringMatcher
+([source](./src/matchers/QueryStringMatcher.ts))
 
 Defines expectations on query parameters:
 
 ```typescript
 router.addRoute({
-	matcher: new ExactQueryMatcher({
-		// example of 4 query parameters:
-		// true defines mandatory parameters
-		mustPresent: true,
-		// false defines parameters expected to absent
-		mustAbsent: false,
-		// undefined defines optional parameters. They
-		// aren't used for matching, but available as type
-		isOptional: undefined,
-		// array of strings defines expected parameter name and value
-		mustExact: ['exactValue'] as const,
+	matcher: queryString({
+		// example query parameters:
+		// this parameter is required
+		someParamter1: chain(getNthVal(), requiredVal()),
+		// this parameter is optional
+		someParamter2: getNthVal(),
+		// this parameter should have one of the values
+		someParamter3: chain(atLeastOneVal(['exactValue1', 'exactValue2']), getNthVal(), requiredVal()),
+		// a PHP style parameter, expected to have at least one element and is conveted to numbers
+		'userIds[]': chain(minCountVal(1), mapToNumVal()),
 	}),
 	// query parameter isOptional has type string | undefined
-	handler: ({ match: { result: { query } } }) => query.isOptional,
+	handler: ({ match: { result: { query } } }) => {
+		// the type of query is:
+		// someParamter1: string
+		// someParamter2: string | undefined
+		// someParamter3: 'exactValue1' | 'exactValue2'
+		// 'userIds[]': number[]
+	},
 })
+
+See [all provided validators](src/validators.ts).
+
 ```
 
-#### RegExpUrlMatcher ([source](./src/matchers/RegExpUrlMatcher.ts))
+#### RegExpUrlMatcher
+([source](./src/matchers/RegExpUrlMatcher.ts))
 
 Allows powerful expressions:
 
 ```typescript
 router.addRoute({
-	matcher: new RegExpUrlMatcher<{ userId: string }>([/^\/group\/(?<userId>[^/]+)$/]),
+	matcher: regExpUrl<{ userId: string }>([/^\/group\/(?<userId>[^/]+)$/]),
 	handler: ({ match: { result: { match } } }) => `User id is: ${match.groups.userId}`,
 })
 ```
 Be aware that regular expression must match the whole base url (also with query parameters) and not only `pathname`. Ordinal parameters can be used too.
 
-#### EndpointMatcher ([source](./src/matchers/EndpointMatcher.ts))
+#### EndpointMatcher
+([source](./src/matchers/EndpointMatcher.ts))
 
 EndpointMatcher is a combination of Method and RegExpUrl matcher for convenient usage:
 
 ```typescript
 router.addRoute({
-	matcher: new EndpointMatcher<{ userId: string }>('GET', /^\/group\/(?<userId>[^/]+)$/),
+	matcher: endpoint<{ userId: string }>('GET', /^\/group\/(?<userId>[^/]+)$/),
 	handler: ({ match: { result: { method, match } } }) => `Group id ${match.groups.userId} matched with ${method} method`,
 })
 ```
@@ -228,7 +241,8 @@ router.addRoute({
 
 Currently, there is no built-in API for middlewares. It seems like there is no aproach to provide centralized and typesafe way for middlewares. And it need some conceptual work, before it will be added. Open an issue, if you have a great idea!
 
-#### CorsMiddleware ([source](./src/middlewares/CorsMiddleware.ts))
+#### CorsMiddleware
+([source](./src/middlewares/CorsMiddleware.ts))
 
 Example of CorsMiddleware usage:
 
@@ -241,7 +255,7 @@ const cors = CorsMiddleware(async () => {
 
 const router = new NodeHttpRouter()
 router.addRoute({
-	matcher: new MethodMatcher(['OPTIONS', 'POST']),
+	matcher: method(['OPTIONS', 'POST']),
 	// use it
 	handler: cors(({ match: { result: { method } } }) => `Method: ${method}.`),
 })
@@ -311,7 +325,7 @@ const cors = CorsMiddleware('http://0.0.0.0:8080')
 const router = new NodeHttpRouter()
 
 router.addRoute({
-	matcher: new MethodMatcher(['OPTIONS', 'POST']),
+	matcher: method(['OPTIONS', 'POST']),
 	// use it
 	handler: cors(({ match: { result: { method } }, data: { isCors } }) => `Method: ${method}. Cors: ${isCors}`),
 })
@@ -370,7 +384,7 @@ const tenantRouter = new Router<{
 
 // connect routers
 rootRouter.addRoute({
-	matcher: new RegExpUrlMatcher<{
+	matcher: regExpUrl<{
 		tenant: string
 		url: string
 	}>([/^\/auth\/realms\/(?<tenant>[^/]+)(?<url>.+)/]),
@@ -390,7 +404,7 @@ rootRouter.addRoute({
 
 // attach some urls behind tenant
 tenantRouter.addRoute({
-	matcher: new ExactUrlPathnameMatcher(['/myurl']),
+	matcher: exactUrlPathname(['/myurl']),
 	handler: ({ data: { tenant }, match: { result: { pathname } } }) => {
 		// if requested url is `/auth/realms/mytenant/myurl`, then:
 		// tenant: mytenant

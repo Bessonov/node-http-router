@@ -48,11 +48,12 @@ module.exports = {
 		'import/extensions': [
 			'error',
 			'ignorePackages',
-			{
-				ts: 'never',
-				tsx: 'never',
-			},
 		],
+		// disable styling rules
+		'sort-imports': 'off',
+		'space-before-function-paren': 'off',
+		'function-paren-newline': 'off',
+		'@typescript-eslint/indent': 'off',
 	},
 	settings: {
 		'import/resolver': {

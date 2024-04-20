@@ -1,9 +1,8 @@
 import { createRequest, createResponse, } from 'node-mocks-http';
 import { compile, pathToRegexp, } from 'path-to-regexp';
-import { Router, } from '../Router.js';
-import { EndpointMatcher, ExactUrlPathnameMatcher, MethodMatcher, RegExpUrlMatcher, and, } from '../matchers/index.js';
-import { BooleanMatcher, } from '../matchers/BooleanMatcher.js';
+import { and, bool, endpoint, exactUrlPathname, method, regExpUrl, } from '../matchers/index.js';
 import { NodeHttpRouter, } from '../node/NodeHttpRouter.js';
+import { Router, } from '../Router.js';
 let router;
 beforeEach(() => {
     router = new Router();
@@ -13,14 +12,14 @@ it('nothing matched', () => {
 });
 it('match not found route if no routes specified', () => {
     router.addRoute({
-        matcher: new BooleanMatcher(true),
+        matcher: bool(true),
         handler: () => 'not found',
     });
     expect(router.exec({ req: createRequest() })).toBe('not found');
 });
 it('match method', () => {
     // example of usage, if matcher is defined first
-    const matcher = new MethodMatcher(['GET', 'DELETE']);
+    const matcher = method(['GET', 'DELETE']);
     const handler = ({ match }) => {
         if (match.result.method === 'DELETE') {
             return 'matched DELETE';
@@ -33,11 +32,11 @@ it('match method', () => {
 });
 it('no match for POST route', () => {
     router.addRoute({
-        matcher: new MethodMatcher(['GET']),
+        matcher: method(['GET']),
         handler: () => 'matched GET',
     });
     router.addRoute({
-        matcher: new BooleanMatcher(true),
+        matcher: bool(true),
         handler: () => 'not found',
     });
     const req = createRequest({
@@ -48,13 +47,13 @@ it('no match for POST route', () => {
 it('match POST /test route', () => {
     // example of usage, if handler is defined first
     const handler = ({ match, }) => {
-        const [{ result: { method } }, { result: { pathname } }] = match.result.and;
-        return `matched ${method} ${pathname}`;
+        const [{ result: { method: methodResult } }, { result: { pathname } }] = match.result.and;
+        return `matched ${methodResult} ${pathname}`;
     };
     router.addRoute({
         matcher: and([
-            new MethodMatcher(['POST']),
-            new ExactUrlPathnameMatcher(['/test']),
+            method(['POST']),
+            exactUrlPathname(['/test']),
         ]),
         handler,
     });
@@ -66,23 +65,23 @@ it('match POST /test route', () => {
 });
 it('match POST /group/123 endpoint', () => {
     // define an endpoint
-    const endpoint = ((pattern) => ({
+    const pathUrl = ((pattern) => ({
         pattern: pathToRegexp(pattern),
         path: compile(pattern),
     }))('/group/:groupId');
     router.addRoute({
-        matcher: new EndpointMatcher('POST', endpoint.pattern),
+        matcher: endpoint('POST', pathUrl.pattern),
         handler: ({ match }) => {
             return `matched ${match.result.method} for group ${match.result.match[1]}`;
         },
     });
     router.addRoute({
-        matcher: new BooleanMatcher(true),
+        matcher: bool(true),
         handler: () => 'not found',
     });
     const req = createRequest({
         method: 'POST',
-        url: endpoint.path({ groupId: 123 }),
+        url: pathUrl.path({ groupId: 123 }),
     });
     expect(router.exec({ req })).toBe('matched POST for group 123');
     expect(router.exec({ req: createRequest() })).toBe('not found');
@@ -104,7 +103,7 @@ class TestMatcherWithParams {
 it('simple route match', () => {
     const routerWithoutParams = new Router();
     routerWithoutParams.addRoute({
-        matcher: new BooleanMatcher(true),
+        matcher: bool(true),
         handler: (_params) => {
             return 'test';
         },
@@ -142,7 +141,7 @@ it('tenant router example from docs', () => {
     const tenantRouter = new Router();
     // connect routers
     rootRouter.addRoute({
-        matcher: new RegExpUrlMatcher([/^\/auth\/realms\/(?<tenant>[^/]+)(?<url>.+)/]),
+        matcher: regExpUrl([/^\/auth\/realms\/(?<tenant>[^/]+)(?<url>.+)/]),
         handler: ({ data, match }) => {
             const { req, res } = data;
             // figure tenant out
@@ -158,7 +157,7 @@ it('tenant router example from docs', () => {
     });
     // attach some urls behind tenant
     tenantRouter.addRoute({
-        matcher: new ExactUrlPathnameMatcher(['/myurl']),
+        matcher: exactUrlPathname(['/myurl']),
         handler: ({ data: { tenant }, match: { result: { pathname } } }) => {
             // if requested url is `/auth/realms/mytenant/myurl`, then:
             // tenant: mytenant
@@ -174,16 +173,16 @@ it('tenant router example from docs', () => {
 it('nested router', () => {
     const appRouter = new Router();
     appRouter.addRoute({
-        matcher: new RegExpUrlMatcher([/\/app\/(?<name>[\w\W]+)/]),
+        matcher: regExpUrl([/\/app\/(?<name>[\w\W]+)/]),
         handler: ({ data: { tenant }, match: { result: { match: { groups: { name } } } }, }) => `myapp ${tenant} ${name}`,
     });
     appRouter.addRoute({
-        matcher: new BooleanMatcher(true),
+        matcher: bool(true),
         handler: () => '404 app route',
     });
     const rootRouter = new NodeHttpRouter();
     rootRouter.addRoute({
-        matcher: new RegExpUrlMatcher([/^\/auth\/realms\/(?<tenant>[^/]+)(?<url>.+)/]),
+        matcher: regExpUrl([/^\/auth\/realms\/(?<tenant>[^/]+)(?<url>.+)/]),
         handler: ({ data, match }) => {
             const { req } = data;
             const { tenant, url } = match.result.match.groups;
@@ -195,7 +194,7 @@ it('nested router', () => {
         },
     });
     rootRouter.addRoute({
-        matcher: new BooleanMatcher(true),
+        matcher: bool(true),
         handler: () => '404 tenant route',
     });
     expect(rootRouter.serve(createRequest({
@@ -231,7 +230,7 @@ it('event processing', () => {
         },
     });
     eventRouter.addRoute({
-        matcher: new BooleanMatcher(true),
+        matcher: bool(true),
         handler({ data }) {
             return `the event '${data.name}' is unknown`;
         },

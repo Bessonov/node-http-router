@@ -1,12 +1,12 @@
 import {
 	createRequest,
 } from 'node-mocks-http'
-import {
-	endpoint,
-} from '../index.js'
 import type {
 	ServerRequest,
 } from '../../node/ServerRequest.js'
+import {
+	endpoint,
+} from '../index.js'
 
 it('not match empty', () => {
 	const result = endpoint('GET', /\/test/)

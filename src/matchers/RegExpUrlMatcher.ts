@@ -13,7 +13,7 @@ export interface RegExpUrlMatcherInput {
 }
 
 export interface RegExpExecGroupArray<
-	T extends object
+	T extends object,
 > extends Array<string> {
 	index: number
 	input: string
@@ -26,9 +26,8 @@ export type RegExpUrlMatchResult<R extends object> = MatchResult<{
 
 export class RegExpUrlMatcher<
 	R extends object,
-	P extends RegExpUrlMatcherInput = RegExpUrlMatcherInput
->
-implements Matcher<RegExpUrlMatchResult<R>, P> {
+	P extends RegExpUrlMatcherInput = RegExpUrlMatcherInput,
+> implements Matcher<RegExpUrlMatchResult<R>, P> {
 	constructor(private readonly urls: RegExp[]) {
 		this.match = this.match.bind(this)
 	}
@@ -56,7 +55,7 @@ implements Matcher<RegExpUrlMatchResult<R>, P> {
 
 export function regExpUrl<
 	R extends object,
-	P extends RegExpUrlMatcherInput = RegExpUrlMatcherInput
+	P extends RegExpUrlMatcherInput = RegExpUrlMatcherInput,
 >(urls: RegExp[]): RegExpUrlMatcher<R, P> {
 	return new RegExpUrlMatcher(urls)
 }

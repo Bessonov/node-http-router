@@ -1,0 +1,33 @@
+{
+	"typescript": {
+		"useTabs": true,
+		"semiColons": "asi",
+		"quoteStyle": "preferSingle",
+		"quoteProps": "asNeeded",
+		"bracePosition": "sameLine",
+		"binaryExpression.linePerExpression": true,
+		"conditionalType.preferSingleLine": true,
+		"exportDeclaration.trailingCommas": "always",
+		"importDeclaration.trailingCommas": "always",
+		"arrowFunction.useParentheses": "preferNone",
+		"exportDeclaration.forceMultiLine": true,
+		"importDeclaration.forceMultiLine": true
+	},
+	"json": {
+		"useTabs": true,
+		"trailingCommas": "never"
+	},
+	"excludes": [
+		"**/node_modules",
+		"**/dist",
+		"**/build",
+		"**/coverage",
+		"**/.ultra.cache.json",
+		"**/*-lock.json",
+		".vscode"
+	],
+	"plugins": [
+		"https://plugins.dprint.dev/typescript-0.88.7.wasm",
+		"https://plugins.dprint.dev/json-0.19.1.wasm"
+	]
+}

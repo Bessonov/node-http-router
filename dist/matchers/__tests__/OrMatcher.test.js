@@ -1,9 +1,9 @@
 import { createRequest, } from 'node-mocks-http';
-import { ExactUrlPathnameMatcher, MethodMatcher, or, } from '../index.js';
+import { exactUrlPathname, method, or, } from '../index.js';
 it('none match', () => {
     const result = or([
-        new MethodMatcher(['DELETE']),
-        new MethodMatcher(['POST']),
+        method(['DELETE']),
+        method(['POST']),
     ])
         .match({ req: createRequest() });
     expect(result).toStrictEqual({
@@ -12,8 +12,8 @@ it('none match', () => {
 });
 it('first match, second not', () => {
     const result = or([
-        new MethodMatcher(['DELETE']),
-        new MethodMatcher(['POST']),
+        method(['DELETE']),
+        method(['POST']),
     ]).match({ req: createRequest({ method: 'DELETE' }) });
     expect(result).toStrictEqual({
         matched: true,
@@ -37,8 +37,8 @@ it('first not match, but second', () => {
         method: 'POST',
     });
     const result = or([
-        new MethodMatcher(['DELETE']),
-        new MethodMatcher(['POST']),
+        method(['DELETE']),
+        method(['POST']),
         undefined,
     ]).match({ req });
     expect(result).toStrictEqual({
@@ -64,8 +64,8 @@ it('both match', () => {
         url: '/test',
     });
     const result = or([
-        new MethodMatcher(['GET']),
-        new ExactUrlPathnameMatcher(['/test']),
+        method(['GET']),
+        exactUrlPathname(['/test']),
     ]).match({ req });
     expect(result).toStrictEqual({
         matched: true,

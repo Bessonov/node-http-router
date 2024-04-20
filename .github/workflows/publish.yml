@@ -8,20 +8,17 @@ on:
 jobs:
   publish:
     name: publish
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2.0.0
+      - uses: actions/checkout@v4
       - name: Setup node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           # https://github.com/actions/setup-node/issues/32#issuecomment-1003854758
           node-version-file: '.nvmrc'
-      - name: prepare dependencies
-        run: |
-          npm install
-          npm install -g pnpm@7.1.5
-      - name: test
-        run: pnpm run precommit
+      - run: corepack enable
+      - run: pnpm install
+      - run: pnpm run precommit
       - name: publish
         run: |
           echo '//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}' >> .npmrc

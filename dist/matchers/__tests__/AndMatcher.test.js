@@ -1,9 +1,9 @@
 import { createRequest, } from 'node-mocks-http';
-import { BooleanMatcher, ExactUrlPathnameMatcher, MethodMatcher, and, } from '../index.js';
+import { and, bool, exactUrlPathname, method, } from '../index.js';
 it('none match', () => {
     const result = and([
-        new MethodMatcher(['POST']),
-        new ExactUrlPathnameMatcher(['/test']),
+        method(['POST']),
+        exactUrlPathname(['/test']),
     ]).match({ req: createRequest() });
     expect(result).toStrictEqual({
         matched: false,
@@ -11,8 +11,8 @@ it('none match', () => {
 });
 it('first match, second not', () => {
     const result = and([
-        new MethodMatcher(['GET']),
-        new ExactUrlPathnameMatcher(['/test']),
+        method(['GET']),
+        exactUrlPathname(['/test']),
     ]).match({ req: createRequest() });
     expect(result).toStrictEqual({
         matched: false,
@@ -24,8 +24,8 @@ it('first not match, but second', () => {
         url: '/test',
     });
     const result = and([
-        new MethodMatcher(['GET']),
-        new ExactUrlPathnameMatcher(['/test']),
+        method(['GET']),
+        exactUrlPathname(['/test']),
     ]).match({ req });
     expect(result).toStrictEqual({
         matched: false,
@@ -36,8 +36,8 @@ it('both match', () => {
         url: '/test',
     });
     const result = and([
-        new MethodMatcher(['GET']),
-        new ExactUrlPathnameMatcher(['/test']),
+        method(['GET']),
+        exactUrlPathname(['/test']),
     ]).match({ req });
     expect(result).toStrictEqual({
         matched: true,
@@ -64,9 +64,9 @@ it('three not a match', () => {
         url: '/test',
     });
     const result = and([
-        new MethodMatcher(['GET']),
-        new ExactUrlPathnameMatcher(['/test']),
-        new BooleanMatcher(false),
+        method(['GET']),
+        exactUrlPathname(['/test']),
+        bool(false),
     ]).match({ req });
     expect(result).toStrictEqual({
         matched: false,
@@ -77,9 +77,9 @@ it('three match', () => {
         url: '/test',
     });
     const result = and([
-        new MethodMatcher(['GET']),
-        new ExactUrlPathnameMatcher(['/test']),
-        new BooleanMatcher(true),
+        method(['GET']),
+        exactUrlPathname(['/test']),
+        bool(true),
     ]).match({ req });
     expect(result).toStrictEqual({
         matched: true,

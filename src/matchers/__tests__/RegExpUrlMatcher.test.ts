@@ -1,12 +1,12 @@
 import {
 	createRequest,
 } from 'node-mocks-http'
-import {
-	regExpUrl,
-} from '../index.js'
 import type {
 	ServerRequest,
 } from '../../node/ServerRequest.js'
+import {
+	regExpUrl,
+} from '../index.js'
 
 it('not match', () => {
 	const result = regExpUrl([/^\/test$/])

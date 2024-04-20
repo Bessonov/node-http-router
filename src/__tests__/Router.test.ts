@@ -1,3 +1,6 @@
+import type {
+	ServerResponse,
+} from 'http'
 import {
 	createRequest,
 	createResponse,
@@ -6,40 +9,31 @@ import {
 	compile,
 	pathToRegexp,
 } from 'path-to-regexp'
+import {
+	and,
+	type AndMatcherResult,
+	bool,
+	endpoint,
+	exactUrlPathname,
+	type ExactUrlPathnameMatchResult,
+	type Matched,
+	type Matcher,
+	type MatchResult,
+	type Method,
+	method,
+	type MethodMatchResult,
+	regExpUrl,
+} from '../matchers/index.js'
+import {
+	NodeHttpRouter,
+} from '../node/NodeHttpRouter.js'
 import type {
-	ServerResponse,
-} from 'http'
+	ServerRequest,
+} from '../node/ServerRequest.js'
 import {
 	type MatchedHandler,
 	Router,
 } from '../Router.js'
-import {
-	type AndMatcherResult,
-	EndpointMatcher,
-	type ExactUrlPathnameMatchResult,
-	ExactUrlPathnameMatcher,
-	type Matched,
-	type Method,
-	type MethodMatchResult,
-	MethodMatcher,
-	RegExpUrlMatcher,
-	and,
-} from '../matchers/index.js'
-import type {
-	ServerRequest,
-} from '../node/ServerRequest.js'
-import type {
-	MatchResult,
-} from '../matchers/MatchResult.js'
-import type {
-	Matcher,
-} from '../matchers/Matcher.js'
-import {
-	BooleanMatcher,
-} from '../matchers/BooleanMatcher.js'
-import {
-	NodeHttpRouter,
-} from '../node/NodeHttpRouter.js'
 
 let router: Router<{ req: ServerRequest }>
 
@@ -53,7 +47,7 @@ it('nothing matched', () => {
 
 it('match not found route if no routes specified', () => {
 	router.addRoute({
-		matcher: new BooleanMatcher(true),
+		matcher: bool(true),
 		handler: () => 'not found',
 	})
 	expect(router.exec({ req: createRequest() })).toBe('not found')
@@ -61,7 +55,7 @@ it('match not found route if no routes specified', () => {
 
 it('match method', () => {
 	// example of usage, if matcher is defined first
-	const matcher = new MethodMatcher(['GET', 'DELETE'])
+	const matcher = method(['GET', 'DELETE'])
 
 	const handler: MatchedHandler<typeof matcher> = ({ match }) => {
 		if (match.result.method === 'DELETE') {
@@ -78,11 +72,11 @@ it('match method', () => {
 
 it('no match for POST route', () => {
 	router.addRoute({
-		matcher: new MethodMatcher(['GET']),
+		matcher: method(['GET']),
 		handler: () => 'matched GET',
 	})
 	router.addRoute({
-		matcher: new BooleanMatcher(true),
+		matcher: bool(true),
 		handler: () => 'not found',
 	})
 
@@ -98,19 +92,21 @@ it('match POST /test route', () => {
 	const handler = ({
 		match,
 	}: {
-		match: Matched<AndMatcherResult<
-		MethodMatchResult<[Method]>,
-		ExactUrlPathnameMatchResult<[string]>
-		>>
+		match: Matched<
+			AndMatcherResult<
+				MethodMatchResult<[Method]>,
+				ExactUrlPathnameMatchResult<[string]>
+			>
+		>
 	}) => {
-		const [{ result: { method } }, { result: { pathname } }] = match.result.and
-		return `matched ${method} ${pathname}`
+		const [{ result: { method: methodResult } }, { result: { pathname } }] = match.result.and
+		return `matched ${methodResult} ${pathname}`
 	}
 
 	router.addRoute({
 		matcher: and([
-			new MethodMatcher(['POST']),
-			new ExactUrlPathnameMatcher(['/test']),
+			method(['POST']),
+			exactUrlPathname(['/test']),
 		]),
 		handler,
 	})
@@ -125,25 +121,25 @@ it('match POST /test route', () => {
 
 it('match POST /group/123 endpoint', () => {
 	// define an endpoint
-	const endpoint = ((pattern: string) => ({
+	const pathUrl = ((pattern: string) => ({
 		pattern: pathToRegexp(pattern),
 		path: compile<{ groupId: number }>(pattern),
 	}))('/group/:groupId')
 
 	router.addRoute({
-		matcher: new EndpointMatcher('POST', endpoint.pattern),
+		matcher: endpoint('POST', pathUrl.pattern),
 		handler: ({ match }) => {
 			return `matched ${match.result.method} for group ${match.result.match[1]}`
 		},
 	})
 	router.addRoute({
-		matcher: new BooleanMatcher(true),
+		matcher: bool(true),
 		handler: () => 'not found',
 	})
 
 	const req = createRequest({
 		method: 'POST',
-		url: endpoint.path({ groupId: 123 }),
+		url: pathUrl.path({ groupId: 123 }),
 	})
 
 	expect(router.exec({ req })).toBe('matched POST for group 123')
@@ -162,7 +158,7 @@ it('no match, but default handler', () => {
 
 class TestMatcherWithParams<
 	T extends MatchResult<void>,
-	D extends { test: string }
+	D extends { test: string },
 > implements Matcher<T, D> {
 	// eslint-disable-next-line class-methods-use-this
 	match(_neededForTypeScript: D): T {
@@ -177,7 +173,7 @@ it('simple route match', () => {
 		match: { matched: true; result: boolean }
 	}
 	routerWithoutParams.addRoute<MatchResult<boolean>>({
-		matcher: new BooleanMatcher(true),
+		matcher: bool(true),
 		handler: (_params: TypeCheckPass) => {
 			return 'test'
 		},
@@ -241,7 +237,7 @@ it('tenant router example from docs', () => {
 
 	// connect routers
 	rootRouter.addRoute({
-		matcher: new RegExpUrlMatcher<{
+		matcher: regExpUrl<{
 			tenant: string
 			url: string
 		}>([/^\/auth\/realms\/(?<tenant>[^/]+)(?<url>.+)/]),
@@ -261,7 +257,7 @@ it('tenant router example from docs', () => {
 
 	// attach some urls behind tenant
 	tenantRouter.addRoute({
-		matcher: new ExactUrlPathnameMatcher(['/myurl']),
+		matcher: exactUrlPathname(['/myurl']),
 		handler: ({ data: { tenant }, match: { result: { pathname } } }) => {
 			// if requested url is `/auth/realms/mytenant/myurl`, then:
 			// tenant: mytenant
@@ -286,7 +282,7 @@ it('nested router', () => {
 	}>()
 
 	appRouter.addRoute({
-		matcher: new RegExpUrlMatcher<{ name: string }>([/\/app\/(?<name>[\w\W]+)/]),
+		matcher: regExpUrl<{ name: string }>([/\/app\/(?<name>[\w\W]+)/]),
 		handler: ({
 			data: { tenant },
 			match: { result: { match: { groups: { name } } } },
@@ -294,13 +290,13 @@ it('nested router', () => {
 	})
 
 	appRouter.addRoute({
-		matcher: new BooleanMatcher(true),
+		matcher: bool(true),
 		handler: () => '404 app route',
 	})
 
 	const rootRouter = new NodeHttpRouter()
 	rootRouter.addRoute({
-		matcher: new RegExpUrlMatcher<{
+		matcher: regExpUrl<{
 			tenant: string
 			url: string
 		}>([/^\/auth\/realms\/(?<tenant>[^/]+)(?<url>.+)/]),
@@ -316,7 +312,7 @@ it('nested router', () => {
 	})
 
 	rootRouter.addRoute({
-		matcher: new BooleanMatcher(true),
+		matcher: bool(true),
 		handler: () => '404 tenant route',
 	})
 
@@ -374,7 +370,7 @@ it('event processing', () => {
 	})
 
 	eventRouter.addRoute({
-		matcher: new BooleanMatcher(true),
+		matcher: bool(true),
 		handler({ data }) {
 			return `the event '${data.name}' is unknown`
 		},

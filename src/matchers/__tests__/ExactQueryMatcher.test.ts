@@ -1,12 +1,12 @@
 import {
 	createRequest,
 } from 'node-mocks-http'
-import {
-	exactQuery,
-} from '../index.js'
 import type {
 	ServerRequest,
 } from '../../node/ServerRequest.js'
+import {
+	exactQuery,
+} from '../index.js'
 
 const matcher = exactQuery({
 	mustPresent: true,

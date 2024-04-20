@@ -1,12 +1,10 @@
 import {
+	isMatched,
 	type Matched,
 	type Matcher,
-	isMatched,
-} from './matchers/index.js'
-import {
 	type MatchResult,
 	type MatchResultAny,
-} from './matchers/MatchResult.js'
+} from './matchers/index.js'
 
 interface HandlerParams<MR extends MatchResultAny, D> {
 	match: Matched<MR>
@@ -19,8 +17,8 @@ export type MatchedHandler<M extends Matcher<MatchResultAny, any>, D = any> = Ha
 export type Handler<
 	MR extends MatchResultAny,
 	D,
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-> = (params: HandlerParams<MR, D>) => any
+> // eslint-disable-next-line @typescript-eslint/no-explicit-any
+ = (params: HandlerParams<MR, D>) => any
 
 export interface Route<MR extends MatchResultAny, D> {
 	matcher: Matcher<MR, D>
