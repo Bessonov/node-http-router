@@ -36,11 +36,14 @@ describe(requiredVal.name, () => {
 describe(getNthVal.name, () => {
 	const validator = getNthVal<string>()
 	it(`don't match non-arrays`, () => {
-		expect(validator(null as unknown as string[])).toBeUndefined()
 		expect(validator({} as unknown as string[])).toBeUndefined()
 	})
 
 	it('match defined values and return the first value', () => {
+		expect(validator()).toBeInstanceOf(Function)
+		expect(validator()?.()).toBe(undefined)
+		expect(validator(null)).toBeInstanceOf(Function)
+		expect(validator(null)?.()).toBe(undefined)
 		expect(validator(['value1', 'value2', 'value3'])).toBeInstanceOf(Function)
 		expect(validator(['value1', 'value2', 'value3'])?.()).toBe('value1')
 	})
@@ -55,6 +58,8 @@ describe(getNthVal.name, () => {
 describe(mapToNumVal.name, () => {
 	const validator = mapToNumVal()
 	it(`don't match uncconvertible arrays`, () => {
+		expect(validator()).toBeUndefined()
+		expect(validator(null)).toBeUndefined()
 		expect(validator(['1', ' '])).toBeUndefined()
 		expect(validator(['1', 'a'])).toBeUndefined()
 		expect(validator(['1_000'])).toBeUndefined()
@@ -89,12 +94,14 @@ describe(atLeastOneVal.name, () => {
 	const validator = atLeastOneVal(['a', 'b', 'c'])
 
 	it(`don't match if not in list`, () => {
-		expect(validator(['1'] as unknown as ['a'])).toBeUndefined()
+		expect(validator()).toBeUndefined()
+		expect(validator(null)).toBeUndefined()
+		expect(validator(['1'])).toBeUndefined()
 	})
 
 	it(`match one of the list`, () => {
-		expect(validator(['b', 'c', 'd'] as unknown as ['a'])).toBeDefined()
-		expect(validator(['b', 'c', 'd'] as unknown as ['a'])?.()).toStrictEqual(['b', 'c'])
+		expect(validator(['b', 'c', 'd'])).toBeDefined()
+		expect(validator(['b', 'c', 'd'])?.()).toStrictEqual(['b', 'c'])
 	})
 })
 
@@ -102,6 +109,8 @@ describe(minCountVal.name, () => {
 	const validator = minCountVal(2)
 
 	it(`don't match if not enough elements`, () => {
+		expect(validator()).toBeUndefined()
+		expect(validator(null)).toBeUndefined()
 		expect(validator([])).toBeUndefined()
 		expect(validator(['1'])).toBeUndefined()
 	})

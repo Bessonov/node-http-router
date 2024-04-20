@@ -50,6 +50,7 @@ module.exports = {
 			'ignorePackages',
 		],
 		// disable styling rules
+		'max-len': 'off',
 		'sort-imports': 'off',
 		'space-before-function-paren': 'off',
 		'function-paren-newline': 'off',

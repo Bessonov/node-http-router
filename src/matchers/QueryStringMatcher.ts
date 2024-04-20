@@ -16,12 +16,12 @@ export interface QueryStringMatcherInput {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyValidator = Validator<string[], any>
+type AnyValidator = Validator<string[] | null, any>
 
 type QueryMatch = Record<string, AnyValidator>
 
 type QueryResult<T extends QueryMatch> = {
-	[P in keyof T]: T[P] extends Validator<string[], infer O> ? O : never
+	[P in keyof T]: T[P] extends Validator<string[] | null, infer O> ? O : never
 }
 
 export type QueryStringMatchResult<U extends QueryMatch> = MatchResult<{
@@ -45,7 +45,7 @@ class QueryStringMatcher<
 
 		const queryResult = {} as QueryResult<U>
 		for (const [key, matcher] of this.listConfig) {
-			const params = queryParams.getAll(key)
+			const params = queryParams.has(key) ? queryParams.getAll(key) : null
 			const getter = matcher(params)
 			if (getter === undefined) {
 				return {

@@ -25,13 +25,16 @@ describe(requiredVal.name, () => {
 describe(getNthVal.name, () => {
     const validator = getNthVal();
     it(`don't match non-arrays`, () => {
-        expect(validator(null)).toBeUndefined();
         expect(validator({})).toBeUndefined();
     });
     it('match defined values and return the first value', () => {
-        var _a;
+        var _a, _b, _c;
+        expect(validator()).toBeInstanceOf(Function);
+        expect((_a = validator()) === null || _a === void 0 ? void 0 : _a()).toBe(undefined);
+        expect(validator(null)).toBeInstanceOf(Function);
+        expect((_b = validator(null)) === null || _b === void 0 ? void 0 : _b()).toBe(undefined);
         expect(validator(['value1', 'value2', 'value3'])).toBeInstanceOf(Function);
-        expect((_a = validator(['value1', 'value2', 'value3'])) === null || _a === void 0 ? void 0 : _a()).toBe('value1');
+        expect((_c = validator(['value1', 'value2', 'value3'])) === null || _c === void 0 ? void 0 : _c()).toBe('value1');
     });
     it('match defined values and return the last value', () => {
         var _a;
@@ -43,6 +46,8 @@ describe(getNthVal.name, () => {
 describe(mapToNumVal.name, () => {
     const validator = mapToNumVal();
     it(`don't match uncconvertible arrays`, () => {
+        expect(validator()).toBeUndefined();
+        expect(validator(null)).toBeUndefined();
         expect(validator(['1', ' '])).toBeUndefined();
         expect(validator(['1', 'a'])).toBeUndefined();
         expect(validator(['1_000'])).toBeUndefined();
@@ -71,6 +76,8 @@ describe(oneOfVal.name, () => {
 describe(atLeastOneVal.name, () => {
     const validator = atLeastOneVal(['a', 'b', 'c']);
     it(`don't match if not in list`, () => {
+        expect(validator()).toBeUndefined();
+        expect(validator(null)).toBeUndefined();
         expect(validator(['1'])).toBeUndefined();
     });
     it(`match one of the list`, () => {
@@ -82,6 +89,8 @@ describe(atLeastOneVal.name, () => {
 describe(minCountVal.name, () => {
     const validator = minCountVal(2);
     it(`don't match if not enough elements`, () => {
+        expect(validator()).toBeUndefined();
+        expect(validator(null)).toBeUndefined();
         expect(validator([])).toBeUndefined();
         expect(validator(['1'])).toBeUndefined();
     });

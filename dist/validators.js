@@ -17,6 +17,9 @@ export function requiredVal() {
 }
 export function getNthVal(num = 0) {
     return (value) => {
+        if (value === undefined || value === null) {
+            return () => undefined;
+        }
         if (Array.isArray(value)) {
             return () => {
                 if (num >= 0) {
@@ -31,6 +34,9 @@ export function getNthVal(num = 0) {
 }
 export function mapToNumVal() {
     return (values) => {
+        if (values === undefined || values === null) {
+            return undefined;
+        }
         const parsedValues = [];
         for (const value of values) {
             const parsedValue = parseNumber(value);
@@ -52,7 +58,7 @@ export function oneOfVal(values) {
 }
 export function atLeastOneVal(expectedValues) {
     return (values) => {
-        const newValues = values.filter(value => expectedValues.includes(value));
+        const newValues = (values !== null && values !== void 0 ? values : []).filter(value => expectedValues.includes(value));
         if (newValues.length > 0) {
             return () => newValues;
         }
@@ -61,7 +67,7 @@ export function atLeastOneVal(expectedValues) {
 }
 export function minCountVal(min) {
     return (value) => {
-        if (value.length >= min) {
+        if (value !== undefined && value !== null && value.length >= min) {
             return () => value;
         }
         return undefined;

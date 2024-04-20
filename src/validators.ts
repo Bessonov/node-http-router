@@ -3,6 +3,8 @@ type Any = any
 
 type Getter<O> = (() => O) | undefined
 
+type Unrequired = undefined | null | void
+
 export interface Validator<I, O> {
 	(value: I): Getter<O>
 }
@@ -18,8 +20,8 @@ export function trueVal<I>(): Validator<I[], NoInfer<I>[]> {
 	return (value: I[]) => () => value
 }
 
-export function requiredVal<I>(): Validator<I | undefined | null | void, NonNullable<NoInfer<I>>> {
-	return (value: I | undefined | null | void): Getter<NonNullable<I>> => {
+export function requiredVal<I>(): Validator<I | Unrequired, NonNullable<NoInfer<I>>> {
+	return (value: I | Unrequired): Getter<NonNullable<I>> => {
 		if (value === undefined || value === null) {
 			return undefined
 		}
@@ -27,8 +29,11 @@ export function requiredVal<I>(): Validator<I | undefined | null | void, NonNull
 	}
 }
 
-export function getNthVal<I>(num: number = 0): Validator<I[], NoInfer<I> | undefined> {
-	return (value: I[]) => {
+export function getNthVal<I>(num: number = 0): Validator<I[] | Unrequired, NoInfer<I> | undefined> {
+	return (value: I[] | Unrequired) => {
+		if (value === undefined || value === null) {
+			return () => undefined
+		}
 		if (Array.isArray(value)) {
 			return () => {
 				if (num >= 0) {
@@ -42,8 +47,11 @@ export function getNthVal<I>(num: number = 0): Validator<I[], NoInfer<I> | undef
 	}
 }
 
-export function mapToNumVal<I extends string[]>(): Validator<I, number[]> {
-	return (values: string[]) => {
+export function mapToNumVal<I extends string[]>(): Validator<I | Unrequired, number[]> {
+	return (values: string[] | Unrequired) => {
+		if (values === undefined || values === null) {
+			return undefined
+		}
 		const parsedValues: number[] = []
 		for (const value of values) {
 			const parsedValue = parseNumber(value)
@@ -56,7 +64,7 @@ export function mapToNumVal<I extends string[]>(): Validator<I, number[]> {
 	}
 }
 
-export function oneOfVal<const I extends string | number | boolean>(values: I[]): Validator<I, I> {
+export function oneOfVal<const I extends string | number | boolean | Unrequired>(values: I[]): Validator<I, I> {
 	return (value: I): Getter<I> => {
 		if (values.includes(value)) {
 			return () => value
@@ -67,9 +75,9 @@ export function oneOfVal<const I extends string | number | boolean>(values: I[])
 
 export function atLeastOneVal<I extends string | number | boolean, const O extends I>(
 	expectedValues: O[],
-): Validator<I[], NoInfer<O>[]> {
-	return (values: I[]): Getter<O[]> => {
-		const newValues = (values as O[]).filter(value => expectedValues.includes(value))
+): Validator<I[] | Unrequired, NoInfer<O>[]> {
+	return (values: I[] | Unrequired): Getter<O[]> => {
+		const newValues = ((values ?? []) as O[]).filter(value => expectedValues.includes(value))
 		if (newValues.length > 0) {
 			return () => newValues
 		}
@@ -79,9 +87,9 @@ export function atLeastOneVal<I extends string | number | boolean, const O exten
 
 export function minCountVal<const I extends string | number | boolean>(
 	min: number,
-): Validator<I[], NoInfer<I>[]> {
-	return (value: I[]): Getter<I[]> => {
-		if (value.length >= min) {
+): Validator<I[] | Unrequired, NoInfer<I>[]> {
+	return (value: I[] | Unrequired): Getter<I[]> => {
+		if (value !== undefined && value !== null && value.length >= min) {
 			return () => value
 		}
 		return undefined
