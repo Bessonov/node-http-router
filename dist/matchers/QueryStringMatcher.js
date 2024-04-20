@@ -7,16 +7,16 @@ class QueryStringMatcher {
             const search = (_a = Url.parse(req.url).search) !== null && _a !== void 0 ? _a : '';
             const queryParams = new URLSearchParams(search);
             const queryResult = {};
-            for (const [key, validatorFactory] of this.listConfig) {
-                const validator = validatorFactory();
+            for (const [key, matcher] of this.listConfig) {
                 const params = queryParams.getAll(key);
-                if (validator.match(params) === false) {
+                const getter = matcher(params);
+                if (getter === undefined) {
                     return {
                         matched: false,
                     };
                 }
-                // @ts-ignore
-                queryResult[key] = validator.parse(params);
+                // @ts-expect-error
+                queryResult[key] = getter(params);
             }
             return {
                 matched: true,

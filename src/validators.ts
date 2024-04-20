@@ -1,13 +1,10 @@
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
 type Any = any
 
+type Getter<O> = (() => O) | undefined
+
 export interface Validator<I, O> {
-	(): {
-		// should return the parse function instead of boolean?
-		match(value: I): boolean
-		// rename to getValue and remove args?
-		parse(value: I): O
-	}
+	(value: I): Getter<O>
 }
 
 function parseNumber(value: string): number {
@@ -18,111 +15,96 @@ function parseNumber(value: string): number {
 }
 
 export function trueVal<I>(): Validator<I[], NoInfer<I>[]> {
-	return () => ({
-		match: (): boolean => true,
-		parse: (value: I[]): I[] => value,
-	})
+	return (value: I[]) => () => value
 }
 
-export function requiredVal<I>(): Validator<I | void | undefined | null, NonNullable<NoInfer<I>>> {
-	return () => ({
-		match(value: I | undefined | null): boolean {
-			return value !== undefined && value !== null
-		},
-		parse(value: I | undefined | null) {
-			return value as NonNullable<I>
-		},
-	})
+export function requiredVal<I>(): Validator<I | undefined | null | void, NonNullable<NoInfer<I>>> {
+	return (value: I | undefined | null | void): Getter<NonNullable<I>> => {
+		if (value === undefined || value === null) {
+			return undefined
+		}
+		return () => value
+	}
 }
 
 export function getNthVal<I>(num: number = 0): Validator<I[], NoInfer<I> | undefined> {
-	return () => ({
-		match(value): boolean {
-			return Array.isArray(value)
-		},
-		parse(value) {
-			if (num >= 0) {
-				return value[num]
+	return (value: I[]) => {
+		if (Array.isArray(value)) {
+			return () => {
+				if (num >= 0) {
+					return value[num]
+				}
+				const newNum = value.length + num
+				return value[newNum]
 			}
-			const newNum = value.length + num
-			return value[newNum]
-		},
-	})
+		}
+		return undefined
+	}
 }
 
 export function mapToNumVal<I extends string[]>(): Validator<I, number[]> {
-	return () => {
+	return (values: string[]) => {
 		const parsedValues: number[] = []
-		return {
-			match(values: string[]): boolean {
-				for (const value of values) {
-					const parsedValue = parseNumber(value)
-					if (Number.isNaN(parsedValue)) {
-						return false
-					}
-					parsedValues.push(parsedValue)
-				}
-				return true
-			},
-			parse(): number[] {
-				return parsedValues
-			},
+		for (const value of values) {
+			const parsedValue = parseNumber(value)
+			if (Number.isNaN(parsedValue)) {
+				return undefined
+			}
+			parsedValues.push(parsedValue)
 		}
+		return () => parsedValues
 	}
 }
 
 export function oneOfVal<const I extends string | number | boolean>(values: I[]): Validator<I, I> {
-	return () => ({
-		match: value => values.includes(value),
-		parse: (value: I): I => value,
-	})
+	return (value: I): Getter<I> => {
+		if (values.includes(value)) {
+			return () => value
+		}
+		return undefined
+	}
 }
 
-export function atLeastOneVal<const I extends string | number | boolean>(
-	expectedValues: I[],
-): Validator<I[], I[]> {
-	return () => {
-		let newValues: I[]
-		return {
-			match(values: I[]): boolean {
-				newValues = values.filter(value => expectedValues.includes(value))
-				return newValues.length > 0
-			},
-			parse(): I[] {
-				return newValues
-			},
+export function atLeastOneVal<I extends string | number | boolean, const O extends I>(
+	expectedValues: O[],
+): Validator<I[], NoInfer<O>[]> {
+	return (values: I[]): Getter<O[]> => {
+		const newValues = (values as O[]).filter(value => expectedValues.includes(value))
+		if (newValues.length > 0) {
+			return () => newValues
 		}
+		return undefined
 	}
 }
 
 export function minCountVal<const I extends string | number | boolean>(
 	min: number,
 ): Validator<I[], NoInfer<I>[]> {
-	return () => ({
-		match(value: I[]): boolean {
-			return value.length >= min
-		},
-		parse(value: I[]): I[] {
-			return value
-		},
-	})
-}
-
-export function toNumVal<I extends string>(): Validator<I, number> {
-	return () => {
-		let parsedValue: number
-		return {
-			match(value: I) {
-				parsedValue = parseNumber(value)
-				return Number.isNaN(parsedValue) === false
-			},
-			parse() {
-				return parsedValue
-			},
+	return (value: I[]): Getter<I[]> => {
+		if (value.length >= min) {
+			return () => value
 		}
+		return undefined
 	}
 }
 
+export function toNumVal<I extends string>(): Validator<I, number> {
+	return (value: I): Getter<number> => {
+		const parsedValue = parseNumber(value)
+		if (Number.isNaN(parsedValue)) {
+			return undefined
+		}
+		return () => parsedValue
+	}
+}
+
+export function chain<I, O1, O2, O3, O4, O>(
+	val1: Validator<I, O1>,
+	val2: Validator<O1, O2>,
+	val3: Validator<O2, O3>,
+	val4: Validator<O3, O4>,
+	val5: Validator<O4, O>,
+): Validator<I, O>
 export function chain<I, O1, O2, O3, O>(
 	val1: Validator<I, O1>,
 	val2: Validator<O1, O2>,
@@ -142,24 +124,15 @@ export function chain<I, O>(
 	val1: Validator<I, O>,
 ): Validator<I, O>
 export function chain(...validators: Validator<Any, Any>[]): Validator<Any, Any> {
-	return () => {
-		let lastValidatorValue: Any
-		return {
-			match(value) {
-				lastValidatorValue = value
-				for (const validatorFactory of validators) {
-					const validator = validatorFactory()
-					const match = validator.match(lastValidatorValue)
-					if (!match) {
-						return false
-					}
-					lastValidatorValue = validator.parse(lastValidatorValue)
-				}
-				return true
-			},
-			parse() {
-				return lastValidatorValue
-			},
+	return value => {
+		let lastValidatorValue = value
+		for (const matcher of validators) {
+			const getter = matcher(lastValidatorValue)
+			if (getter === undefined) {
+				return undefined
+			}
+			lastValidatorValue = getter()
 		}
+		return () => lastValidatorValue
 	}
 }

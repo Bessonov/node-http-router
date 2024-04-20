@@ -1,107 +1,107 @@
 import { atLeastOneVal, getNthVal, mapToNumVal, minCountVal, oneOfVal, requiredVal, toNumVal, trueVal, } from '../validators.js';
 describe(trueVal.name, () => {
     it('matches always', () => {
-        const validator = trueVal()();
+        var _a;
+        const validator = trueVal();
         const input = ['any'];
-        expect(validator.match(input)).toBe(true);
-        expect(validator.parse(input)).toBe(input);
+        expect(validator(input)).toBeDefined();
+        expect((_a = validator(input)) === null || _a === void 0 ? void 0 : _a()).toBe(input);
     });
 });
 describe(requiredVal.name, () => {
-    const validatorFactory = requiredVal();
+    const validator = requiredVal();
     it(`don't match undefined and null`, () => {
-        expect(validatorFactory().match()).toBe(false);
-        expect(validatorFactory().match(undefined)).toBe(false);
-        expect(validatorFactory().match(null)).toBe(false);
+        expect(validator()).toBeUndefined();
+        expect(validator(undefined)).toBeUndefined();
+        expect(validator(null)).toBeUndefined();
     });
     it('match defined values', () => {
-        const validator = validatorFactory();
+        var _a;
         const value = 'test';
-        expect(validator.match(value)).toBe(true);
-        expect(validator.parse(value)).toBe(value);
+        expect(validator(value)).toBeInstanceOf(Function);
+        expect((_a = validator(value)) === null || _a === void 0 ? void 0 : _a()).toBe(value);
     });
 });
 describe(getNthVal.name, () => {
-    const validatorFactory = getNthVal();
+    const validator = getNthVal();
     it(`don't match non-arrays`, () => {
-        expect(validatorFactory().match(null)).toBe(false);
-        expect(validatorFactory().match({})).toBe(false);
+        expect(validator(null)).toBeUndefined();
+        expect(validator({})).toBeUndefined();
     });
     it('match defined values and return the first value', () => {
-        const validator = validatorFactory();
-        expect(validator.match(['value1', 'value2', 'value3'])).toBe(true);
-        expect(validator.parse(['value1', 'value2', 'value3'])).toBe('value1');
+        var _a;
+        expect(validator(['value1', 'value2', 'value3'])).toBeInstanceOf(Function);
+        expect((_a = validator(['value1', 'value2', 'value3'])) === null || _a === void 0 ? void 0 : _a()).toBe('value1');
     });
     it('match defined values and return the last value', () => {
-        const validatorLast = getNthVal(-1)();
-        expect(validatorLast.match(['value1', 'value2', 'value3'])).toBe(true);
-        expect(validatorLast.parse(['value1', 'value2', 'value3'])).toBe('value3');
+        var _a;
+        const validatorLast = getNthVal(-1);
+        expect(validatorLast(['value1', 'value2', 'value3'])).toBeInstanceOf(Function);
+        expect((_a = validatorLast(['value1', 'value2', 'value3'])) === null || _a === void 0 ? void 0 : _a()).toBe('value3');
     });
 });
 describe(mapToNumVal.name, () => {
-    const validatorFactory = mapToNumVal();
+    const validator = mapToNumVal();
     it(`don't match uncconvertible arrays`, () => {
-        expect(validatorFactory().match(['1', ' '])).toBe(false);
-        expect(validatorFactory().match(['1', 'a'])).toBe(false);
-        expect(validatorFactory().match(['1_000'])).toBe(false);
+        expect(validator(['1', ' '])).toBeUndefined();
+        expect(validator(['1', 'a'])).toBeUndefined();
+        expect(validator(['1_000'])).toBeUndefined();
     });
     it(`convert a string array to a number array`, () => {
-        let validator = validatorFactory();
-        expect(validator.match([])).toBe(true);
-        expect(validator.parse([])).toStrictEqual([]);
-        validator = validatorFactory();
-        expect(validator.match(['1', '-1', '1000'])).toBe(true);
-        expect(validator.parse(['1', '-1', '1000'])).toStrictEqual([1, -1, 1000]);
-        validator = validatorFactory();
-        expect(validator.match([' 1 '])).toBe(true);
-        expect(validator.parse([' 1 '])).toStrictEqual([1]);
+        var _a, _b, _c;
+        expect(validator([])).toBeDefined();
+        expect((_a = validator([])) === null || _a === void 0 ? void 0 : _a()).toStrictEqual([]);
+        expect(validator(['1', '-1', '1000'])).toBeDefined();
+        expect((_b = validator(['1', '-1', '1000'])) === null || _b === void 0 ? void 0 : _b()).toStrictEqual([1, -1, 1000]);
+        expect(validator([' 1 '])).toBeDefined();
+        expect((_c = validator([' 1 '])) === null || _c === void 0 ? void 0 : _c()).toStrictEqual([1]);
     });
 });
 describe(oneOfVal.name, () => {
-    const validatorFactory = oneOfVal(['a', 'b', 'c']);
+    const validator = oneOfVal(['a', 'b', 'c']);
     it(`don't match if not in list`, () => {
-        expect(validatorFactory().match('1')).toBe(false);
+        expect(validator('1')).toBeUndefined();
     });
     it(`match one of the list`, () => {
-        const validator = validatorFactory();
-        expect(validator.match('b')).toBe(true);
-        expect(validator.parse('b')).toStrictEqual('b');
+        var _a;
+        expect(validator('b')).toBeDefined();
+        expect((_a = validator('b')) === null || _a === void 0 ? void 0 : _a()).toStrictEqual('b');
     });
 });
 describe(atLeastOneVal.name, () => {
-    const validatorFactory = atLeastOneVal(['a', 'b', 'c']);
+    const validator = atLeastOneVal(['a', 'b', 'c']);
     it(`don't match if not in list`, () => {
-        expect(validatorFactory().match(['1'])).toBe(false);
+        expect(validator(['1'])).toBeUndefined();
     });
     it(`match one of the list`, () => {
-        const validator = validatorFactory();
-        expect(validator.match(['b', 'c', 'd'])).toBe(true);
-        expect(validator.parse(['b', 'c', 'd'])).toStrictEqual(['b', 'c']);
+        var _a;
+        expect(validator(['b', 'c', 'd'])).toBeDefined();
+        expect((_a = validator(['b', 'c', 'd'])) === null || _a === void 0 ? void 0 : _a()).toStrictEqual(['b', 'c']);
     });
 });
 describe(minCountVal.name, () => {
-    const validatorFactory = minCountVal(2);
+    const validator = minCountVal(2);
     it(`don't match if not enough elements`, () => {
-        expect(validatorFactory().match([])).toBe(false);
-        expect(validatorFactory().match(['1'])).toBe(false);
+        expect(validator([])).toBeUndefined();
+        expect(validator(['1'])).toBeUndefined();
     });
     it(`match if enough elements`, () => {
-        const validator = validatorFactory();
-        expect(validator.match(['1', '2'])).toBe(true);
-        expect(validator.parse(['1', '2'])).toStrictEqual(['1', '2']);
+        var _a;
+        expect(validator(['1', '2'])).toBeDefined();
+        expect((_a = validator(['1', '2'])) === null || _a === void 0 ? void 0 : _a()).toStrictEqual(['1', '2']);
     });
 });
 describe(toNumVal.name, () => {
-    const validatorFactory = toNumVal();
+    const validator = toNumVal();
     it(`don't match if not convertible to a number`, () => {
-        expect(validatorFactory().match('')).toBe(false);
-        expect(validatorFactory().match(' ')).toBe(false);
-        expect(validatorFactory().match('a')).toBe(false);
+        expect(validator('')).toBeUndefined();
+        expect(validator(' ')).toBeUndefined();
+        expect(validator('a')).toBeUndefined();
     });
     it(`match if convertible to a number`, () => {
-        const validator = validatorFactory();
-        expect(validator.match('1')).toBe(true);
-        expect(validator.parse('1')).toStrictEqual(1);
+        var _a;
+        expect(validator('1')).toBeDefined();
+        expect((_a = validator('1')) === null || _a === void 0 ? void 0 : _a()).toStrictEqual(1);
     });
 });
 //# sourceMappingURL=validators.test.js.map

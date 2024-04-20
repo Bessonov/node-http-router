@@ -5,119 +5,88 @@ function parseNumber(value) {
     return Number(value);
 }
 export function trueVal() {
-    return () => ({
-        match: () => true,
-        parse: (value) => value,
-    });
+    return (value) => () => value;
 }
 export function requiredVal() {
-    return () => ({
-        match(value) {
-            return value !== undefined && value !== null;
-        },
-        parse(value) {
-            return value;
-        },
-    });
+    return (value) => {
+        if (value === undefined || value === null) {
+            return undefined;
+        }
+        return () => value;
+    };
 }
 export function getNthVal(num = 0) {
-    return () => ({
-        match(value) {
-            return Array.isArray(value);
-        },
-        parse(value) {
-            if (num >= 0) {
-                return value[num];
-            }
-            const newNum = value.length + num;
-            return value[newNum];
-        },
-    });
+    return (value) => {
+        if (Array.isArray(value)) {
+            return () => {
+                if (num >= 0) {
+                    return value[num];
+                }
+                const newNum = value.length + num;
+                return value[newNum];
+            };
+        }
+        return undefined;
+    };
 }
 export function mapToNumVal() {
-    return () => {
+    return (values) => {
         const parsedValues = [];
-        return {
-            match(values) {
-                for (const value of values) {
-                    const parsedValue = parseNumber(value);
-                    if (Number.isNaN(parsedValue)) {
-                        return false;
-                    }
-                    parsedValues.push(parsedValue);
-                }
-                return true;
-            },
-            parse() {
-                return parsedValues;
-            },
-        };
+        for (const value of values) {
+            const parsedValue = parseNumber(value);
+            if (Number.isNaN(parsedValue)) {
+                return undefined;
+            }
+            parsedValues.push(parsedValue);
+        }
+        return () => parsedValues;
     };
 }
 export function oneOfVal(values) {
-    return () => ({
-        match: value => values.includes(value),
-        parse: (value) => value,
-    });
+    return (value) => {
+        if (values.includes(value)) {
+            return () => value;
+        }
+        return undefined;
+    };
 }
 export function atLeastOneVal(expectedValues) {
-    return () => {
-        let newValues;
-        return {
-            match(values) {
-                newValues = values.filter(value => expectedValues.includes(value));
-                return newValues.length > 0;
-            },
-            parse() {
-                return newValues;
-            },
-        };
+    return (values) => {
+        const newValues = values.filter(value => expectedValues.includes(value));
+        if (newValues.length > 0) {
+            return () => newValues;
+        }
+        return undefined;
     };
 }
 export function minCountVal(min) {
-    return () => ({
-        match(value) {
-            return value.length >= min;
-        },
-        parse(value) {
-            return value;
-        },
-    });
+    return (value) => {
+        if (value.length >= min) {
+            return () => value;
+        }
+        return undefined;
+    };
 }
 export function toNumVal() {
-    return () => {
-        let parsedValue;
-        return {
-            match(value) {
-                parsedValue = parseNumber(value);
-                return Number.isNaN(parsedValue) === false;
-            },
-            parse() {
-                return parsedValue;
-            },
-        };
+    return (value) => {
+        const parsedValue = parseNumber(value);
+        if (Number.isNaN(parsedValue)) {
+            return undefined;
+        }
+        return () => parsedValue;
     };
 }
 export function chain(...validators) {
-    return () => {
-        let lastValidatorValue;
-        return {
-            match(value) {
-                lastValidatorValue = value;
-                for (const validatorFactory of validators) {
-                    const validator = validatorFactory();
-                    const match = validator.match(lastValidatorValue);
-                    if (!match) {
-                        return false;
-                    }
-                    lastValidatorValue = validator.parse(lastValidatorValue);
-                }
-                return true;
-            },
-            parse() {
-                return lastValidatorValue;
-            },
-        };
+    return value => {
+        let lastValidatorValue = value;
+        for (const matcher of validators) {
+            const getter = matcher(lastValidatorValue);
+            if (getter === undefined) {
+                return undefined;
+            }
+            lastValidatorValue = getter();
+        }
+        return () => lastValidatorValue;
     };
 }
 //# sourceMappingURL=validators.js.map
