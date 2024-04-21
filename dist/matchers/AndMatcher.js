@@ -13,7 +13,7 @@ export class AndMatcher {
             let result;
             if (matcher) {
                 result = matcher.match(params);
-                if (isMatched(result) === false) {
+                if (matcher !== undefined && isMatched(result) === false) {
                     return {
                         matched: false,
                     };

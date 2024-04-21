@@ -5,11 +5,11 @@ import type {
 	ServerRequest,
 } from '../../node/ServerRequest.js'
 import {
-	regExpUrl,
-} from '../index.js'
+	RegExpUrlMatcher,
+} from '../RegExpUrlMatcher.js'
 
 it('not match', () => {
-	const result = regExpUrl([/^\/test$/])
+	const result = new RegExpUrlMatcher([/^\/test$/])
 		.match({ req: createRequest<ServerRequest>() })
 	expect(result).toStrictEqual({
 		matched: false,
@@ -17,7 +17,7 @@ it('not match', () => {
 })
 
 it('match', () => {
-	const result = regExpUrl([/^\/test$/])
+	const result = new RegExpUrlMatcher([/^\/test$/])
 		.match({
 			req: createRequest<ServerRequest>({
 				url: '/test',
@@ -30,7 +30,7 @@ it('match', () => {
 })
 
 it('match first', () => {
-	const result = regExpUrl([/^\/test$/, /^\/test2$/])
+	const result = new RegExpUrlMatcher([/^\/test$/, /^\/test2$/])
 		.match({
 			req: createRequest<ServerRequest>({
 				url: '/test',
@@ -43,7 +43,7 @@ it('match first', () => {
 })
 
 it('match second', () => {
-	const result = regExpUrl([/^\/test$/, /^\/test2$/])
+	const result = new RegExpUrlMatcher([/^\/test$/, /^\/test2$/])
 		.match({
 			req: createRequest<ServerRequest>({
 				url: '/test2',
@@ -56,7 +56,7 @@ it('match second', () => {
 })
 
 it('match group', () => {
-	const result = regExpUrl<{ groupId: string }>([/^\/group\/(?<groupId>[^/]+)$/])
+	const result = new RegExpUrlMatcher<{ groupId: string }>([/^\/group\/(?<groupId>[^/]+)$/])
 		.match({
 			req: createRequest<ServerRequest>({
 				url: '/group/123',
@@ -66,44 +66,5 @@ it('match group', () => {
 	if (result.matched) {
 		expect(result.result.match.input).toBe('/group/123')
 		expect(result.result.match.groups.groupId).toBe('123')
-	}
-})
-
-it(`url is empty`, () => {
-	const result = regExpUrl([/^\/$/])
-		.match({
-			req: createRequest<ServerRequest>({
-				url: '',
-			}),
-		})
-	expect(result.matched).toBe(true)
-	if (result.matched) {
-		expect(result.result.match.input).toBe('/')
-	}
-})
-
-it(`query string isn't matched`, () => {
-	const result = regExpUrl([/^\/test$/])
-		.match({
-			req: createRequest<ServerRequest>({
-				url: '/test?query=not-matched',
-			}),
-		})
-	expect(result.matched).toBe(true)
-	if (result.matched) {
-		expect(result.result.match.input).toBe('/test')
-	}
-})
-
-it('match string', () => {
-	const result = regExpUrl(['/test'])
-		.match({
-			req: createRequest<ServerRequest>({
-				url: '/test?param=value',
-			}),
-		})
-	expect(result.matched).toBe(true)
-	if (result.matched) {
-		expect(result.result.match.input).toBe('/test')
 	}
 })

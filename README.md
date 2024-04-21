@@ -1,25 +1,25 @@
-Router for Node.js, micro and other use cases
-=============================================
+Router for Node.js, Micro, and other use cases
+==============================================
 
 [![Project is](https://img.shields.io/badge/Project%20is-fantastic-ff69b4.svg)](https://github.com/Bessonov/node-http-router)
 [![License](http://img.shields.io/:license-MIT-blue.svg)](https://raw.githubusercontent.com/Bessonov/node-http-router/master/LICENSE)
 
-This router is intended to be used with native node http interface. Features:
-- Written in TypeScript with focus on type safety.
-- Extensible via [`Matcher`](src/matchers/Matcher.ts) and [`MatchResult`](src/matchers/MatchResult.ts) interfaces.
-- Works with [native node http server](#usage-with-native-node-http-server).
-- Works with [micro](#usage-with-micro).
+This router is intended to be used with the native Node.js HTTP interface. Features:
+- Written in TypeScript with a focus on type safety.
+- Extensible via the [`Matcher`](src/matchers/Matcher.ts) and [`MatchResult`](src/matchers/MatchResult.ts) interfaces.
+- Works with the [native Node.js HTTP server](#usage-with-native-node-http-server).
+- Works with [Micro](#usage-with-micro), and probably with any other server.
 - Offers a set of matchers:
   - [`MethodMatcher`](#methodmatcher)
   - [`ExactUrlPathnameMatcher`](#exacturlpathnamematcher)
   - [`QueryStringMatcher`](#querystringmatcher)
-  - Powerful [`RegExpUrlMatcher`](#regexpurlmatcher)
+  - Powerful [`RegExpPathnameMatcher`](#regexppathnamematcher)
   - Convenient [`EndpointMatcher`](#endpointmatcher)
   - `AndMatcher` and `OrMatcher`
 - Can be used with [path-to-regexp](https://github.com/pillarjs/path-to-regexp).
-- Work with other servers? Tell it me!
+- Work with other servers? Let me know!
 
-From 2.0.0 the router isn't tied to node or even http anymore! Although the primary use case is still node's request routing, you can use it for use cases like event processing.
+Starting from version 2.0.0, the router isn't tied to Node.js or even HTTP anymore! Although the primary use case is still request routing in Node.js, you can now use it for use cases like event processing.
 
 ## Sponsoring
 
@@ -31,7 +31,7 @@ Sponsored by [Superlative GmbH](https://superlative.gmbh)
 
 ## Installation
 
-Choose for one of your favourite package manager:
+Choose one of your favorite package managers:
 
 ```bash
 npm install @bessonovs/node-http-router
@@ -43,16 +43,16 @@ pnpm add @bessonovs/node-http-router
 
 See [releases](https://github.com/Bessonov/node-http-router/releases).
 
-## Documentation and examples
+## Documentation and Examples
 
 ### Binding
 
-The router doesn't depends on the native http interfaces like `IncomingMessage` and `ServerResponse`. Therefore, you can use it for everything. Below are some use cases.
+The router doesn't depend on the native HTTP interfaces like `IncomingMessage` and `ServerResponse`. Therefore, you can use it for anything. Below are some use cases.
 
-#### Usage with native node http server
+#### Usage with Native Node.js HTTP Server
 
 ```typescript
-const router = new NodeHttpRouter()
+const router = new NodeHttpRouter(({ data: { res } }) => send(res, 404))
 
 const server = http.createServer(router.serve).listen(8080, 'localhost')
 
@@ -60,19 +60,13 @@ router.addRoute({
 	matcher: exactUrlPathname(['/hello']),
 	handler: () => 'Hello kitty!',
 })
-
-// 404 handler
-router.addRoute({
-	matcher: bool(true),
-	handler: ({ data: { res } }) => send(res, 404)
-})
 ```
 
-See [full example](src/examples/node.ts) and [native node http server](https://nodejs.org/api/http.html#http_class_http_server) documentation.
+See the [full example](src/examples/node.ts) and the [native Node.js HTTP server](https://nodejs.org/api/http.html#http_class_http_server) documentation.
 
-#### Usage with micro server
+#### Usage with Micro Server
 
-[micro](https://github.com/vercel/micro) is a very lightweight layer around the native node http server with some convenience methods.
+[Micro](https://github.com/vercel/micro) is a very lightweight layer around the native Node.js HTTP server with some convenience methods.
 
 ```typescript
 import {
@@ -80,7 +74,7 @@ import {
 	serve,
 } from 'micro'
 
-const router = new NodeHttpRouter()
+const router = new NodeHttpRouter(({ data: { res } }) => send(res, 404))
 
 http.createServer(serve(router.serve)).listen(8080, 'localhost')
 
@@ -88,17 +82,11 @@ router.addRoute({
 	matcher: exactUrlPathname(['/hello']),
 	handler: () => 'Hello kitty!',
 })
-
-// 404 handler
-router.addRoute({
-	matcher: bool(true),
-	handler: ({ data: { res } }) => send(res, 404)
-})
 ```
 
-See [full example](src/examples/micro.ts).
+See the [full example](src/examples/micro.ts).
 
-#### Usage for event processing or generic use case
+#### Usage for Event Processing or Generic Use Case
 
 ```typescript
 // Custom type
@@ -113,7 +101,7 @@ type MyEvent = {
 const eventRouter = new Router<MyEvent>()
 
 eventRouter.addRoute({
-	// define matchers for event processing
+	// Define matchers for event processing
 	matcher: ({
 		match(params: MyEvent): MatchResult<number> {
 			const result = /^test(?<num>\d+)$/.exec(params.name)
@@ -128,21 +116,21 @@ eventRouter.addRoute({
 			}
 		},
 	}),
-	// define event handler for matched events
+	// Define event handler for matched events
 	handler({ data, match: { result } }) {
 		return `the event ${data.name} has number ${result}`
 	}
 })
 
-// add default handler
+// Add default handler
 eventRouter.addRoute({
-	matcher: bool(true),
+	matcher: bool(true), // matches everything
 	handler({ data }) {
 		return `the event '${data.name}' is unknown`
 	}
 })
 
-// execute and get processing result
+// Execute and get processing result
 const result = eventRouter.exec({
 	name: 'test1',
 })
@@ -150,12 +138,12 @@ const result = eventRouter.exec({
 
 ### Matchers
 
-In the core, matchers are responsible to decide if particular handler should be called or not. There is no magic: matchers are iterated on every request and first positive "match" calls defined handler.
+In the core, matchers are responsible for deciding if a particular handler should be called or not. There is no magic: matchers are iterated on every request, and the first positive "match" calls the defined handler.
 
 #### MethodMatcher
 ([source](./src/matchers/MethodMatcher.ts))
 
-Method matcher is the simplest matcher and matches any of the passed http methods:
+The method matcher is the simplest matcher and matches any of the passed HTTP methods:
 
 ```typescript
 router.addRoute({
@@ -168,7 +156,7 @@ router.addRoute({
 #### ExactUrlPathnameMatcher
 ([source](./src/matchers/ExactUrlPathnameMatcher.ts))
 
-Matches given pathnames (but ignores query parameters):
+Matches the given pathnames:
 
 ```typescript
 router.addRoute({
@@ -188,20 +176,20 @@ router.addRoute({
 	matcher: queryString({
 		// example query parameters:
 		// this parameter is required
-		someParamter1: chain(getNthVal(), requiredVal()),
+		someParameter1: chain(getNthVal(), requiredVal()),
 		// this parameter is optional
-		someParamter2: getNthVal(),
+		someParameter2: getNthVal(),
 		// this parameter should have one of the values
-		someParamter3: chain(atLeastOneVal(['exactValue1', 'exactValue2']), getNthVal(), requiredVal()),
-		// a PHP style parameter, expected to have at least one element and is conveted to numbers
+		someParameter3: chain(atLeastOneVal(['exactValue1', 'exactValue2']), getNthVal(), requiredVal()),
+		// a PHP-style parameter, expected to have at least one element and is converted to numbers
 		'userIds[]': chain(minCountVal(1), mapToNumVal()),
 	}),
 	// query parameter isOptional has type string | undefined
 	handler: ({ match: { result: { query } } }) => {
 		// the type of query is:
-		// someParamter1: string
-		// someParamter2: string | undefined
-		// someParamter3: 'exactValue1' | 'exactValue2'
+		// someParameter1: string
+		// someParameter2: string | undefined
+		// someParameter3: 'exactValue1' | 'exactValue2'
 		// 'userIds[]': number[]
 	},
 })
@@ -210,38 +198,70 @@ See [all provided validators](src/validators.ts).
 
 ```
 
-#### RegExpUrlMatcher
-([source](./src/matchers/RegExpUrlMatcher.ts))
+#### RegExpPathnameMatcher
+([source](./src/matchers/RegExpPathnameMatcher.ts))
 
 Allows powerful expressions:
 
 ```typescript
 router.addRoute({
-	matcher: regExpUrl<{ userId: string }>([/^\/group\/(?<userId>[^/]+)$/]),
-	handler: ({ match: { result: { match } } }) => `User id is: ${match.groups.userId}`,
+	matcher: regExpPathname([/^\/group\/(?<userId>[^/]+)$/], {
+		userId: chain(getNthVal(), requiredVal(), toNumVal()),
+	}),
+	handler: ({ match: { result: { pathname } } }) => `User id is: ${pathname.params.userId}`,
 })
 ```
-Be aware that regular expression must match the whole base url (also with query parameters) and not only `pathname`. Ordinal parameters can be used too.
+Ordinal parameters can be used too.
 
 #### EndpointMatcher
 ([source](./src/matchers/EndpointMatcher.ts))
 
-EndpointMatcher is a combination of Method and RegExpUrl matcher for convenient usage:
+The `EndpointMatcher` is a combination of `MethodMatcher`, `RegExpPathnameMatcher`, and `QueryStringMatcher` for convenient usage:
 
 ```typescript
 router.addRoute({
-	matcher: endpoint<{ userId: string }>('GET', /^\/group\/(?<userId>[^/]+)$/),
-	handler: ({ match: { result: { method, match } } }) => `Group id ${match.groups.userId} matched with ${method} method`,
+	matcher: endpoint('GET', /^\/user\/(?<userId>[^/]+)$/
+		{
+			url: {
+				userId: chain(getNthVal(), requiredVal(), toNumVal()),
+			},
+			query: {
+				// profile query parameter is optional in this example
+				profile: chain(atLeastOneVal([undefined, 'short', 'full']), getNthVal()),
+			},
+		},
+	),
+	handler: ({ match: { result: { pathname, query } } }) => {
+		return `User id: ${pathname.params.userId}, profile: ${query.profile}.`,
+	}
 })
 ```
 
-Both, `RegExpUrlMatcher` and `EndpointMatcher` can be used with a string for an exact match instead of a RegExp.
+`EndpointMatcher` can be used with a string for an exact match instead of a RegExp.
+
+### Validators
+([source](./src/validators.ts))
+
+Validators set expectations on the input and convert values. Currently, they work with `RegExpPathnameMatcher`, `EndpointMatcher`, and `QueryStringMatcher`. The following validators are available:
+
+Validator       | Array | Value | Description
+----------------|-------|-------|------------
+`trueVal`       |   ✓   |   ✓   | It's a wildcard validator mainly used for optional parameters.
+`requiredVal`   |   ✓   |   ✓   | Validator to mark required parameters.
+`getNthVal`     |   ✓   |       | Returns the n-th element of an array. A negative value returns the element counting from the end of the array.
+`mapToNumVal`   |   ✓   |       | Ensures that a string array can be converted to a number array.
+`toNumVal`      |       |   ✓   | Ensures that a single value can be converted to a number.
+`atLeastOneVal` |   ✓   |       | Filters the passed values based on the listed options. If `undefined` is included in the option list, it indicates that the passed value is optional.
+`oneOfVal`      |       |   ✓   | Ensures that the passed value is one of the listed options.
+`minCountVal`   |   ✓   |       | Ensures that the passed array has a minimal length.
+
+Validators can be chained with the `chain` function.
 
 ### Middlewares
 
 **This whole section is highly experimental!**
 
-Currently, there is no built-in API for middlewares. It seems like there is no aproach to provide centralized and typesafe way for middlewares. And it need some conceptual work, before it will be added. Open an issue, if you have a great idea!
+Currently, there is no built-in API for middlewares. It seems like there is no approach to provide a centralized and type-safe way for middlewares. And it needs some conceptual work before it will be added. Open an issue if you have a great idea!
 
 #### CorsMiddleware
 ([source](./src/middlewares/CorsMiddleware.ts))
@@ -364,14 +384,14 @@ router.addRoute({
 ### Nested routers
 
 There are some use cases for nested routers:
-- Add features like multi-tenancy
+- Features like multi-tenancy
 - Implement modularity
 - Apply middlewares globally
 
 An example of multi-tenancy:
 
 ```typescript
-// create main rooter
+// create main router
 const rootRouter = new NodeHttpRouter()
 // attach some global urls
 // rootRouter.addRoute(...)
@@ -392,7 +412,7 @@ rootRouter.addRoute({
 	}>([/^\/auth\/realms\/(?<tenant>[^/]+)(?<url>.+)/]),
 	handler: ({ data, match }) => {
 		const { req, res } = data
-		// figure tenant out
+		// figure out the tenant
 		const { tenant, url } = match.result.match.groups
 		// pass the new url down
 		req.url = url
@@ -408,7 +428,7 @@ rootRouter.addRoute({
 tenantRouter.addRoute({
 	matcher: exactUrlPathname(['/myurl']),
 	handler: ({ data: { tenant }, match: { result: { pathname } } }) => {
-		// if requested url is `/auth/realms/mytenant/myurl`, then:
+		// if the requested url is `/auth/realms/mytenant/myurl`, then:
 		// tenant: mytenant
 		// pathname: /myurl
 		return `tenant: ${tenant}, url: ${pathname}`

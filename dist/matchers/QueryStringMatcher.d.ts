@@ -1,4 +1,4 @@
-import type { Validator } from '../validators.js';
+import type { AnyValidator, Validator } from '../validators.js';
 import type { Matcher } from './Matcher.js';
 import type { MatchResult } from './MatchResult.js';
 export interface QueryStringMatcherInput {
@@ -6,9 +6,8 @@ export interface QueryStringMatcherInput {
         url: string;
     };
 }
-type AnyValidator = Validator<string[] | null, any>;
-type QueryMatch = Record<string, AnyValidator>;
-type QueryResult<T extends QueryMatch> = {
+export type QueryMatch = Record<string, AnyValidator>;
+export type QueryResult<T extends QueryMatch> = {
     [P in keyof T]: T[P] extends Validator<string[] | null, infer O> ? O : never;
 };
 export type QueryStringMatchResult<U extends QueryMatch> = MatchResult<{

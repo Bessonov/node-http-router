@@ -1,5 +1,6 @@
 import Url from 'urlite'
 import type {
+	AnyValidator,
 	Validator,
 } from '../validators.js'
 import type {
@@ -15,12 +16,9 @@ export interface QueryStringMatcherInput {
 	}
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyValidator = Validator<string[] | null, any>
+export type QueryMatch = Record<string, AnyValidator>
 
-type QueryMatch = Record<string, AnyValidator>
-
-type QueryResult<T extends QueryMatch> = {
+export type QueryResult<T extends QueryMatch> = {
 	[P in keyof T]: T[P] extends Validator<string[] | null, infer O> ? O : never
 }
 
@@ -45,7 +43,7 @@ class QueryStringMatcher<
 
 		const queryResult = {} as QueryResult<U>
 		for (const [key, matcher] of this.listConfig) {
-			const params = queryParams.has(key) ? queryParams.getAll(key) : null
+			const params = queryParams.has(key) ? queryParams.getAll(key) : undefined
 			const getter = matcher(params)
 			if (getter === undefined) {
 				return {

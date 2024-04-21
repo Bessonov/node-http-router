@@ -5,6 +5,13 @@ import type {
 	ServerRequest,
 } from '../../node/ServerRequest.js'
 import {
+	atLeastOneVal,
+	chain,
+	getNthVal,
+	requiredVal,
+	toNumVal,
+} from '../../validators.js'
+import {
 	endpoint,
 } from '../index.js'
 
@@ -19,54 +26,48 @@ it('not match empty', () => {
 it('usual usage', () => {
 	const matcher = endpoint(['GET', 'POST'], [/^\/test$/, '/api'])
 	// https://github.com/facebook/jest/issues/8475#issuecomment-656629010
-	expect(() => {
-		expect(matcher.match({
-			req: createRequest<ServerRequest>({
+	expect(matcher.match({
+		req: createRequest<ServerRequest>({
+			url: '/test',
+		}),
+	})).toStrictEqual({
+		matched: true,
+		result: {
+			method: 'GET',
+			pathname: {
 				url: '/test',
-			}),
-		})).toStrictEqual({
-			matched: true,
-			result: {
-				method: 'GET',
-				match: [
-					'/test',
-				],
 			},
-		})
-	}).toThrow('serializes to the same string')
+		},
+	})
 
-	expect(() => {
-		expect(matcher.match({
-			req: createRequest<ServerRequest>({
-				method: 'POST',
-				url: '/test?query=ignored',
-			}),
-		})).toStrictEqual({
-			matched: true,
-			result: {
-				method: 'POST',
-				match: [
-					'/test',
-				],
+	expect(matcher.match({
+		req: createRequest<ServerRequest>({
+			method: 'POST',
+			url: '/test?query=ignored',
+		}),
+	})).toStrictEqual({
+		matched: true,
+		result: {
+			method: 'POST',
+			pathname: {
+				url: '/test',
 			},
-		})
-	}).toThrow('serializes to the same string')
+		},
+	})
 
-	expect(() => {
-		expect(matcher.match({
-			req: createRequest<ServerRequest>({
+	expect(matcher.match({
+		req: createRequest<ServerRequest>({
+			url: '/api',
+		}),
+	})).toStrictEqual({
+		matched: true,
+		result: {
+			method: 'GET',
+			pathname: {
 				url: '/api',
-			}),
-		})).toStrictEqual({
-			matched: true,
-			result: {
-				method: 'GET',
-				match: [
-					'/api',
-				],
 			},
-		})
-	}).toThrow('serializes to the same string')
+		},
+	})
 
 	expect(matcher.match({
 		req: createRequest<ServerRequest>({
@@ -79,23 +80,82 @@ it('usual usage', () => {
 })
 
 it('match path', () => {
-	const matcher = endpoint<{ userId: string }>('GET', /^\/api\/user\/(?<userId>[^/]+)$/)
-	// https://github.com/facebook/jest/issues/8475#issuecomment-656629010
-	expect(() => {
-		const match = matcher.match({
-			req: createRequest<ServerRequest>({
+	const matcher = endpoint('GET', /^\/api\/user\/(?<userId>[^/]+)$/, {
+		url: {
+			userId: chain(getNthVal(), requiredVal(), toNumVal()),
+		},
+	})
+	const match = matcher.match({
+		req: createRequest<ServerRequest>({
+			url: '/api/user/5',
+		}),
+	})
+	expect(match).toStrictEqual({
+		matched: true,
+		result: {
+			method: 'GET',
+			pathname: {
 				url: '/api/user/5',
-			}),
-		})
-		expect(match).toStrictEqual({
-			matched: true,
-			result: {
-				method: 'GET',
-				match: [
-					'/api/user/5',
-					'5',
-				],
+				params: {
+					userId: 5,
+				},
 			},
-		})
-	}).toThrow('serializes to the same string')
+		},
+	})
+})
+
+it('usage with QueryStringMatcher', () => {
+	const matcher = endpoint(
+		'GET',
+		/^\/api\/user\/(?<userId>[^/]+)$/,
+		{
+			url: {
+				userId: chain(getNthVal(), requiredVal(), toNumVal()),
+			},
+			query: {
+				// profile is optional
+				profile: chain(atLeastOneVal([undefined, 'short', 'full']), getNthVal()),
+			},
+		},
+	)
+
+	expect(matcher.match({
+		req: createRequest<ServerRequest>({
+			url: '/api/user/5?profile=full',
+		}),
+	})).toStrictEqual({
+		matched: true,
+		result: {
+			method: 'GET',
+			pathname: {
+				url: '/api/user/5',
+				params: {
+					userId: 5,
+				},
+			},
+			query: {
+				profile: 'full',
+			},
+		},
+	})
+
+	expect(matcher.match({
+		req: createRequest<ServerRequest>({
+			url: '/api/user/5',
+		}),
+	})).toStrictEqual({
+		matched: true,
+		result: {
+			method: 'GET',
+			pathname: {
+				url: '/api/user/5',
+				params: {
+					userId: 5,
+				},
+			},
+			query: {
+				profile: undefined,
+			},
+		},
+	})
 })

@@ -11,10 +11,12 @@ import {
 
 describe(trueVal.name, () => {
 	it('matches always', () => {
-		const validator = trueVal<string>()
+		const validator = trueVal()
 		const input = ['any']
 		expect(validator(input)).toBeDefined()
 		expect(validator(input)?.()).toBe(input)
+		expect(validator(undefined)).toBeDefined()
+		expect(validator(undefined)?.()).toBe(undefined)
 	})
 })
 
@@ -91,17 +93,36 @@ describe(oneOfVal.name, () => {
 })
 
 describe(atLeastOneVal.name, () => {
-	const validator = atLeastOneVal(['a', 'b', 'c'])
+	describe('required', () => {
+		const validator = atLeastOneVal(['undefined', 'a', 'b', 'c'])
 
-	it(`don't match if not in list`, () => {
-		expect(validator()).toBeUndefined()
-		expect(validator(null)).toBeUndefined()
-		expect(validator(['1'])).toBeUndefined()
+		it(`don't match if not in list`, () => {
+			expect(validator()).toBeUndefined()
+			expect(validator(null)).toBeUndefined()
+			expect(validator(['1'])).toBeUndefined()
+		})
+
+		it(`match one of the list`, () => {
+			expect(validator(['b', 'c', 'd'])).toBeDefined()
+			expect(validator(['b', 'c', 'd'])?.()).toStrictEqual(['b', 'c'])
+			expect(validator(['b', 'undefined', 'd'])).toBeDefined()
+			expect(validator(['b', 'undefined', 'd'])?.()).toStrictEqual(['b', 'undefined'])
+		})
 	})
+	describe('optional', () => {
+		const validator = atLeastOneVal([undefined, 'a', 'b', 'c'])
 
-	it(`match one of the list`, () => {
-		expect(validator(['b', 'c', 'd'])).toBeDefined()
-		expect(validator(['b', 'c', 'd'])?.()).toStrictEqual(['b', 'c'])
+		it(`don't match if not in list`, () => {
+			expect(validator(null)).toBeUndefined()
+			expect(validator(['1'])).toBeUndefined()
+		})
+
+		it(`match one of the list`, () => {
+			expect(validator()).toBeDefined()
+			expect(validator()?.()).toBeUndefined()
+			expect(validator(['b', 'c', 'd'])).toBeDefined()
+			expect(validator(['b', 'c', 'd'])?.()).toStrictEqual(['b', 'c'])
+		})
 	})
 })
 

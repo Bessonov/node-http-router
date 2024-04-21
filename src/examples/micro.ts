@@ -11,6 +11,11 @@ import {
 import {
 	NodeHttpRouter,
 } from '../node/NodeHttpRouter.js'
+import {
+	chain,
+	getNthVal,
+	requiredVal,
+} from '../validators.js'
 
 /*
 
@@ -35,10 +40,13 @@ server.once('listening', () => {
 })
 
 router.addRoute({
-	// it's not necessary to type the matcher, but it give you a confidence
-	matcher: endpoint<{ name: string }>('GET', /^\/hello\/(?<name>[^/]+)$/),
+	matcher: endpoint('GET', /^\/hello\/(?<name>[^/]+)$/, {
+		url: {
+			name: chain(getNthVal(), requiredVal()),
+		},
+	}),
 	handler: ({ match }) => {
-		return `Hello ${match.result.match.groups.name}!`
+		return `Hello ${match.result.pathname.params.name}!`
 	},
 })
 

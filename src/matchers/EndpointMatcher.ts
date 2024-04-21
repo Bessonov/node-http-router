@@ -6,12 +6,18 @@ import {
 	type Method,
 	method,
 	type MethodMatchResult,
-	regExpUrl,
-	type RegExpUrlMatchResult,
+	type QueryMatch,
+	type QueryResult,
+	queryString,
+	type QueryStringMatcherInput,
+	type QueryStringMatchResult,
+	regExpPathname,
+	type RegExpPathnameMatchResult,
 } from './index.js'
 import type {
-	RegExpExecGroupArray,
-} from './RegExpUrlMatcher.js'
+	RegExpMatch,
+	RegExpResult,
+} from './RegExpPathnameMatcher.js'
 
 // waiting for
 // https://github.com/microsoft/TypeScript/issues/10571
@@ -25,46 +31,74 @@ export interface EndpointMatcherInput {
 	}
 }
 
-export type EndpointMatchResult<R extends object> = MatchResult<{
+export type EndpointMatchResult<R extends RegExpMatch, U extends QueryMatch> = MatchResult<{
 	method: Method
-	match: RegExpExecGroupArray<R>
+	pathname: RegExpResult<R>
+	query: QueryResult<U>
 }>
+
+// https://stackoverflow.com/questions/3561493/is-there-a-regexp-escape-function-in-javascript/3561711#3561711
+const escapeRegexRe = /[/\-\\^$*+?.()|[\]{}]/g
+function escapeRegex(string: string) {
+	return string.replace(escapeRegexRe, '\\$&')
+}
 
 /**
  * higher order matcher which is combine matching of method
  * with regular expression
  */
 export class EndpointMatcher<
-	R extends object,
+	R extends RegExpMatch,
 	P extends EndpointMatcherInput = EndpointMatcherInput,
-> implements Matcher<EndpointMatchResult<R>, P> {
+	U extends QueryMatch = QueryMatch,
+	QP extends QueryStringMatcherInput = QueryStringMatcherInput,
+> implements Matcher<EndpointMatchResult<R, U>, P> {
 	private readonly matcher: AndMatcher<
 		MethodMatchResult<[Method]>,
 		P,
-		RegExpUrlMatchResult<R>,
-		P
+		RegExpPathnameMatchResult<R>,
+		P,
+		QueryStringMatchResult<U>,
+		QP
 	>
-	constructor(methods: Method | Method[], urls: RegExp | string | (RegExp | string)[]) {
+	constructor(
+		methods: Method | Method[],
+		urls: RegExp | string | (RegExp | string)[],
+		params?: {
+			url?: R
+			query?: U
+		},
+	) {
 		this.match = this.match.bind(this)
+		const regExpUrls = (Array.isArray(urls) ? urls : [urls])
+			.map(url => {
+				if (typeof url === 'string') {
+					return new RegExp(`^${escapeRegex(url)}$`)
+				}
+				return url
+			})
+		// @ts-expect-error
 		this.matcher = and([
 			method(Array.isArray(methods) ? methods : [methods]),
-			regExpUrl<R, P>(Array.isArray(urls) ? urls : [urls]),
+			regExpPathname<R, P>(regExpUrls, params?.url),
+			...params?.query ? [queryString<U, QP>(params.query)] : [undefined],
 		])
 	}
 
-	match(params: EndpointMatcherInput): EndpointMatchResult<R> {
+	match(params: EndpointMatcherInput): EndpointMatchResult<R, U> {
 		// @ts-expect-error
 		const result = this.matcher.match(params)
 
 		if (result.matched) {
-			const [methodResult, urlResult] = result.result.and
+			const [methodResult, urlResult, queryResult] = result.result.and
 			return {
 				matched: true,
 				result: {
 					method: methodResult.result.method,
-					match: urlResult.result.match,
+					pathname: urlResult.result.pathname,
+					...queryResult ? { query: queryResult.result.query } : {},
 				},
-			}
+			} as EndpointMatchResult<R, U>
 		}
 
 		return {
@@ -74,10 +108,12 @@ export class EndpointMatcher<
 }
 
 export function endpoint<
-	R extends object,
+	R extends RegExpMatch,
 	P extends EndpointMatcherInput = EndpointMatcherInput,
+	U extends QueryMatch = QueryMatch,
+	QP extends QueryStringMatcherInput = QueryStringMatcherInput,
 >(
-	...args: ConstructorParameters<typeof EndpointMatcher<R, P>>
-): EndpointMatcher<R, P> {
+	...args: ConstructorParameters<typeof EndpointMatcher<R, P, U, QP>>
+): EndpointMatcher<R, P, U, QP> {
 	return new EndpointMatcher(...args)
 }

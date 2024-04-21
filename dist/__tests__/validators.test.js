@@ -1,11 +1,13 @@
 import { atLeastOneVal, getNthVal, mapToNumVal, minCountVal, oneOfVal, requiredVal, toNumVal, trueVal, } from '../validators.js';
 describe(trueVal.name, () => {
     it('matches always', () => {
-        var _a;
+        var _a, _b;
         const validator = trueVal();
         const input = ['any'];
         expect(validator(input)).toBeDefined();
         expect((_a = validator(input)) === null || _a === void 0 ? void 0 : _a()).toBe(input);
+        expect(validator(undefined)).toBeDefined();
+        expect((_b = validator(undefined)) === null || _b === void 0 ? void 0 : _b()).toBe(undefined);
     });
 });
 describe(requiredVal.name, () => {
@@ -74,16 +76,34 @@ describe(oneOfVal.name, () => {
     });
 });
 describe(atLeastOneVal.name, () => {
-    const validator = atLeastOneVal(['a', 'b', 'c']);
-    it(`don't match if not in list`, () => {
-        expect(validator()).toBeUndefined();
-        expect(validator(null)).toBeUndefined();
-        expect(validator(['1'])).toBeUndefined();
+    describe('required', () => {
+        const validator = atLeastOneVal(['undefined', 'a', 'b', 'c']);
+        it(`don't match if not in list`, () => {
+            expect(validator()).toBeUndefined();
+            expect(validator(null)).toBeUndefined();
+            expect(validator(['1'])).toBeUndefined();
+        });
+        it(`match one of the list`, () => {
+            var _a, _b;
+            expect(validator(['b', 'c', 'd'])).toBeDefined();
+            expect((_a = validator(['b', 'c', 'd'])) === null || _a === void 0 ? void 0 : _a()).toStrictEqual(['b', 'c']);
+            expect(validator(['b', 'undefined', 'd'])).toBeDefined();
+            expect((_b = validator(['b', 'undefined', 'd'])) === null || _b === void 0 ? void 0 : _b()).toStrictEqual(['b', 'undefined']);
+        });
     });
-    it(`match one of the list`, () => {
-        var _a;
-        expect(validator(['b', 'c', 'd'])).toBeDefined();
-        expect((_a = validator(['b', 'c', 'd'])) === null || _a === void 0 ? void 0 : _a()).toStrictEqual(['b', 'c']);
+    describe('optional', () => {
+        const validator = atLeastOneVal([undefined, 'a', 'b', 'c']);
+        it(`don't match if not in list`, () => {
+            expect(validator(null)).toBeUndefined();
+            expect(validator(['1'])).toBeUndefined();
+        });
+        it(`match one of the list`, () => {
+            var _a, _b;
+            expect(validator()).toBeDefined();
+            expect((_a = validator()) === null || _a === void 0 ? void 0 : _a()).toBeUndefined();
+            expect(validator(['b', 'c', 'd'])).toBeDefined();
+            expect((_b = validator(['b', 'c', 'd'])) === null || _b === void 0 ? void 0 : _b()).toStrictEqual(['b', 'c']);
+        });
     });
 });
 describe(minCountVal.name, () => {

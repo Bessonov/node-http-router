@@ -2,6 +2,7 @@ import http from 'http';
 import { send, serve, } from 'micro';
 import { bool, endpoint, exactUrlPathname, } from '../matchers/index.js';
 import { NodeHttpRouter, } from '../node/NodeHttpRouter.js';
+import { chain, getNthVal, requiredVal, } from '../validators.js';
 /*
 
 Demo how to use router with micro@canary
@@ -21,10 +22,13 @@ server.once('listening', () => {
     console.log(`started at http://${address}:${port}`);
 });
 router.addRoute({
-    // it's not necessary to type the matcher, but it give you a confidence
-    matcher: endpoint('GET', /^\/hello\/(?<name>[^/]+)$/),
+    matcher: endpoint('GET', /^\/hello\/(?<name>[^/]+)$/, {
+        url: {
+            name: chain(getNthVal(), requiredVal()),
+        },
+    }),
     handler: ({ match }) => {
-        return `Hello ${match.result.match.groups.name}!`;
+        return `Hello ${match.result.pathname.params.name}!`;
     },
 });
 router.addRoute({

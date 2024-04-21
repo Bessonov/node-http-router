@@ -1,8 +1,9 @@
 import { createRequest, createResponse, } from 'node-mocks-http';
 import { compile, pathToRegexp, } from 'path-to-regexp';
-import { and, bool, endpoint, exactUrlPathname, method, regExpUrl, } from '../matchers/index.js';
+import { and, bool, endpoint, exactUrlPathname, method, regExpPathname, } from '../matchers/index.js';
 import { NodeHttpRouter, } from '../node/NodeHttpRouter.js';
 import { Router, } from '../Router.js';
+import { chain, getNthVal, requiredVal, } from '../validators.js';
 let router;
 beforeEach(() => {
     router = new Router();
@@ -70,9 +71,13 @@ it('match POST /group/123 endpoint', () => {
         path: compile(pattern),
     }))('/group/:groupId');
     router.addRoute({
-        matcher: endpoint('POST', pathUrl.pattern),
+        matcher: endpoint('POST', pathUrl.pattern, {
+            url: {
+                1: chain(getNthVal(), requiredVal()),
+            },
+        }),
         handler: ({ match }) => {
-            return `matched ${match.result.method} for group ${match.result.match[1]}`;
+            return `matched ${match.result.method} for group ${match.result.pathname.params[1]}`;
         },
     });
     router.addRoute({
@@ -141,11 +146,14 @@ it('tenant router example from docs', () => {
     const tenantRouter = new Router();
     // connect routers
     rootRouter.addRoute({
-        matcher: regExpUrl([/^\/auth\/realms\/(?<tenant>[^/]+)(?<url>.+)/]),
+        matcher: regExpPathname([/^\/auth\/realms\/(?<tenant>[^/]+)(?<url>.+)/], {
+            tenant: chain(getNthVal(), requiredVal()),
+            url: chain(getNthVal(), requiredVal()),
+        }),
         handler: ({ data, match }) => {
             const { req, res } = data;
             // figure tenant out
-            const { tenant, url } = match.result.match.groups;
+            const { tenant, url } = match.result.pathname.params;
             // pass the new url down
             req.url = url;
             return tenantRouter.exec({
@@ -173,8 +181,10 @@ it('tenant router example from docs', () => {
 it('nested router', () => {
     const appRouter = new Router();
     appRouter.addRoute({
-        matcher: regExpUrl([/\/app\/(?<name>[\w\W]+)/]),
-        handler: ({ data: { tenant }, match: { result: { match: { groups: { name } } } }, }) => `myapp ${tenant} ${name}`,
+        matcher: regExpPathname([/\/app\/(?<name>[\w\W]+)/], {
+            name: chain(getNthVal(), requiredVal()),
+        }),
+        handler: ({ data: { tenant }, match: { result: { pathname: { params: { name } } } }, }) => `myapp ${tenant} ${name}`,
     });
     appRouter.addRoute({
         matcher: bool(true),
@@ -182,10 +192,13 @@ it('nested router', () => {
     });
     const rootRouter = new NodeHttpRouter();
     rootRouter.addRoute({
-        matcher: regExpUrl([/^\/auth\/realms\/(?<tenant>[^/]+)(?<url>.+)/]),
+        matcher: regExpPathname([/^\/auth\/realms\/(?<tenant>[^/]+)(?<url>.+)/], {
+            tenant: chain(getNthVal(), requiredVal()),
+            url: chain(getNthVal(), requiredVal()),
+        }),
         handler: ({ data, match }) => {
             const { req } = data;
-            const { tenant, url } = match.result.match.groups;
+            const { tenant, url } = match.result.pathname.params;
             req.url = url;
             return appRouter.exec({
                 tenant,

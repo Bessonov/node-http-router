@@ -49,6 +49,13 @@ module.exports = {
 			'error',
 			'ignorePackages',
 		],
+		'no-labels': [
+			'error',
+			{
+				allowLoop: true,
+			},
+		],
+		'no-continue': 'off',
 		// disable styling rules
 		'max-len': 'off',
 		'sort-imports': 'off',

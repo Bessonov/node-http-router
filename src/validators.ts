@@ -1,9 +1,11 @@
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
 type Any = any
 
-type Getter<O> = (() => O) | undefined
+export type AnyValidator = Validator<string[] | undefined, Any>
 
-type Unrequired = undefined | null | void
+export type Getter<O> = (() => O) | undefined
+
+export type Undefined = undefined | null | void
 
 export interface Validator<I, O> {
 	(value: I): Getter<O>
@@ -16,12 +18,22 @@ function parseNumber(value: string): number {
 	return Number(value)
 }
 
-export function trueVal<I>(): Validator<I[], NoInfer<I>[]> {
-	return (value: I[]) => () => value
+/**
+ * It's a wildcard validator mainly used for optional parameters.
+ * It does nothing and simply returns the value.
+ */
+// it is unclear, why `null` is needed and why `undefined` doesn't work
+export function trueVal<I, O extends I | Undefined | I[]>(): Validator<O | null, NoInfer<O>> {
+	return (value: O | null) => (() => value) as Getter<O>
 }
 
-export function requiredVal<I>(): Validator<I | Unrequired, NonNullable<NoInfer<I>>> {
-	return (value: I | Unrequired): Getter<NonNullable<I>> => {
+/**
+ * Validator to mark required parameters. It ensures, for example:
+ * string[] | undefined -> string[]
+ * number | undefined  -> number
+ */
+export function requiredVal<I>(): Validator<I | Undefined, NonNullable<NoInfer<I>>> {
+	return (value: I | Undefined): Getter<NonNullable<I>> => {
 		if (value === undefined || value === null) {
 			return undefined
 		}
@@ -29,8 +41,12 @@ export function requiredVal<I>(): Validator<I | Unrequired, NonNullable<NoInfer<
 	}
 }
 
-export function getNthVal<I>(num: number = 0): Validator<I[] | Unrequired, NoInfer<I> | undefined> {
-	return (value: I[] | Unrequired) => {
+/**
+ * Returns the n-th element of an array. A negative value returns
+ * the element counting from the end of the array.
+ */
+export function getNthVal<I>(num: number = 0): Validator<I[] | Undefined, NoInfer<I> | undefined> {
+	return (value: I[] | Undefined) => {
 		if (value === undefined || value === null) {
 			return () => undefined
 		}
@@ -47,8 +63,11 @@ export function getNthVal<I>(num: number = 0): Validator<I[] | Unrequired, NoInf
 	}
 }
 
-export function mapToNumVal<I extends string[]>(): Validator<I | Unrequired, number[]> {
-	return (values: string[] | Unrequired) => {
+/**
+ * Ensures that a string array can be converted to a number array.
+ */
+export function mapToNumVal<I extends string[]>(): Validator<I | Undefined, number[]> {
+	return (values: string[] | Undefined) => {
 		if (values === undefined || values === null) {
 			return undefined
 		}
@@ -64,38 +83,9 @@ export function mapToNumVal<I extends string[]>(): Validator<I | Unrequired, num
 	}
 }
 
-export function oneOfVal<const I extends string | number | boolean | Unrequired>(values: I[]): Validator<I, I> {
-	return (value: I): Getter<I> => {
-		if (values.includes(value)) {
-			return () => value
-		}
-		return undefined
-	}
-}
-
-export function atLeastOneVal<I extends string | number | boolean, const O extends I>(
-	expectedValues: O[],
-): Validator<I[] | Unrequired, NoInfer<O>[]> {
-	return (values: I[] | Unrequired): Getter<O[]> => {
-		const newValues = ((values ?? []) as O[]).filter(value => expectedValues.includes(value))
-		if (newValues.length > 0) {
-			return () => newValues
-		}
-		return undefined
-	}
-}
-
-export function minCountVal<const I extends string | number | boolean>(
-	min: number,
-): Validator<I[] | Unrequired, NoInfer<I>[]> {
-	return (value: I[] | Unrequired): Getter<I[]> => {
-		if (value !== undefined && value !== null && value.length >= min) {
-			return () => value
-		}
-		return undefined
-	}
-}
-
+/**
+ * Ensures that a single value can be converted to a number.
+ */
 export function toNumVal<I extends string>(): Validator<I, number> {
 	return (value: I): Getter<number> => {
 		const parsedValue = parseNumber(value)
@@ -106,6 +96,57 @@ export function toNumVal<I extends string>(): Validator<I, number> {
 	}
 }
 
+/**
+ * Filters the passed values based on the listed options. If `undefined` is
+ * included in the option list, it indicates that the passed value is optional.
+ */
+export function atLeastOneVal<I extends string | number | boolean, const O extends (I | undefined)[]>(
+	expectedValues: O,
+): Validator<I[] | Undefined, NoInfer<O>> {
+	return (values: I[] | Undefined): Getter<O> => {
+		if (values === undefined && expectedValues.includes(undefined)) {
+			return (() => undefined) as unknown as Getter<O>
+		}
+		const newValues = (values ?? []).filter(value => expectedValues.includes(value)) as O
+		if (newValues.length > 0) {
+			return () => newValues
+		}
+		return undefined
+	}
+}
+
+/**
+ * Ensures that the passed value is one of the listed options.
+ */
+// TODO: accept undefined
+export function oneOfVal<I extends string | number | boolean, const O extends I>(
+	values: O[],
+): Validator<I | Undefined, NoInfer<O>> {
+	return (value: I | Undefined): Getter<O> => {
+		if (values.includes(value as O)) {
+			return () => value as O
+		}
+		return undefined
+	}
+}
+
+/**
+ * Ensures that the passed array has a minimal length.
+ */
+export function minCountVal<const I extends string | number | boolean>(
+	min: number,
+): Validator<I[] | Undefined, NoInfer<I>[]> {
+	return (value: I[] | Undefined): Getter<I[]> => {
+		if (value !== undefined && value !== null && value.length >= min) {
+			return () => value
+		}
+		return undefined
+	}
+}
+
+/**
+ * Allows chaining validators while preserving the types.
+ */
 export function chain<I, O1, O2, O3, O4, O>(
 	val1: Validator<I, O1>,
 	val2: Validator<O1, O2>,

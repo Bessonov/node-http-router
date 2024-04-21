@@ -8,7 +8,7 @@ class QueryStringMatcher {
             const queryParams = new URLSearchParams(search);
             const queryResult = {};
             for (const [key, matcher] of this.listConfig) {
-                const params = queryParams.has(key) ? queryParams.getAll(key) : null;
+                const params = queryParams.has(key) ? queryParams.getAll(key) : undefined;
                 const getter = matcher(params);
                 if (getter === undefined) {
                     return {

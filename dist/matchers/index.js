@@ -8,5 +8,6 @@ export { isMatched, } from './MatchResult.js';
 export { method, MethodMatcher, } from './MethodMatcher.js';
 export { or, OrMatcher, } from './OrMatcher.js';
 export { queryString, } from './QueryStringMatcher.js';
-export { regExpUrl, RegExpUrlMatcher, } from './RegExpUrlMatcher.js';
+export { regExpPathname, } from './RegExpPathnameMatcher.js';
+export { RegExpUrlMatcher, } from './RegExpUrlMatcher.js';
 //# sourceMappingURL=index.js.map

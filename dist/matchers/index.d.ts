@@ -7,5 +7,6 @@ export { type ExtractMatchResult, type Matcher, } from './Matcher.js';
 export { isMatched, type Matched, type MatchedResult, type MatchResult, type MatchResultAny, type UnmatchedResult, } from './MatchResult.js';
 export { type Method, method, MethodMatcher, type MethodMatcherInput, type MethodMatchResult, } from './MethodMatcher.js';
 export { or, OrMatcher, type OrMatcherResult, } from './OrMatcher.js';
-export { queryString, type QueryStringMatcherInput, type QueryStringMatchResult, } from './QueryStringMatcher.js';
-export { regExpUrl, RegExpUrlMatcher, type RegExpUrlMatcherInput, type RegExpUrlMatchResult, } from './RegExpUrlMatcher.js';
+export { type QueryMatch, type QueryResult, queryString, type QueryStringMatcherInput, type QueryStringMatchResult, } from './QueryStringMatcher.js';
+export { regExpPathname, type RegExpPathnameMatcherInput, type RegExpPathnameMatchResult, } from './RegExpPathnameMatcher.js';
+export { RegExpUrlMatcher, type RegExpUrlMatcherInput, type RegExpUrlMatchResult, } from './RegExpUrlMatcher.js';
