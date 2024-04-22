@@ -52,7 +52,7 @@ export function getNthVal(num = 0) {
 export function mapToNumVal() {
     return (values) => {
         if (values === undefined || values === null) {
-            return undefined;
+            return (() => undefined);
         }
         const parsedValues = [];
         for (const value of values) {
@@ -62,7 +62,7 @@ export function mapToNumVal() {
             }
             parsedValues.push(parsedValue);
         }
-        return () => parsedValues;
+        return (() => parsedValues);
     };
 }
 /**
@@ -70,11 +70,14 @@ export function mapToNumVal() {
  */
 export function toNumVal() {
     return (value) => {
+        if (value === undefined) {
+            return (() => undefined);
+        }
         const parsedValue = parseNumber(value);
         if (Number.isNaN(parsedValue)) {
             return undefined;
         }
-        return () => parsedValue;
+        return (() => parsedValue);
     };
 }
 /**
@@ -96,7 +99,6 @@ export function atLeastOneVal(expectedValues) {
 /**
  * Ensures that the passed value is one of the listed options.
  */
-// TODO: accept undefined
 export function oneOfVal(values) {
     return (value) => {
         if (values.includes(value)) {

@@ -10,22 +10,27 @@ import {
 } from '../validators.js'
 
 describe(trueVal.name, () => {
-	it('matches always', () => {
-		const validator = trueVal()
-		const input = ['any']
-		expect(validator(input)).toBeDefined()
-		expect(validator(input)?.()).toBe(input)
-		expect(validator(undefined)).toBeDefined()
+	const validator = trueVal()
+
+	it(`ignore undefined`, () => {
+		expect(validator(undefined)).toBeInstanceOf(Function)
 		expect(validator(undefined)?.()).toBe(undefined)
+	})
+
+	it('matches always', () => {
+		const input = ['any']
+		expect(validator(input)).toBeInstanceOf(Function)
+		expect(validator(input)?.()).toBe(input)
 	})
 })
 
 describe(requiredVal.name, () => {
 	const validator = requiredVal<string>()
+
 	it(`don't match undefined and null`, () => {
-		expect(validator()).toBeUndefined()
-		expect(validator(undefined)).toBeUndefined()
-		expect(validator(null)).toBeUndefined()
+		expect(validator()).toBe(undefined)
+		expect(validator(undefined)).toBe(undefined)
+		expect(validator(null)).toBe(undefined)
 	})
 
 	it('match defined values', () => {
@@ -37,15 +42,19 @@ describe(requiredVal.name, () => {
 
 describe(getNthVal.name, () => {
 	const validator = getNthVal<string>()
-	it(`don't match non-arrays`, () => {
-		expect(validator({} as unknown as string[])).toBeUndefined()
-	})
 
-	it('match defined values and return the first value', () => {
+	it(`ignore undefined`, () => {
 		expect(validator()).toBeInstanceOf(Function)
 		expect(validator()?.()).toBe(undefined)
 		expect(validator(null)).toBeInstanceOf(Function)
 		expect(validator(null)?.()).toBe(undefined)
+	})
+
+	it(`don't match non-arrays`, () => {
+		expect(validator({} as unknown as string[])).toBe(undefined)
+	})
+
+	it('match defined values and return the first value', () => {
 		expect(validator(['value1', 'value2', 'value3'])).toBeInstanceOf(Function)
 		expect(validator(['value1', 'value2', 'value3'])?.()).toBe('value1')
 	})
@@ -59,36 +68,49 @@ describe(getNthVal.name, () => {
 
 describe(mapToNumVal.name, () => {
 	const validator = mapToNumVal()
+
+	it(`ignore undefined`, () => {
+		expect(validator()).toBeInstanceOf(Function)
+		expect(validator()?.()).toBe(undefined)
+		expect(validator(null)).toBeInstanceOf(Function)
+		expect(validator(null)?.()).toBe(undefined)
+	})
+
 	it(`don't match uncconvertible arrays`, () => {
-		expect(validator()).toBeUndefined()
-		expect(validator(null)).toBeUndefined()
-		expect(validator(['1', ' '])).toBeUndefined()
-		expect(validator(['1', 'a'])).toBeUndefined()
-		expect(validator(['1_000'])).toBeUndefined()
+		expect(validator(['1', ' '])).toBe(undefined)
+		expect(validator(['1', 'a'])).toBe(undefined)
+		expect(validator(['1_000'])).toBe(undefined)
 	})
 
 	it(`convert a string array to a number array`, () => {
-		expect(validator([])).toBeDefined()
+		expect(validator([])).toBeInstanceOf(Function)
 		expect(validator([])?.()).toStrictEqual([])
 
-		expect(validator(['1', '-1', '1000'])).toBeDefined()
+		expect(validator(['1', '-1', '1000'])).toBeInstanceOf(Function)
 		expect(validator(['1', '-1', '1000'])?.()).toStrictEqual([1, -1, 1_000])
 
-		expect(validator([' 1 '])).toBeDefined()
+		expect(validator([' 1 '])).toBeInstanceOf(Function)
 		expect(validator([' 1 '])?.()).toStrictEqual([1])
 	})
 })
 
-describe(oneOfVal.name, () => {
-	const validator = oneOfVal(['a', 'b', 'c'])
+describe(toNumVal.name, () => {
+	const validator = toNumVal()
 
-	it(`don't match if not in list`, () => {
-		expect(validator('1' as 'a')).toBeUndefined()
+	it(`ignore undefined`, () => {
+		expect(validator()).toBeInstanceOf(Function)
+		expect(validator()?.()).toBe(undefined)
 	})
 
-	it(`match one of the list`, () => {
-		expect(validator('b' as 'a')).toBeDefined()
-		expect(validator('b' as 'a')?.()).toStrictEqual('b')
+	it(`don't match if not convertible to a number`, () => {
+		expect(validator('')).toBe(undefined)
+		expect(validator(' ')).toBe(undefined)
+		expect(validator('a')).toBe(undefined)
+	})
+
+	it(`match if convertible to a number`, () => {
+		expect(validator('1')).toBeInstanceOf(Function)
+		expect(validator('1')?.()).toStrictEqual(1)
 	})
 })
 
@@ -97,32 +119,53 @@ describe(atLeastOneVal.name, () => {
 		const validator = atLeastOneVal(['undefined', 'a', 'b', 'c'])
 
 		it(`don't match if not in list`, () => {
-			expect(validator()).toBeUndefined()
-			expect(validator(null)).toBeUndefined()
-			expect(validator(['1'])).toBeUndefined()
+			expect(validator()).toBe(undefined)
+			expect(validator(null)).toBe(undefined)
+			expect(validator(['1'])).toBe(undefined)
 		})
 
 		it(`match one of the list`, () => {
-			expect(validator(['b', 'c', 'd'])).toBeDefined()
+			expect(validator(['b', 'c', 'd'])).toBeInstanceOf(Function)
 			expect(validator(['b', 'c', 'd'])?.()).toStrictEqual(['b', 'c'])
-			expect(validator(['b', 'undefined', 'd'])).toBeDefined()
+			expect(validator(['b', 'undefined', 'd'])).toBeInstanceOf(Function)
 			expect(validator(['b', 'undefined', 'd'])?.()).toStrictEqual(['b', 'undefined'])
 		})
 	})
+
 	describe('optional', () => {
 		const validator = atLeastOneVal([undefined, 'a', 'b', 'c'])
 
 		it(`don't match if not in list`, () => {
-			expect(validator(null)).toBeUndefined()
-			expect(validator(['1'])).toBeUndefined()
+			expect(validator(null)).toBe(undefined)
+			expect(validator(['1'])).toBe(undefined)
 		})
 
 		it(`match one of the list`, () => {
-			expect(validator()).toBeDefined()
-			expect(validator()?.()).toBeUndefined()
-			expect(validator(['b', 'c', 'd'])).toBeDefined()
+			expect(validator()).toBeInstanceOf(Function)
+			expect(validator()?.()).toBe(undefined)
+			expect(validator(['b', 'c', 'd'])).toBeInstanceOf(Function)
 			expect(validator(['b', 'c', 'd'])?.()).toStrictEqual(['b', 'c'])
 		})
+	})
+})
+
+describe(oneOfVal.name, () => {
+	const validator = oneOfVal([undefined, 'a', 'b', 'c'])
+
+	it(`ignore undefined`, () => {
+		expect(validator()).toBeInstanceOf(Function)
+		expect(validator()?.()).toBe(undefined)
+		expect(validator(undefined)).toBeInstanceOf(Function)
+		expect(validator(undefined)?.()).toBe(undefined)
+	})
+
+	it(`don't match if not in list`, () => {
+		expect(validator('1' as 'a')).toBe(undefined)
+	})
+
+	it(`match one of the list`, () => {
+		expect(validator('b' as 'a')).toBeInstanceOf(Function)
+		expect(validator('b' as 'a')?.()).toStrictEqual('b')
 	})
 })
 
@@ -130,29 +173,14 @@ describe(minCountVal.name, () => {
 	const validator = minCountVal(2)
 
 	it(`don't match if not enough elements`, () => {
-		expect(validator()).toBeUndefined()
-		expect(validator(null)).toBeUndefined()
-		expect(validator([])).toBeUndefined()
-		expect(validator(['1'])).toBeUndefined()
+		expect(validator()).toBe(undefined)
+		expect(validator(null)).toBe(undefined)
+		expect(validator([])).toBe(undefined)
+		expect(validator(['1'])).toBe(undefined)
 	})
 
 	it(`match if enough elements`, () => {
-		expect(validator(['1', '2'])).toBeDefined()
+		expect(validator(['1', '2'])).toBeInstanceOf(Function)
 		expect(validator(['1', '2'])?.()).toStrictEqual(['1', '2'])
-	})
-})
-
-describe(toNumVal.name, () => {
-	const validator = toNumVal()
-
-	it(`don't match if not convertible to a number`, () => {
-		expect(validator('')).toBeUndefined()
-		expect(validator(' ')).toBeUndefined()
-		expect(validator('a')).toBeUndefined()
-	})
-
-	it(`match if convertible to a number`, () => {
-		expect(validator('1')).toBeDefined()
-		expect(validator('1')?.()).toStrictEqual(1)
 	})
 })

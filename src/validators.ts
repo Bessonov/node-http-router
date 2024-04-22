@@ -66,10 +66,13 @@ export function getNthVal<I>(num: number = 0): Validator<I[] | Undefined, NoInfe
 /**
  * Ensures that a string array can be converted to a number array.
  */
-export function mapToNumVal<I extends string[]>(): Validator<I | Undefined, number[]> {
-	return (values: string[] | Undefined) => {
+export function mapToNumVal<
+	const I extends string[] | Undefined,
+	const O extends I extends string[] ? number[] : undefined,
+>(): Validator<I, NoInfer<O>> {
+	return (values: string[] | Undefined): Getter<O> => {
 		if (values === undefined || values === null) {
-			return undefined
+			return (() => undefined) as Getter<O>
 		}
 		const parsedValues: number[] = []
 		for (const value of values) {
@@ -79,20 +82,26 @@ export function mapToNumVal<I extends string[]>(): Validator<I | Undefined, numb
 			}
 			parsedValues.push(parsedValue)
 		}
-		return () => parsedValues
+		return (() => parsedValues) as Getter<O>
 	}
 }
 
 /**
  * Ensures that a single value can be converted to a number.
  */
-export function toNumVal<I extends string>(): Validator<I, number> {
-	return (value: I): Getter<number> => {
+export function toNumVal<const I extends string | undefined, O extends Exclude<I, string> | number>(): Validator<
+	I | void,
+	NoInfer<O>
+> {
+	return (value: I | void): Getter<O> => {
+		if (value === undefined) {
+			return (() => undefined) as Getter<O>
+		}
 		const parsedValue = parseNumber(value)
 		if (Number.isNaN(parsedValue)) {
 			return undefined
 		}
-		return () => parsedValue
+		return (() => parsedValue) as Getter<O>
 	}
 }
 
@@ -118,8 +127,7 @@ export function atLeastOneVal<I extends string | number | boolean, const O exten
 /**
  * Ensures that the passed value is one of the listed options.
  */
-// TODO: accept undefined
-export function oneOfVal<I extends string | number | boolean, const O extends I>(
+export function oneOfVal<I extends string | number | boolean, O extends I | undefined>(
 	values: O[],
 ): Validator<I | Undefined, NoInfer<O>> {
 	return (value: I | Undefined): Getter<O> => {

@@ -24,11 +24,11 @@ export declare function getNthVal<I>(num?: number): Validator<I[] | Undefined, N
 /**
  * Ensures that a string array can be converted to a number array.
  */
-export declare function mapToNumVal<I extends string[]>(): Validator<I | Undefined, number[]>;
+export declare function mapToNumVal<const I extends string[] | Undefined, const O extends I extends string[] ? number[] : undefined>(): Validator<I, NoInfer<O>>;
 /**
  * Ensures that a single value can be converted to a number.
  */
-export declare function toNumVal<I extends string>(): Validator<I, number>;
+export declare function toNumVal<const I extends string | undefined, O extends Exclude<I, string> | number>(): Validator<I | void, NoInfer<O>>;
 /**
  * Filters the passed values based on the listed options. If `undefined` is
  * included in the option list, it indicates that the passed value is optional.
@@ -37,7 +37,7 @@ export declare function atLeastOneVal<I extends string | number | boolean, const
 /**
  * Ensures that the passed value is one of the listed options.
  */
-export declare function oneOfVal<I extends string | number | boolean, const O extends I>(values: O[]): Validator<I | Undefined, NoInfer<O>>;
+export declare function oneOfVal<I extends string | number | boolean, O extends I | undefined>(values: O[]): Validator<I | Undefined, NoInfer<O>>;
 /**
  * Ensures that the passed array has a minimal length.
  */

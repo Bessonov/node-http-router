@@ -244,16 +244,16 @@ router.addRoute({
 
 Validators set expectations on the input and convert values. Currently, they work with `RegExpPathnameMatcher`, `EndpointMatcher`, and `QueryStringMatcher`. The following validators are available:
 
-Validator       | Array | Value | Description
-----------------|-------|-------|------------
-`trueVal`       |   ✓   |   ✓   | It's a wildcard validator mainly used for optional parameters.
-`requiredVal`   |   ✓   |   ✓   | Validator to mark required parameters.
-`getNthVal`     |   ✓   |       | Returns the n-th element of an array. A negative value returns the element counting from the end of the array.
-`mapToNumVal`   |   ✓   |       | Ensures that a string array can be converted to a number array.
-`toNumVal`      |       |   ✓   | Ensures that a single value can be converted to a number.
-`atLeastOneVal` |   ✓   |       | Filters the passed values based on the listed options. If `undefined` is included in the option list, it indicates that the passed value is optional.
-`oneOfVal`      |       |   ✓   | Ensures that the passed value is one of the listed options.
-`minCountVal`   |   ✓   |       | Ensures that the passed array has a minimal length.
+Validator       | Array | Value | Ignores `undefined` | Description
+----------------|-------|-------|---------------------|------------
+`trueVal`       |   ✓   |   ✓   |          ✓          | It's a wildcard validator mainly used for optional parameters.
+`requiredVal`   |   ✓   |   ✓   |                     | Validator to mark required parameters.
+`getNthVal`     |   ✓   |       |          ✓          | Returns the n-th element of an array. A negative value returns the element counting from the end of the array.
+`mapToNumVal`   |   ✓   |       |          ✓          | Ensures that a string array can be converted to a number array.
+`toNumVal`      |       |   ✓   |          ✓          | Ensures that a single value can be converted to a number.
+`atLeastOneVal` |   ✓   |       |   With `undefined`  | Filters the passed values based on the listed options. If `undefined` is included in the option list, it indicates that the passed value is optional.
+`oneOfVal`      |       |   ✓   |          ✓          | Ensures that the passed value is one of the listed options.
+`minCountVal`   |   ✓   |       |                     | Ensures that the passed array has a minimal length.
 
 Validators can be chained with the `chain` function.
 
