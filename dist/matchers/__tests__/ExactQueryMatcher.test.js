@@ -96,4 +96,20 @@ it('match with additional param', () => {
         const checkType = result.result.query.mustExact;
     }
 });
+it('no decoding', () => {
+    const result = matcher.match({
+        req: createRequest({
+            url: '/auth?mustPresent=https%3A%2F%2Fmyhost%3A4520%2Fonboarding&mustExact=exactValue1',
+        }),
+    });
+    expect(result).toStrictEqual({
+        matched: true,
+        result: {
+            query: {
+                mustExact: 'exactValue1',
+                mustPresent: 'https%3A%2F%2Fmyhost%3A4520%2Fonboarding',
+            },
+        },
+    });
+});
 //# sourceMappingURL=ExactQueryMatcher.test.js.map

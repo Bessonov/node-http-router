@@ -98,7 +98,10 @@ queryString({
 })
 ```
 
-Note that a negative match isn't possible yet. However, I'm not sure if anyone has ever used it.
+Note:
+- A negative match isn't possible yet. Create an issue with your use case if you need it.
+- Unspecified parameters aren't passed anymore.
+- Specified parameters are decoded instead of being passed as is.
 
 Trying It Out
 =============

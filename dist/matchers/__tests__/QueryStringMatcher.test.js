@@ -87,6 +87,23 @@ it('match with additional param', () => {
         const checkType = result.result.query;
     }
 });
+it('decoding', () => {
+    const result = matcher.match({
+        req: createRequest({
+            url: '/auth?mustPresent=https%3A%2F%2Fmyhost%3A4520%2Fonboarding&mustExact=exactValue1',
+        }),
+    });
+    expect(result).toStrictEqual({
+        matched: true,
+        result: {
+            query: {
+                isOptional: undefined,
+                mustExact: 'exactValue1',
+                mustPresent: 'https://myhost:4520/onboarding',
+            },
+        },
+    });
+});
 describe('PHP-style multi-querystring', () => {
     const multiMatcher = queryString({
         'userIds[]': chain(minCountVal(2), mapToNumVal()),
