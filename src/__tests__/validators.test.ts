@@ -150,22 +150,39 @@ describe(atLeastOneVal.name, () => {
 })
 
 describe(oneOfVal.name, () => {
-	const validator = oneOfVal([undefined, 'a', 'b', 'c'])
+	describe('required', () => {
+		const validator = oneOfVal(['undefined', 'a', 'b', 'c'])
 
-	it(`ignore undefined`, () => {
-		expect(validator()).toBeInstanceOf(Function)
-		expect(validator()?.()).toBe(undefined)
-		expect(validator(undefined)).toBeInstanceOf(Function)
-		expect(validator(undefined)?.()).toBe(undefined)
+		it(`don't match if not in list`, () => {
+			expect(validator()).toBe(undefined)
+			expect(validator(null)).toBe(undefined)
+			expect(validator('1')).toBe(undefined)
+		})
+
+		it(`match one of the list`, () => {
+			expect(validator('b')).toBeInstanceOf(Function)
+			expect(validator('b')?.()).toStrictEqual('b')
+		})
 	})
 
-	it(`don't match if not in list`, () => {
-		expect(validator('1' as 'a')).toBe(undefined)
-	})
+	describe('optional', () => {
+		const validator = oneOfVal([undefined, 'a', 'b', 'c'])
 
-	it(`match one of the list`, () => {
-		expect(validator('b' as 'a')).toBeInstanceOf(Function)
-		expect(validator('b' as 'a')?.()).toStrictEqual('b')
+		it(`ignore undefined`, () => {
+			expect(validator()).toBeInstanceOf(Function)
+			expect(validator()?.()).toBe(undefined)
+			expect(validator(undefined)).toBeInstanceOf(Function)
+			expect(validator(undefined)?.()).toBe(undefined)
+		})
+
+		it(`don't match if not in list`, () => {
+			expect(validator('1' as 'a')).toBe(undefined)
+		})
+
+		it(`match one of the list`, () => {
+			expect(validator('b')).toBeInstanceOf(Function)
+			expect(validator('b')?.()).toStrictEqual('b')
+		})
 	})
 })
 

@@ -125,21 +125,36 @@ describe(atLeastOneVal.name, () => {
     });
 });
 describe(oneOfVal.name, () => {
-    const validator = oneOfVal([undefined, 'a', 'b', 'c']);
-    it(`ignore undefined`, () => {
-        var _a, _b;
-        expect(validator()).toBeInstanceOf(Function);
-        expect((_a = validator()) === null || _a === void 0 ? void 0 : _a()).toBe(undefined);
-        expect(validator(undefined)).toBeInstanceOf(Function);
-        expect((_b = validator(undefined)) === null || _b === void 0 ? void 0 : _b()).toBe(undefined);
+    describe('required', () => {
+        const validator = oneOfVal(['undefined', 'a', 'b', 'c']);
+        it(`don't match if not in list`, () => {
+            expect(validator()).toBe(undefined);
+            expect(validator(null)).toBe(undefined);
+            expect(validator('1')).toBe(undefined);
+        });
+        it(`match one of the list`, () => {
+            var _a;
+            expect(validator('b')).toBeInstanceOf(Function);
+            expect((_a = validator('b')) === null || _a === void 0 ? void 0 : _a()).toStrictEqual('b');
+        });
     });
-    it(`don't match if not in list`, () => {
-        expect(validator('1')).toBe(undefined);
-    });
-    it(`match one of the list`, () => {
-        var _a;
-        expect(validator('b')).toBeInstanceOf(Function);
-        expect((_a = validator('b')) === null || _a === void 0 ? void 0 : _a()).toStrictEqual('b');
+    describe('optional', () => {
+        const validator = oneOfVal([undefined, 'a', 'b', 'c']);
+        it(`ignore undefined`, () => {
+            var _a, _b;
+            expect(validator()).toBeInstanceOf(Function);
+            expect((_a = validator()) === null || _a === void 0 ? void 0 : _a()).toBe(undefined);
+            expect(validator(undefined)).toBeInstanceOf(Function);
+            expect((_b = validator(undefined)) === null || _b === void 0 ? void 0 : _b()).toBe(undefined);
+        });
+        it(`don't match if not in list`, () => {
+            expect(validator('1')).toBe(undefined);
+        });
+        it(`match one of the list`, () => {
+            var _a;
+            expect(validator('b')).toBeInstanceOf(Function);
+            expect((_a = validator('b')) === null || _a === void 0 ? void 0 : _a()).toStrictEqual('b');
+        });
     });
 });
 describe(minCountVal.name, () => {
