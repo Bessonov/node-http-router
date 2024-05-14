@@ -47,11 +47,11 @@ export {
 	type OrMatcherResult,
 } from './OrMatcher.js'
 export {
-	type QueryMatch,
-	type QueryResult,
 	queryString,
+	type QueryStringMatch,
 	type QueryStringMatcherInput,
 	type QueryStringMatchResult,
+	type QueryStringResult,
 } from './QueryStringMatcher.js'
 export {
 	regExpPathname,

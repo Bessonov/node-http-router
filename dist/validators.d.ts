@@ -1,5 +1,6 @@
 type Any = any;
-export type AnyValidator = Validator<string[] | undefined, Any>;
+export type FirstValidator<T> = Validator<T, Any>;
+export type ValidatorReturnType<V> = V extends Validator<Any, infer O> ? O : never;
 export type Getter<O> = (() => O) | undefined;
 export type Undefined = undefined | null | void;
 export interface Validator<I, O> {
@@ -24,7 +25,7 @@ export declare function getNthVal<I>(num?: number): Validator<I[] | Undefined, N
 /**
  * Ensures that a string array can be converted to a number array.
  */
-export declare function mapToNumVal<const I extends string[] | Undefined, const O extends I extends string[] ? number[] : undefined>(): Validator<I, NoInfer<O>>;
+export declare function mapToNumVal<const I extends string[] | Undefined, const O extends I extends string[] ? number[] : undefined>(): NoInfer<Validator<I, O>>;
 /**
  * Ensures that a single value can be converted to a number.
  */

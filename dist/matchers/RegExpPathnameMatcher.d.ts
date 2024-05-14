@@ -1,4 +1,4 @@
-import type { AnyValidator, Validator } from '../index.js';
+import type { FirstValidator, ValidatorReturnType } from '../index.js';
 import type { Matcher } from './Matcher.js';
 import type { MatchResult } from './MatchResult.js';
 export interface RegExpPathnameMatcherInput {
@@ -6,21 +6,21 @@ export interface RegExpPathnameMatcherInput {
         url: string;
     };
 }
-export type RegExpMatch = Record<string, AnyValidator>;
-export type RegExpResult<T extends RegExpMatch> = {
+export type RegExpPathnameMatch = Record<string, FirstValidator<string[] | undefined>>;
+export type RegExpPathnameResult<T extends RegExpPathnameMatch> = {
     url: string;
     params: {
-        [P in keyof T]: T[P] extends Validator<string[] | null, infer O> ? O : never;
+        [P in keyof T]: ValidatorReturnType<T[P]>;
     };
 };
-export type RegExpPathnameMatchResult<R extends RegExpMatch> = MatchResult<{
-    pathname: RegExpResult<R>;
+export type RegExpPathnameMatchResult<R extends RegExpPathnameMatch> = MatchResult<{
+    pathname: RegExpPathnameResult<R>;
 }>;
-declare class RegExpPathnameMatcher<R extends RegExpMatch, P extends RegExpPathnameMatcherInput = RegExpPathnameMatcherInput> implements Matcher<RegExpPathnameMatchResult<R>, P> {
+declare class RegExpPathnameMatcher<R extends RegExpPathnameMatch, P extends RegExpPathnameMatcherInput = RegExpPathnameMatcherInput> implements Matcher<RegExpPathnameMatchResult<R>, P> {
     private readonly urls;
     private readonly listConfig;
     constructor(urls: RegExp[], config?: R);
     match({ req }: RegExpPathnameMatcherInput): RegExpPathnameMatchResult<R>;
 }
-export declare function regExpPathname<R extends RegExpMatch, P extends RegExpPathnameMatcherInput = RegExpPathnameMatcherInput>(urls: RegExp[], config?: R): RegExpPathnameMatcher<R, P>;
+export declare function regExpPathname<R extends RegExpPathnameMatch, P extends RegExpPathnameMatcherInput = RegExpPathnameMatcherInput>(urls: RegExp[], config?: R): RegExpPathnameMatcher<R, P>;
 export {};

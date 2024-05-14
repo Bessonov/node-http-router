@@ -4,7 +4,7 @@ import { NodeHttpRouter, } from '../node/NodeHttpRouter.js';
 import { chain, getNthVal, requiredVal, } from '../validators.js';
 /*
 
-Demo how to use router with native node native http server
+Demo how to use router with node's native http server
 
 run with:
 

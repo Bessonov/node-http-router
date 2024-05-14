@@ -1,8 +1,11 @@
 import Url from 'urlite'
 import type {
-	AnyValidator,
-	Validator,
+	FirstValidator,
+	ValidatorReturnType,
 } from '../index.js'
+import type {
+	ObjectToArray,
+} from '../TypeUtils.js'
 import type {
 	Matcher,
 } from './Matcher.js'
@@ -16,24 +19,24 @@ export interface RegExpPathnameMatcherInput {
 	}
 }
 
-export type RegExpMatch = Record<string, AnyValidator>
+export type RegExpPathnameMatch = Record<string, FirstValidator<string[] | undefined>>
 
-export type RegExpResult<T extends RegExpMatch> = {
+export type RegExpPathnameResult<T extends RegExpPathnameMatch> = {
 	url: string
 	params: {
-		[P in keyof T]: T[P] extends Validator<string[] | null, infer O> ? O : never
+		[P in keyof T]: ValidatorReturnType<T[P]>
 	}
 }
 
-export type RegExpPathnameMatchResult<R extends RegExpMatch> = MatchResult<{
-	pathname: RegExpResult<R>
+export type RegExpPathnameMatchResult<R extends RegExpPathnameMatch> = MatchResult<{
+	pathname: RegExpPathnameResult<R>
 }>
 
 class RegExpPathnameMatcher<
-	R extends RegExpMatch,
+	R extends RegExpPathnameMatch,
 	P extends RegExpPathnameMatcherInput = RegExpPathnameMatcherInput,
 > implements Matcher<RegExpPathnameMatchResult<R>, P> {
-	private readonly listConfig: [string, AnyValidator][]
+	private readonly listConfig: ObjectToArray<RegExpPathnameMatch>
 
 	constructor(private readonly urls: RegExp[], config?: R) {
 		this.match = this.match.bind(this)
@@ -86,7 +89,7 @@ class RegExpPathnameMatcher<
 					},
 				} as RegExpPathnameMatchResult<R>
 			}
-			const matchResult = {} as RegExpResult<R>['params']
+			const matchResult = {} as RegExpPathnameResult<R>['params']
 			for (const [key, matcher] of this.listConfig) {
 				const params = extractedValues[key]
 				const getter = matcher(params)
@@ -115,7 +118,7 @@ class RegExpPathnameMatcher<
 }
 
 export function regExpPathname<
-	R extends RegExpMatch,
+	R extends RegExpPathnameMatch,
 	P extends RegExpPathnameMatcherInput = RegExpPathnameMatcherInput,
 >(urls: RegExp[], config?: R): RegExpPathnameMatcher<R, P> {
 	return new RegExpPathnameMatcher(urls, config)

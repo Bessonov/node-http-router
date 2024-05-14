@@ -6,17 +6,17 @@ import {
 	type Method,
 	method,
 	type MethodMatchResult,
-	type QueryMatch,
-	type QueryResult,
 	queryString,
+	type QueryStringMatch,
 	type QueryStringMatcherInput,
 	type QueryStringMatchResult,
+	type QueryStringResult,
 	regExpPathname,
 	type RegExpPathnameMatchResult,
 } from './index.js'
 import type {
-	RegExpMatch,
-	RegExpResult,
+	RegExpPathnameMatch,
+	RegExpPathnameResult,
 } from './RegExpPathnameMatcher.js'
 
 // waiting for
@@ -31,10 +31,10 @@ export interface EndpointMatcherInput {
 	}
 }
 
-export type EndpointMatchResult<R extends RegExpMatch, U extends QueryMatch> = MatchResult<{
+export type EndpointMatchResult<R extends RegExpPathnameMatch, U extends QueryStringMatch> = MatchResult<{
 	method: Method
-	pathname: RegExpResult<R>
-	query: QueryResult<U>
+	pathname: RegExpPathnameResult<R>
+	query: QueryStringResult<U>
 }>
 
 // https://stackoverflow.com/questions/3561493/is-there-a-regexp-escape-function-in-javascript/3561711#3561711
@@ -48,9 +48,9 @@ function escapeRegex(string: string) {
  * with regular expression
  */
 export class EndpointMatcher<
-	R extends RegExpMatch,
+	R extends RegExpPathnameMatch,
 	P extends EndpointMatcherInput = EndpointMatcherInput,
-	U extends QueryMatch = QueryMatch,
+	U extends QueryStringMatch = QueryStringMatch,
 	QP extends QueryStringMatcherInput = QueryStringMatcherInput,
 > implements Matcher<EndpointMatchResult<R, U>, P> {
 	private readonly matcher: AndMatcher<
@@ -108,9 +108,9 @@ export class EndpointMatcher<
 }
 
 export function endpoint<
-	R extends RegExpMatch,
+	R extends RegExpPathnameMatch,
 	P extends EndpointMatcherInput = EndpointMatcherInput,
-	U extends QueryMatch = QueryMatch,
+	U extends QueryStringMatch = QueryStringMatch,
 	QP extends QueryStringMatcherInput = QueryStringMatcherInput,
 >(
 	...args: ConstructorParameters<typeof EndpointMatcher<R, P, U, QP>>

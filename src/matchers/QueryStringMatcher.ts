@@ -1,7 +1,10 @@
 import Url from 'urlite'
 import type {
-	AnyValidator,
-	Validator,
+	ObjectToArray,
+} from '../TypeUtils.js'
+import type {
+	FirstValidator,
+	ValidatorReturnType,
 } from '../validators.js'
 import type {
 	Matcher,
@@ -16,21 +19,21 @@ export interface QueryStringMatcherInput {
 	}
 }
 
-export type QueryMatch = Record<string, AnyValidator>
+export type QueryStringMatch = Record<string, FirstValidator<string[] | undefined>>
 
-export type QueryResult<T extends QueryMatch> = {
-	[P in keyof T]: T[P] extends Validator<string[] | null, infer O> ? O : never
+export type QueryStringResult<T extends QueryStringMatch> = {
+	[P in keyof T]: ValidatorReturnType<T[P]>
 }
 
-export type QueryStringMatchResult<U extends QueryMatch> = MatchResult<{
-	query: QueryResult<U>
+export type QueryStringMatchResult<U extends QueryStringMatch> = MatchResult<{
+	query: QueryStringResult<U>
 }>
 
 class QueryStringMatcher<
-	U extends QueryMatch,
+	U extends QueryStringMatch,
 	P extends QueryStringMatcherInput,
 > implements Matcher<QueryStringMatchResult<U>, P> {
-	private readonly listConfig: [string, AnyValidator][]
+	private readonly listConfig: ObjectToArray<QueryStringMatch>
 
 	constructor(config: U) {
 		this.listConfig = Object.entries(config)
@@ -41,7 +44,7 @@ class QueryStringMatcher<
 		const search = Url.parse(req.url).search ?? ''
 		const queryParams = new URLSearchParams(search)
 
-		const queryResult = {} as QueryResult<U>
+		const queryResult = {} as QueryStringResult<U>
 		for (const [key, matcher] of this.listConfig) {
 			const params = queryParams.has(key) ? queryParams.getAll(key) : undefined
 			const getter = matcher(params)
@@ -64,7 +67,7 @@ class QueryStringMatcher<
 }
 
 export function queryString<
-	U extends QueryMatch,
+	U extends QueryStringMatch,
 	P extends QueryStringMatcherInput,
 >(config: U): QueryStringMatcher<U, P> {
 	return new QueryStringMatcher(config)

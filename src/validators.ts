@@ -1,7 +1,9 @@
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Any = any
 
-export type AnyValidator = Validator<string[] | undefined, Any>
+export type FirstValidator<T> = Validator<T, Any>
+
+export type ValidatorReturnType<V> = V extends Validator<Any, infer O> ? O : never
 
 export type Getter<O> = (() => O) | undefined
 
@@ -69,7 +71,7 @@ export function getNthVal<I>(num: number = 0): Validator<I[] | Undefined, NoInfe
 export function mapToNumVal<
 	const I extends string[] | Undefined,
 	const O extends I extends string[] ? number[] : undefined,
->(): Validator<I, NoInfer<O>> {
+>(): NoInfer<Validator<I, O>> {
 	return (values: string[] | Undefined): Getter<O> => {
 		if (values === undefined || values === null) {
 			return (() => undefined) as Getter<O>
