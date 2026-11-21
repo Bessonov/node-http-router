@@ -1,12 +1,11 @@
 import type { Matcher } from './Matcher.js';
 import type { MatchResult } from './MatchResult.js';
-declare const validMethods: readonly ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"];
 export interface MethodMatcherInput {
     req: {
         method: string;
     };
 }
-export type Method = typeof validMethods[number];
+export type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS';
 export type MethodMatchResult<M extends Method[]> = MatchResult<{
     method: M[number];
 }>;
@@ -19,4 +18,3 @@ export declare class MethodMatcher<M extends Method[], P extends MethodMatcherIn
     match({ req }: MethodMatcherInput): MethodMatchResult<M>;
 }
 export declare function method<M extends Method[], P extends MethodMatcherInput>(methods: M): MethodMatcher<M, P>;
-export {};

@@ -1,4 +1,3 @@
-const validMethods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'];
 /**
  * Match methods
  */

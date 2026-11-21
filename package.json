@@ -29,7 +29,7 @@
 		"start:all": "pnpm run compile:watch || pnpm run test:watch",
 		"test": "pnpm run compile && NODE_OPTIONS='--experimental-vm-modules --no-warnings=ExperimentalWarning' jest --coverage",
 		"test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --coverage --watchAll",
-		"lint": "eslint . --ext .ts,.js,.cjs",
+		"lint": "eslint .",
 		"format": "dprint check",
 		"format:fix": "dprint fmt",
 		"compile": "tsc --build",
@@ -49,40 +49,32 @@
 		"urlite": "3.1.0"
 	},
 	"devDependencies": {
-		"@bessonovs/eslint-config": "0.0.7",
+		"@eslint/js": "9.39.5",
 		"@jest/globals": "29.7.0",
 		"@types/express": "4.17.21",
 		"@types/jest": "29.5.12",
 		"@types/node": "20.12.7",
-		"@typescript-eslint/eslint-plugin": "7.7.0",
-		"@typescript-eslint/parser": "7.7.0",
 		"dprint": "0.45.1",
-		"eslint": "8.56.0",
-		"eslint-config-airbnb": "19.0.4",
-		"eslint-plugin-import": "2.29.1",
-		"eslint-plugin-jsx-a11y": "6.8.0",
-		"eslint-plugin-react": "7.34.1",
+		"eslint": "9.39.5",
+		"eslint-plugin-import": "2.32.0",
+		"globals": "17.14.0",
 		"jest": "29.7.0",
 		"micro": "10.0.1",
 		"node-mocks-http": "1.14.1",
 		"path-to-regexp": "6.2.2",
 		"typescript": "5.4.5",
+		"typescript-eslint": "8.73.0",
 		"ultra-runner": "3.10.5"
 	},
 	"publishConfig": {
 		"access": "public"
 	},
-	"packageManager": "pnpm@8.15.7+sha256.50783dd0fa303852de2dd1557cd4b9f07cb5b018154a6e76d0f40635d6cee019",
-	"pnpm": {
-		"updateConfig": {
-			"ignoreDependencies": [
-				"eslint"
-			]
-		},
-		"peerDependencyRules": {
-			"ignoreMissing": [
-				"eslint-plugin-react-hooks"
-			]
+	"packageManager": "pnpm@12.21.0",
+	"devEngines": {
+		"runtime": {
+			"name": "node",
+			"version": "24.20.0",
+			"onFail": "download"
 		}
 	}
 }

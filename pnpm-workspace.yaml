@@ -1,0 +1,8 @@
+allowBuilds:
+  dprint: false
+
+update:
+  ignoreDeps:
+    # eslint-plugin-import 2.32.0 supports ESLint through v9.
+    - eslint
+    - '@eslint/js'

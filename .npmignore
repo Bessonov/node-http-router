@@ -1,6 +1,5 @@
 coverage/
-.eslintignore
-.eslintrc.cjs
+eslint.config.js
 .git
 .github
 .npmignore

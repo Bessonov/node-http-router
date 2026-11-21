@@ -5,15 +5,19 @@ import type {
 	MatchResult,
 } from './MatchResult.js'
 
-const validMethods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'] as const
-
 export interface MethodMatcherInput {
 	req: {
 		method: string
 	}
 }
 
-export type Method = typeof validMethods[number]
+export type Method =
+	| 'GET'
+	| 'POST'
+	| 'PUT'
+	| 'PATCH'
+	| 'DELETE'
+	| 'OPTIONS'
 
 export type MethodMatchResult<M extends Method[]> = MatchResult<{
 	method: M[number]
