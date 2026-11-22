@@ -84,3 +84,18 @@ it('match second', () => {
 		},
 	})
 })
+
+it.each([
+	['https://catalog.example:8443/books?sort=title#results', '/books'],
+	['https://catalog.example', '/'],
+	['https://catalog.example?next=/books', '/'],
+	['//catalog/books?sort=title', '//catalog/books'],
+	['/books/./part%2Fone', '/books/./part%2Fone'],
+	['/books#summary?sort=title', '/books'],
+	['*', '*'],
+])('matches the original pathname of %s', (url, pathname) => {
+	expect(exactUrlPathname([pathname]).match({ req: { url } })).toStrictEqual({
+		matched: true,
+		result: { pathname },
+	})
+})

@@ -2,7 +2,6 @@ import http from 'http'
 import {
 	bool,
 	endpoint,
-	exactUrlPathname,
 } from '../matchers/index.js'
 import {
 	NodeHttpRouter,
@@ -42,17 +41,8 @@ router.addRoute({
 		},
 	}),
 	handler: ({ data: { res }, match }) => {
-		res.write(`Hello ${match.result.pathname.params.name}!`)
-		res.end()
-	},
-})
-
-router.addRoute({
-	matcher: exactUrlPathname(['/shutdown']),
-	handler: ({ data: { res } }) => {
-		res.write('Shutdown the server')
-		res.end()
-		server.close()
+		res.setHeader('Content-Type', 'text/plain; charset=utf-8')
+		res.end(`Hello ${match.result.pathname.params.name}!`)
 	},
 })
 

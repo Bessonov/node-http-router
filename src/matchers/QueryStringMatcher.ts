@@ -1,4 +1,3 @@
-import Url from 'urlite'
 import type {
 	ObjectToArray,
 } from '../TypeUtils.js'
@@ -12,6 +11,9 @@ import type {
 import type {
 	MatchResult,
 } from './MatchResult.js'
+import {
+	getRequestSearch,
+} from './parseRequestTarget.js'
 
 export interface QueryStringMatcherInput {
 	req: {
@@ -36,31 +38,32 @@ class QueryStringMatcher<
 	private readonly listConfig: ObjectToArray<QueryStringMatch>
 
 	constructor(config: U) {
+		this.match = this.match.bind(this)
 		this.listConfig = Object.entries(config)
 	}
 
-	match = ({ req }: P): QueryStringMatchResult<U> => {
-		// original URL returns '' if search is empty
-		const search = Url.parse(req.url).search ?? ''
-		const queryParams = new URLSearchParams(search)
+	match({ req }: P): QueryStringMatchResult<U> {
+		const search = getRequestSearch(req.url)
+		const queryParams = search === '' ? undefined : new URLSearchParams(search)
 
-		const queryResult = {} as QueryStringResult<U>
+		const entries: [string, unknown][] = []
 		for (const [key, matcher] of this.listConfig) {
-			const params = queryParams.has(key) ? queryParams.getAll(key) : undefined
+			const values = queryParams?.getAll(key)
+			const params = values?.length ? values : undefined
 			const getter = matcher(params)
 			if (getter === undefined) {
 				return {
 					matched: false,
 				}
 			}
-			// @ts-expect-error
-			queryResult[key] = getter(params)
+			const getValue: (values: typeof params) => unknown = getter
+			entries.push([key, getValue(params)])
 		}
 
 		return {
 			matched: true,
 			result: {
-				query: queryResult,
+				query: Object.fromEntries(entries) as QueryStringResult<U>,
 			},
 		}
 	}

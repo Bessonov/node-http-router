@@ -1,13 +1,15 @@
-import Url from 'urlite'
 import type {
 	Matcher,
 } from './Matcher.js'
 import type {
 	MatchResult,
 } from './MatchResult.js'
+import {
+	getRequestSearch,
+} from './parseRequestTarget.js'
 
 /**
- * @deprecated
+ * @deprecated Use `QueryStringMatcherInput` with `queryString`.
  */
 export interface ExactQueryMatcherInput {
 	req: {
@@ -26,7 +28,7 @@ type QueryResult<T> = {
 }
 
 /**
- * @deprecated
+ * @deprecated Use `QueryStringMatchResult`.
  */
 export type ExactQueryMatchResult<U extends QueryMatch> = MatchResult<{
 	query: QueryResult<U>
@@ -39,8 +41,8 @@ export type ExactQueryMatchResult<U extends QueryMatch> = MatchResult<{
  * true: must be present
  * false: must be absent
  * undefined: optional
- * 'some string': must be exact value
- * @deprecated
+ * string[]: must be one of these exact values
+ * @deprecated Use `queryString` with validators to match query parameters.
  */
 export class ExactQueryMatcher<U extends QueryMatch, P extends ExactQueryMatcherInput>
 	implements Matcher<ExactQueryMatchResult<U>, P> {
@@ -51,27 +53,28 @@ export class ExactQueryMatcher<U extends QueryMatch, P extends ExactQueryMatcher
 	}
 
 	match({ req }: P): ExactQueryMatchResult<U> {
-		// original URL returns '' if search is empty
-		const search = Url.parse(req.url).search ?? ''
-
-		// parse query string into dict
-		let params = {} as QueryResult<U>
-		if (search !== '') {
-			params = search.substring(1).split(/&/).reduce((acc, parts) => {
-				const part = parts.split(/=/)
-				const [key, value] = part
-				// @ts-ignore
-				acc[key] = value
-				return acc
-			}, params)
+		const search = getRequestSearch(req.url)
+		const entries: [string, string][] = []
+		for (const part of search.slice(1).split('&')) {
+			if (part === '') {
+				continue
+			}
+			const separator = part.indexOf('=')
+			if (separator === -1) {
+				entries.push([part, ''])
+			} else {
+				entries.push([part.slice(0, separator), part.slice(separator + 1)])
+			}
 		}
+
+		const params = Object.fromEntries(entries)
 
 		// validate query params
 		for (const [key, value] of this.listConfig) {
 			switch (value) {
 				// key must be absent
 				case false:
-					if (key in params) {
+					if (Object.hasOwn(params, key)) {
 						return {
 							matched: false,
 						}
@@ -79,7 +82,7 @@ export class ExactQueryMatcher<U extends QueryMatch, P extends ExactQueryMatcher
 					break
 				// key must be present with any value
 				case true:
-					if (key in params === false) {
+					if (!Object.hasOwn(params, key)) {
 						return {
 							matched: false,
 						}
@@ -90,8 +93,8 @@ export class ExactQueryMatcher<U extends QueryMatch, P extends ExactQueryMatcher
 					break
 				// assume string[] and therefore exact key and value
 				default: {
-					const paramsValue = params[key] as string | undefined
-					if (!paramsValue || value.includes(paramsValue) === false) {
+					const paramsValue = Object.hasOwn(params, key) ? params[key] : undefined
+					if (paramsValue === undefined || !value.includes(paramsValue)) {
 						return {
 							matched: false,
 						}
@@ -104,14 +107,14 @@ export class ExactQueryMatcher<U extends QueryMatch, P extends ExactQueryMatcher
 		return {
 			matched: true,
 			result: {
-				query: params,
+				query: params as QueryResult<U>,
 			},
 		}
 	}
 }
 
 /**
- * @deprecated
+ * @deprecated Use `queryString` with validators to match query parameters.
  */
 export function exactQuery<
 	U extends QueryMatch,

@@ -62,7 +62,7 @@ it('match method', () => {
 	// example of usage, if matcher is defined first
 	const matcher = method(['GET', 'DELETE'])
 
-	const handler: MatchedHandler<typeof matcher> = ({ match }) => {
+	const handler: MatchedHandler<typeof matcher> = function handleMethod({ match }) {
 		if (match.result.method === 'DELETE') {
 			return 'matched DELETE'
 		}
@@ -94,7 +94,7 @@ it('no match for POST route', () => {
 
 it('match POST /test route', () => {
 	// example of usage, if handler is defined first
-	const handler = ({
+	function handler({
 		match,
 	}: {
 		match: Matched<
@@ -103,7 +103,7 @@ it('match POST /test route', () => {
 				ExactUrlPathnameMatchResult<[string]>
 			>
 		>
-	}) => {
+	}) {
 		const [{ result: { method: methodResult } }, { result: { pathname } }] = match.result.and
 		return `matched ${methodResult} ${pathname}`
 	}
@@ -126,13 +126,12 @@ it('match POST /test route', () => {
 
 it('match POST /group/123 endpoint', () => {
 	// define an endpoint
-	const pathUrl = ((pattern: string) => ({
-		pattern: pathToRegexp(pattern),
-		path: compile<{ groupId: number }>(pattern),
-	}))('/group/:groupId')
+	const pattern = '/group/:groupId'
+	const { regexp } = pathToRegexp(pattern)
+	const path = compile(pattern)
 
 	router.addRoute({
-		matcher: endpoint('POST', pathUrl.pattern, {
+		matcher: endpoint('POST', regexp, {
 			url: {
 				1: chain(getNthVal(), requiredVal()),
 			},
@@ -148,7 +147,7 @@ it('match POST /group/123 endpoint', () => {
 
 	const req = createRequest({
 		method: 'POST',
-		url: pathUrl.path({ groupId: 123 }),
+		url: path({ groupId: '123' }),
 	})
 
 	expect(router.exec({ req })).toBe('matched POST for group 123')

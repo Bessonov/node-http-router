@@ -1,10 +1,12 @@
-import Url from 'urlite'
 import type {
 	Matcher,
 } from './Matcher.js'
 import type {
 	MatchResult,
 } from './MatchResult.js'
+import {
+	getRequestPathname,
+} from './parseRequestTarget.js'
 
 export interface ExactUrlPathnameMatcherInput {
 	req: {
@@ -28,9 +30,7 @@ export class ExactUrlPathnameMatcher<
 	}
 
 	match({ req }: P): ExactUrlPathnameMatchResult<U> {
-		/* istanbul ignore else */
-		// original URL returns '/' if pathname is empty
-		const pathname = Url.parse(req.url).pathname ?? '/'
+		const pathname = getRequestPathname(req.url)
 		if (this.urls.indexOf(pathname) >= 0) {
 			return {
 				matched: true,

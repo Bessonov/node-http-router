@@ -1,17 +1,16 @@
-import Url from 'urlite'
 import type {
 	FirstValidator,
 	ValidatorReturnType,
-} from '../index.js'
-import type {
-	ObjectToArray,
-} from '../TypeUtils.js'
+} from '../validators.js'
 import type {
 	Matcher,
 } from './Matcher.js'
 import type {
 	MatchResult,
 } from './MatchResult.js'
+import {
+	getRequestPathname,
+} from './parseRequestTarget.js'
 
 export interface RegExpPathnameMatcherInput {
 	req: {
@@ -36,76 +35,77 @@ class RegExpPathnameMatcher<
 	R extends RegExpPathnameMatch,
 	P extends RegExpPathnameMatcherInput = RegExpPathnameMatcherInput,
 > implements Matcher<RegExpPathnameMatchResult<R>, P> {
-	private readonly listConfig: ObjectToArray<RegExpPathnameMatch>
+	private readonly listConfig: {
+		key: string
+		validator: FirstValidator<string[] | undefined>
+		index: number | undefined
+	}[]
+	private readonly patterns: RegExp[]
 
-	constructor(private readonly urls: RegExp[], config?: R) {
+	constructor(urls: RegExp[], config?: R) {
 		this.match = this.match.bind(this)
-		this.listConfig = Object.entries(config ?? {})
+		this.listConfig = Object.entries(config ?? {}).map(([key, validator]) => ({
+			key,
+			validator,
+			index: /^(?:0|[1-9]\d*)$/.test(key) ? Number(key) : undefined,
+		}))
+		this.patterns = urls.map(function copyPattern(url) {
+			const flags = url.sticky && !url.global ? `${url.flags}g` : url.flags
+			return new RegExp(url.source, flags)
+		})
 	}
 
 	match({ req }: RegExpPathnameMatcherInput): RegExpPathnameMatchResult<R> {
-		// original URL returns '/' if pathname is empty
-		const pathname = Url.parse(req.url).pathname ?? '/'
-		urlLoop: for (const url of this.urls) {
-			const extractedValues: Record<string, string[]> = {}
-			let m: RegExpExecArray | null
-			let matchedUrl: string | undefined
-			let lastIndex = 0
-			// eslint-disable-next-line no-cond-assign
-			while ((m = url.exec(pathname)) !== null) {
-				matchedUrl = m.input
-				const [wholeMatch, matched] = m
-				extractedValues[0] = (extractedValues[0] ?? []).concat(wholeMatch)
-				if (matched !== undefined) {
-					extractedValues[1] = (extractedValues[1] ?? []).concat(matched)
-					for (const [key, value] of Object.entries(m.groups ?? {})) {
-						extractedValues[key] = (extractedValues[key] ?? []).concat(value)
+		const pathname = getRequestPathname(req.url)
+		if (this.listConfig.length === 0) {
+			for (const pattern of this.patterns) {
+				pattern.lastIndex = 0
+				if (pattern.test(pathname)) {
+					return {
+						matched: true,
+						result: { pathname: { url: pathname } },
+					} as RegExpPathnameMatchResult<R>
+				}
+			}
+			return { matched: false }
+		}
+
+		urlLoop: for (const pattern of this.patterns) {
+			// matchAll advances after zero-width matches. A stateless pattern only needs one exec.
+			const matches = pattern.global ? pathname.matchAll(pattern) : [pattern.exec(pathname)]
+			let extractedValues: Record<string, string[]> | undefined
+			for (const match of matches) {
+				if (match === null) {
+					break
+				}
+				extractedValues ??= Object.create(null) as Record<string, string[]>
+				for (const { key, index } of this.listConfig) {
+					const value = index === undefined ? match.groups?.[key] : match.at(index)
+					if (value !== undefined) {
+						extractedValues[key] ??= []
+						extractedValues[key].push(value)
 					}
 				}
-
-				/* istanbul ignore else */
-				if (url.flags.includes('g') === false && url.flags.includes('y') === false) {
-					// the RegExp is stateless without global and sticky flag.
-					// Therefore, we stop the loop to avoid infinity loop
-					break
-				} else if (lastIndex === url.lastIndex) {
-					// avoid inifinity loop with empty match. See the warning in:
-					// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec#finding_successive_matches
-					url.lastIndex = +1
-				}
-				lastIndex = url.lastIndex
 			}
 
-			if (matchedUrl === undefined) {
+			if (extractedValues === undefined) {
 				continue
 			}
-			if (this.listConfig.length === 0) {
-				return {
-					matched: true,
-					result: {
-						pathname: {
-							url: matchedUrl,
-						},
-					},
-				} as RegExpPathnameMatchResult<R>
-			}
-			const matchResult = {} as RegExpPathnameResult<R>['params']
-			for (const [key, matcher] of this.listConfig) {
-				const params = extractedValues[key]
-				const getter = matcher(params)
+			const entries: [string, unknown][] = []
+			for (const { key, validator } of this.listConfig) {
+				const getter = validator(extractedValues[key])
 				if (getter === undefined) {
 					continue urlLoop
 				}
-				// @ts-expect-error
-				matchResult[key] = getter()
+				entries.push([key, getter()])
 			}
 
 			return {
 				matched: true,
 				result: {
 					pathname: {
-						url: matchedUrl,
-						params: matchResult,
+						url: pathname,
+						params: Object.fromEntries(entries) as RegExpPathnameResult<R>['params'],
 					},
 				},
 			}

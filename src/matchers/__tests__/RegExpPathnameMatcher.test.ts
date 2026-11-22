@@ -136,3 +136,60 @@ it(`matched url, but not parameter`, () => {
 		}).matched,
 	).toBe(false)
 })
+
+it('collects matches after an empty match without sharing regex state', () => {
+	const expression = /^|(?<word>[a-z]+)/g
+	expression.lastIndex = 3
+	const matcher = regExpPathname([expression], { 0: requiredVal(), word: requiredVal() })
+	const data = { req: { url: '/books/fiction' } }
+	const expected = {
+		matched: true,
+		result: {
+			pathname: {
+				url: '/books/fiction',
+				params: { 0: ['', 'books', 'fiction'], word: ['books', 'fiction'] },
+			},
+		},
+	}
+	expect(matcher.match(data)).toStrictEqual(expected)
+	expect(matcher.match(data)).toStrictEqual(expected)
+	expect(expression.lastIndex).toBe(3)
+})
+
+it('collects later ordinal and named groups when an optional group is absent', () => {
+	const matcher = regExpPathname([/^\/(draft-)?(?<title>[a-z]+)$/], {
+		2: requiredVal(),
+		title: requiredVal(),
+	})
+	expect(matcher.match({ req: { url: '/books' } })).toStrictEqual({
+		matched: true,
+		result: { pathname: { url: '/books', params: { 2: ['books'], title: ['books'] } } },
+	})
+})
+
+it('treats an unmatched named group as absent for validation', () => {
+	const matcher = regExpPathname([/^\/(books)(?:\/(?<edition>[a-z]+))?$/], {
+		edition: requiredVal(),
+	})
+	expect(matcher.match({ req: { url: '/books' } })).toStrictEqual({ matched: false })
+})
+
+it('tries the next regex when a pattern with validators does not match', () => {
+	const matcher = regExpPathname([/^\/magazines\/(?<title>[^/]+)$/, /^\/books\/(?<title>[^/]+)$/], {
+		title: requiredVal(),
+	})
+	expect(matcher.match({ req: { url: '/books/fiction' } })).toStrictEqual({
+		matched: true,
+		result: { pathname: { url: '/books/fiction', params: { title: ['fiction'] } } },
+	})
+})
+
+it.each(['g', 'y'])('starts each match without validators at the beginning with the %s flag', flag => {
+	const expression = new RegExp('^/books', flag)
+	expression.lastIndex = 3
+	const matcher = regExpPathname([expression])
+	const data = { req: { url: '/books' } }
+	expect(matcher.match(data).matched).toBe(true)
+	expect(matcher.match(data).matched).toBe(true)
+	expect(expression.lastIndex).toBe(3)
+})

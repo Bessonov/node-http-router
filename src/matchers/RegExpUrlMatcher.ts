@@ -1,12 +1,12 @@
 import type {
 	Matcher,
-} from './Matcher'
+} from './Matcher.js'
 import type {
 	MatchResult,
-} from './MatchResult'
+} from './MatchResult.js'
 
 /**
- * @deprecated
+ * @deprecated Use `RegExpPathnameMatcherInput` with `regExpPathname`.
  */
 export interface RegExpUrlMatcherInput {
 	req: {
@@ -15,7 +15,7 @@ export interface RegExpUrlMatcherInput {
 }
 
 /**
- * @deprecated
+ * @deprecated Use `regExpPathname` and access validated captures through `pathname.params`.
  */
 export interface RegExpExecGroupArray<
 	T extends object,
@@ -26,14 +26,14 @@ export interface RegExpExecGroupArray<
 }
 
 /**
- * @deprecated
+ * @deprecated Use `RegExpPathnameMatchResult`.
  */
 export type RegExpUrlMatchResult<R extends object> = MatchResult<{
 	match: RegExpExecGroupArray<R>
 }>
 
 /**
- * @deprecated
+ * @deprecated Use `regExpPathname` for paths and `queryString` for query parameters.
  */
 export class RegExpUrlMatcher<
 	R extends object,
@@ -45,12 +45,12 @@ export class RegExpUrlMatcher<
 
 	match({ req }: RegExpUrlMatcherInput): RegExpUrlMatchResult<R> {
 		for (const url of this.urls) {
-			const result = url.exec(req.url) as never as RegExpExecGroupArray<R>
+			const result = new RegExp(url).exec(req.url)
 			if (result !== null) {
 				return {
 					matched: true,
 					result: {
-						match: result,
+						match: result as unknown as RegExpExecGroupArray<R>,
 					},
 				}
 			}

@@ -1,8 +1,18 @@
 allowBuilds:
+  '@parcel/watcher': false
   dprint: false
+  # Jest's resolver uses platform binaries from its optional dependencies.
+  unrs-resolver: false
+
+overrides:
+  # Keep Jest and its coverage tooling on versions with the fixes for these advisories.
+  'glob@>=9.0.0 <14.0.2': 14.0.2 # GHSA-3g3m-2fjr-6pw4
+  'minimatch@>=7.0.0 <11.0.1': 11.0.9 # GHSA-g3hv-75wg-m249
 
 update:
   ignoreDeps:
     # eslint-plugin-import 2.32.0 supports ESLint through v9.
     - eslint
     - '@eslint/js'
+    # typescript-eslint 8.73.0 supports TypeScript through v6.0.
+    - typescript

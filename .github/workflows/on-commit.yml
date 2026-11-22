@@ -2,17 +2,20 @@ name: On commit hook
 
 on: [push, pull_request]
 
+permissions:
+  contents: read
+
 jobs:
   test:
     name: test
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
-      - name: Setup node
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          # https://github.com/actions/setup-node/issues/32#issuecomment-1003854758
-          node-version-file: '.nvmrc'
-      - run: corepack enable
-      - run: pnpm install
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: package.json
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - run: pnpm install --frozen-lockfile
       - run: pnpm run precommit

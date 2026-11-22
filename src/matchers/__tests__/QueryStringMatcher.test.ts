@@ -175,3 +175,8 @@ describe('PHP-style multi-querystring', () => {
 		})
 	})
 })
+
+it('ignores query-like text inside a fragment', () => {
+	const viewMatcher = queryString({ view: requiredVal() })
+	expect(viewMatcher.match({ req: { url: '/books#chapter?view=summary' } })).toStrictEqual({ matched: false })
+})

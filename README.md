@@ -52,14 +52,23 @@ The router doesn't depend on the native HTTP interfaces like `IncomingMessage` a
 #### Usage with Native Node.js HTTP Server
 
 ```typescript
-const router = new NodeHttpRouter(({ data: { res } }) => send(res, 404))
+import { createServer } from 'node:http'
+import { endpoint, NodeHttpRouter } from '@bessonovs/node-http-router'
 
-const server = http.createServer(router.serve).listen(8080, 'localhost')
+const router = new NodeHttpRouter(function notFound({ data: { res } }) {
+	res.statusCode = 404
+	res.end()
+})
 
 router.addRoute({
-	matcher: exactUrlPathname(['/hello']),
-	handler: () => 'Hello kitty!',
+	matcher: endpoint('GET', '/hello'),
+	handler({ data: { res } }) {
+		res.setHeader('Content-Type', 'application/json')
+		res.end(JSON.stringify({ message: 'Hello kitty!' }))
+	},
 })
+
+createServer(router.serve).listen(8080, 'localhost')
 ```
 
 See the [full example](src/examples/node.ts) and the [native Node.js HTTP server](https://nodejs.org/api/http.html#http_class_http_server) documentation.
@@ -69,19 +78,22 @@ See the [full example](src/examples/node.ts) and the [native Node.js HTTP server
 [Micro](https://github.com/vercel/micro) is a very lightweight layer around the native Node.js HTTP server with some convenience methods.
 
 ```typescript
-import {
-	send,
-	serve,
-} from 'micro'
+import { createServer } from 'node:http'
+import { send, serve } from 'micro'
+import { endpoint, NodeHttpRouter } from '@bessonovs/node-http-router'
 
-const router = new NodeHttpRouter(({ data: { res } }) => send(res, 404))
-
-http.createServer(serve(router.serve)).listen(8080, 'localhost')
+const router = new NodeHttpRouter(function notFound({ data: { res } }) {
+	send(res, 404)
+})
 
 router.addRoute({
-	matcher: exactUrlPathname(['/hello']),
-	handler: () => 'Hello kitty!',
+	matcher: endpoint('GET', '/hello'),
+	handler() {
+		return 'Hello kitty!'
+	},
 })
+
+createServer(serve(router.serve)).listen(8080, 'localhost')
 ```
 
 See the [full example](src/examples/micro.ts).
@@ -156,7 +168,7 @@ router.addRoute({
 #### ExactUrlPathnameMatcher
 ([source](./src/matchers/ExactUrlPathnameMatcher.ts))
 
-Matches the given pathnames:
+Matches the original request pathname, preserving percent escapes, dot segments, and repeated slashes.
 
 ```typescript
 router.addRoute({
@@ -211,7 +223,7 @@ router.addRoute({
 	handler: ({ match: { result: { pathname } } }) => `User id is: ${pathname.params.userId}`,
 })
 ```
-Ordinal parameters can be used too.
+Validators can use named or ordinal capture groups. Global and sticky expressions collect captures from successive matches.
 
 #### EndpointMatcher
 ([source](./src/matchers/EndpointMatcher.ts))
@@ -278,8 +290,7 @@ const cors = CorsMiddleware(async () => {
 const router = new NodeHttpRouter()
 router.addRoute({
 	matcher: method(['OPTIONS', 'POST']),
-	// use it
-	handler: cors(({ match: { result: { method } } }) => `Method: ${method}.`),
+	handler: cors(({ data: { res }, match: { result: { method } } }) => res.end(`Method: ${method}.`)),
 })
 ```
 
@@ -293,14 +304,18 @@ interface CorsMiddlewareOptions {
 	allowMethods?: HttpMethod[]
 	// headers like 'Authorization' or 'X-Requested-With'
 	allowHeaders?: string[]
-	// allows cookies in CORS scenario
+	// allows credentials for explicitly listed origins (defaults to true)
 	allowCredentials?: boolean
-	// max age in seconds
+	// max age in seconds, or 0 to disable preflight caching
 	maxAge?: number
 }
 ```
 
-See ([source](./src/middlewares/CorsMiddleware.ts)) file for defaults.
+Use `origins: ['*']` for public cross-origin access without credentials. Explicitly listed origins take precedence over the wildcard.
+
+The middleware handles preflight requests when `OPTIONS` includes both `Origin` and `Access-Control-Request-Method`. It returns `403` for preflight requests from unlisted origins when no wildcard is configured. Other `OPTIONS` requests reach the wrapped handler.
+
+See the [middleware source](./src/middlewares/CorsMiddleware.ts) for defaults.
 
 #### Create own middleware
 

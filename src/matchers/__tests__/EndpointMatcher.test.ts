@@ -121,7 +121,7 @@ it('usage with QueryStringMatcher', () => {
 
 	expect(matcher.match({
 		req: createRequest<ServerRequest>({
-			url: '/api/user/5?profile=full',
+			url: 'https://api.example/api/user/5?profile=full#results',
 		}),
 	})).toStrictEqual({
 		matched: true,

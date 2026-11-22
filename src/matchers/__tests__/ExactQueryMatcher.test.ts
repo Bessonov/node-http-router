@@ -128,3 +128,20 @@ it('no decoding', () => {
 		},
 	})
 })
+
+it('only recognizes explicitly present query names', () => {
+	const ownKeyMatcher = exactQuery({ toString: true })
+	expect(ownKeyMatcher.match({ req: { url: '/test' } })).toStrictEqual({ matched: false })
+	expect(ownKeyMatcher.match({ req: { url: '/test?toString=label' } })).toStrictEqual({
+		matched: true,
+		result: { query: { toString: 'label' } },
+	})
+})
+
+it('preserves empty values and the full last value for repeated keys', () => {
+	const rawMatcher = exactQuery({ preview: [''], token: ['YQ=='] })
+	expect(rawMatcher.match({ req: { url: '/test?preview&token=Yg==&token=YQ==' } })).toStrictEqual({
+		matched: true,
+		result: { query: { preview: '', token: 'YQ==' } },
+	})
+})

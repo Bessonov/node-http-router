@@ -68,3 +68,11 @@ it('match group', () => {
 		expect(result.result.match.groups.groupId).toBe('123')
 	}
 })
+
+it.each([/^\/test/g, /^\/test/y])('matches every request independently with %s', expression => {
+	const matcher = new RegExpUrlMatcher([expression])
+	const data = { req: { url: '/test' } }
+	expect(matcher.match(data).matched).toBe(true)
+	expect(matcher.match(data).matched).toBe(true)
+	expect(expression.lastIndex).toBe(0)
+})
