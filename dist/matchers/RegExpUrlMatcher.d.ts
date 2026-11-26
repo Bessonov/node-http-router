@@ -1,0 +1,32 @@
+import type { Matcher } from './Matcher.js';
+import type { MatchResult } from './MatchResult.js';
+/**
+ * @deprecated Use `RegExpPathnameMatcherInput` with `regExpPathname`.
+ */
+export interface RegExpUrlMatcherInput {
+    req: {
+        url: string;
+    };
+}
+/**
+ * @deprecated Use `regExpPathname` and access validated captures through `pathname.params`.
+ */
+export interface RegExpExecGroupArray<T extends object> extends Array<string> {
+    index: number;
+    input: string;
+    groups: T;
+}
+/**
+ * @deprecated Use `RegExpPathnameMatchResult`.
+ */
+export type RegExpUrlMatchResult<R extends object> = MatchResult<{
+    match: RegExpExecGroupArray<R>;
+}>;
+/**
+ * @deprecated Use `regExpPathname` for paths and `queryString` for query parameters.
+ */
+export declare class RegExpUrlMatcher<R extends object, P extends RegExpUrlMatcherInput = RegExpUrlMatcherInput> implements Matcher<RegExpUrlMatchResult<R>, P> {
+    private readonly urls;
+    constructor(urls: RegExp[]);
+    match({ req }: RegExpUrlMatcherInput): RegExpUrlMatchResult<R>;
+}
